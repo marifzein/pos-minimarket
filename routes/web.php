@@ -1,132 +1,226 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+
+/*
+|--------------------------------------------------------------------------
+| Redirect Root
+|--------------------------------------------------------------------------
+*/
 
 
-Route::get('/', function () {
-    return redirect('/dashboard');
-});
 
-// buka hal POS
-Route::get('/pos', [PosController::class, 'index']);
 
-Route::get('/api/products/search', [
-    ProductController::class,
-    'search'
-]);
+/*
+|--------------------------------------------------------------------------
+| Semua menu POS harus login
+|--------------------------------------------------------------------------
+*/
 
-// save transaksi/nota
-Route::post(
-    '/api/transactions',
-    [TransactionController::class, 'store']
-);
+Route::redirect('/', '/login');
 
-// daftar nota/transaksi
-Route::get(
-    '/transactions',
-    [TransactionController::class, 'index']
-);  
+Route::middleware('auth')->group(function () {
 
-// tampilkan nota detail
-Route::get(
-    '/transactions/{id}',
-    [TransactionController::class, 'show']
-)->name('transactions.show');
-
-// cetak struk
-Route::get(
-    '/transactions/{id}/print',
-    [TransactionController::class, 'print']
-)->name('transactions.print');
-
-// cek jam hrs sesuai dgn WIB
-Route::get('/cekjam', function () {
-
-    return [
-        'now_string' => now()->format('Y-m-d H:i:s'),
-        'php' => date('Y-m-d H:i:s'),
-        'timezone' => config('app.timezone')
-    ];
-
-});
-
-// dashboard
-Route::get(
+    // Dashboard
+    Route::get(
     '/dashboard',
-    [DashboardController::class, 'index']
-);
+    [DashboardController::class,'index']
+        )->name('dashboard');
 
-// ploduk2 dalam negeli
-Route::get(
-    '/products',
-    [ProductController::class, 'index']
-);
+    //MODUL2 ROLE ADMIN 
+    Route::middleware('role:Admin')->group(function () {
 
-// form tambah produk
-Route::get(
-    '/products/create',
-    [ProductController::class, 'create']
-);
+        // Produk
+        Route::get(
+            '/products',
+            [ProductController::class,'index']
+        );
 
-// simpan produk
-Route::post(
-    '/products',
-    [ProductController::class, 'store']
-);
+        Route::get(
+            '/products/create',
+            [ProductController::class,'create']
+        );
 
-// halaman edit produk
-Route::get(
-    '/products/{product}/edit',
-    [ProductController::class, 'edit']
-);
+        Route::post(
+            '/products',
+            [ProductController::class,'store']
+        );
 
-//update produk
-Route::put(
-    '/products/{product}',
-    [ProductController::class, 'update']
-);
+        Route::get(
+            '/products/{product}/edit',
+            [ProductController::class,'edit']
+        );
 
-// kartu stok
-Route::get(
-    '/products/{product}/stock-card',
-    [ProductController::class, 'stockCard']
-);
+        Route::put(
+            '/products/{product}',
+            [ProductController::class,'update']
+        );
 
-// ===============================
-// STOCK OPNAME
-// ===============================
+        Route::get(
+            '/products/{product}/stock-card',
+            [ProductController::class,'stockCard']
+        );
 
-// daftar SO
-Route::get(
-    '/stock-opname',
-    [StockOpnameController::class,'index']
-);
+        /*
+        |--------------------------------------------------------------------------
+        | USER MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
 
-// mulai SO baru
-Route::post(
-    '/stock-opname/start',
-    [StockOpnameController::class,'start']
-);
+        Route::get(
+            '/users',
+            [UserController::class,'index']
+        )->name('users.index');
 
-// halaman detail SO
-Route::get(
-    '/stock-opname/{stockOpname}',
-    [StockOpnameController::class,'show']
-);
+        Route::get(
+            '/users/create',
+            [UserController::class,'create']
+        )->name('users.create');
 
-// scan / simpan item
-Route::post(
-    '/stock-opname/{stockOpname}',
-    [StockOpnameController::class,'store']
-);
+        Route::post(
+            '/users',
+            [UserController::class,'store']
+        )->name('users.store');
 
-// posting selesai
-Route::post(
-    '/stock-opname/{stockOpname}/finish',
-    [StockOpnameController::class,'finish']
-);
+        Route::get(
+            '/users/{user}/edit',
+            [UserController::class,'edit']
+        )->name('users.edit');
+
+        Route::put(
+            '/users/{user}',
+            [UserController::class,'update']
+        )->name('users.update');
+
+        Route::post(
+            '/users/{user}/reset-password',
+            [UserController::class,'resetPassword']
+        )->name('users.reset-password');
+
+        // user end----------------------------------------------
+
+    });
+
+    // POS
+    Route::get(
+        '/pos',
+        [PosController::class,'index']
+    );
+
+    // Search produk
+    Route::get(
+        '/api/products/search',
+        [ProductController::class,'search']
+    );
+
+    // Simpan transaksi
+    Route::post(
+        '/api/transactions',
+        [TransactionController::class,'store']
+    );
+
+    // Daftar transaksi
+    Route::get(
+        '/transactions',
+        [TransactionController::class,'index']
+    );
+
+    // Detail transaksi
+    Route::get(
+        '/transactions/{id}',
+        [TransactionController::class,'show']
+    )->name('transactions.show');
+
+    // Print transaksi
+    Route::get(
+        '/transactions/{id}/print',
+        [TransactionController::class,'print']
+    )->name('transactions.print');
+
+    // Cek Jam
+    Route::get('/cekjam', function () {
+
+        return [
+            'now_string'=>now()->format('Y-m-d H:i:s'),
+            'php'=>date('Y-m-d H:i:s'),
+            'timezone'=>config('app.timezone')
+        ];
+
+    });
+
+    
+    /*
+    |--------------------------------------------------------------------------
+    | STOCK OPNAME
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/stock-opname',
+        [StockOpnameController::class,'index']
+    );
+
+    Route::post(
+        '/stock-opname/start',
+        [StockOpnameController::class,'start']
+    );
+
+    Route::get(
+        '/stock-opname/{stockOpname}',
+        [StockOpnameController::class,'show']
+    );
+
+    Route::post(
+        '/stock-opname/{stockOpname}',
+        [StockOpnameController::class,'store']
+    );
+
+    Route::post(
+        '/stock-opname/{stockOpname}/finish',
+        [StockOpnameController::class,'finish']
+    );
+
+    // cetak SO
+    Route::get(
+        '/stock-opname/{stockOpname}/print',
+        [StockOpnameController::class,'print']
+    )->name('stock-opname.print');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile (Breeze)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/profile',
+        [ProfileController::class,'edit']
+    )->name('profile.edit');
+
+    Route::patch(
+        '/profile',
+        [ProfileController::class,'update']
+    )->name('profile.update');
+
+    Route::delete(
+        '/profile',
+        [ProfileController::class,'destroy']
+    )->name('profile.destroy');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Login Register Logout
+|--------------------------------------------------------------------------
+*/
+
+require __DIR__.'/auth.php';

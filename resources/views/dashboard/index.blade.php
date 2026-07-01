@@ -10,85 +10,109 @@
     Dashboard
 </h2>
 
-    <div
-        class="grid grid-cols-1 md:grid-cols-4 gap-4"
-    >
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
 
-        <div
-            class="bg-white p-5 rounded-xl shadow"
-        >
+        <div class="bg-green-500 text-white rounded-xl shadow p-5">
 
-            <div
-                class="text-gray-500"
-            >
+            <div class="text-sm opacity-80">
+
                 Penjualan Hari Ini
+
             </div>
 
-            <div
-                class="text-2xl font-bold"
-            >
+            <div class="text-3xl font-bold mt-2">
+
                 Rp {{ number_format($todaySales,0,',','.') }}
+
             </div>
 
         </div>
 
-        <div
-            class="bg-white p-5 rounded-xl shadow"
-        >
+        <div class="bg-blue-500 text-white rounded-xl shadow p-5">
 
-            <div
-                class="text-gray-500"
-            >
-                Transaksi Hari Ini
+            <div class="text-sm opacity-80">
+
+                Transaksi
+
             </div>
 
-            <div
-                class="text-2xl font-bold"
-            >
+            <div class="text-3xl font-bold mt-2">
+
                 {{ $todayTransactions }}
+
             </div>
 
         </div>
 
-        <div
-            class="bg-white p-5 rounded-xl shadow"
-        >
+        <div class="bg-orange-500 text-white rounded-xl shadow p-5">
 
-            <div
-                class="text-gray-500"
-            >
-                Total Produk
+            <div class="text-sm opacity-80">
+
+                Produk
+
             </div>
 
-            <div
-                class="text-2xl font-bold"
-            >
+            <div class="text-3xl font-bold mt-2">
+
                 {{ $totalProducts }}
+
             </div>
 
         </div>
 
-        <div
-            class="bg-white p-5 rounded-xl shadow"
-        >
+        <div class="bg-purple-500 text-white rounded-xl shadow p-5">
 
-            <div
-                class="text-gray-500"
-            >
-                Total Stok
+            <div class="text-sm opacity-80">
+
+                Total Stock
+
             </div>
 
-            <div
-                class="text-2xl font-bold"
-            >
+            <div class="text-3xl font-bold mt-2">
+
                 {{ number_format($totalStock) }}
+
+            </div>
+
+        </div>
+
+        <div class="bg-indigo-500 text-white rounded-xl shadow p-5">
+
+            <div class="text-sm opacity-80">
+
+                SO Terakhir
+
+            </div>
+
+            <div class="font-bold text-lg mt-2">
+
+                {{ $lastOpname?->opname_no ?? '-' }}
+
+            </div>
+
+            <div class="text-sm">
+
+                {{ $lastOpname?->status ?? '' }}
+
             </div>
 
         </div>
     </div>
+
+
+    <div class="bg-white rounded-xl shadow p-5 mt-6">
+        <h3 class="font-bold mb-4">
+            Penjualan 7 Hari Terakhir
+        </h3>
+        <canvas id="salesChart"></canvas>
+    </div>
+
     
     <!-- tambahan -->
      <div class="grid md:grid-cols-3 gap-4 mt-6">
+        
+        
+
     
         <div class="bg-white rounded-xl shadow p-4 min-h-[350px]">
 
@@ -106,8 +130,13 @@
                         {{ $item->nama_barang }}
                     </td>
 
-                    <td class="text-right text-red-600 font-bold">
+                    {{-- <td class="text-right text-red-600 font-bold">
                         {{ $item->stok }}
+                    </td> --}}
+                    <td class="text-right">
+                        <span class="bg-red-100 text-red-700 px-2 py-1 rounded">
+                            {{ $item->stok }}
+                        </span>
                     </td>
 
                 </tr>
@@ -141,8 +170,24 @@
 
                     <tr class="border-b">
 
-                        <td class="py-2">
+                        {{-- <td class="py-2">
                             {{ $trx->no_nota }}
+                        </td> --}}
+
+                        <td class="py-2">
+
+                            <div class="font-semibold">
+
+                            {{ $trx->no_nota }}
+
+                            </div>
+
+                            <div class="text-xs text-gray-500">
+
+                            {{ $trx->created_at->format('H:i') }}
+
+                            </div>
+
                         </td>
 
                         <td class="text-right">
@@ -178,11 +223,16 @@
 
                 @forelse($topProducts as $item)
 
+                {{-- @php
+                $rank = $loop->iteration;
+                @endphp --}}
+
                 <tr class="border-b">
 
                     <td class="py-2">
                         {{ $item->nama_barang }}
                     </td>
+                    
 
                     <td class="text-right font-bold">
 
@@ -212,6 +262,70 @@
 
         </div>
 
+        
+
     </div>
+
+@push('scripts')
+
+    <script>
+
+        const ctx =
+        document
+        .getElementById('salesChart');
+
+        new Chart(ctx,{
+
+            type:'line',
+
+            data:{
+
+                labels:[
+                    @foreach($salesChart as $row)
+                        "{{ $row['tanggal'] }}",
+                    @endforeach
+                ],
+
+                datasets:[{
+
+                    label:'Penjualan',
+
+                    data:[
+                        @foreach($salesChart as $row)
+                            {{ $row['total'] }},
+                        @endforeach
+                    ],
+
+                    borderWidth:3,
+
+                    fill:false,
+
+                    tension:.3
+
+                }]
+
+            },
+
+            options:{
+
+                responsive:true,
+
+                plugins:{
+
+                    legend:{
+
+                        display:false
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+@endpush
 
 @endsection

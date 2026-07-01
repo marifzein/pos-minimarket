@@ -1,147 +1,201 @@
 @extends('layouts.app')
 
-@section('title','Stock Opname')
+@section('title','History Stock Opname')
 
 @section('content')
-
-@if(session('success'))
-<div class="mb-4 p-3 rounded bg-green-100 text-green-700">
-    {{ session('success') }}
-</div>
-@endif
 
 <div class="flex justify-between items-center mb-6">
 
     <h2 class="text-2xl font-bold">
-        Stock Opname
+
+        History Stock Opname
+
     </h2>
 
     <form
         method="POST"
         action="/stock-opname/start"
     >
+
         @csrf
 
         <button
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg"
         >
+
             + Mulai Stock Opname
+
         </button>
 
     </form>
 
 </div>
 
+@if(session('success'))
 
-<div class="bg-white rounded-xl shadow">
+<div class="mb-4 p-3 rounded bg-green-100 text-green-700">
 
-    <table class="w-full">
+{{ session('success') }}
 
-        <thead class="bg-gray-100">
+</div>
 
-            <tr>
+@endif
 
-                <th class="p-3 text-left">
-                    No SO
-                </th>
+@if(session('warning'))
 
-                <th class="text-left">
-                    Tanggal
-                </th>
+<div class="mb-4 p-3 rounded bg-yellow-100 text-yellow-700">
 
-                <th class="text-center">
-                    Status
-                </th>
+{{ session('warning') }}
 
-                <th class="text-center">
-                    Item
-                </th>
+</div>
 
-                <th class="text-center">
-                    Aksi
-                </th>
+@endif
 
-            </tr>
+<div class="bg-white rounded-xl shadow overflow-hidden">
 
-        </thead>
+<table class="w-full">
 
-        <tbody>
+<thead class="bg-gray-100">
 
-        @forelse($opnames as $opname)
+<tr>
 
-            <tr class="border-t">
+<th class="p-3 text-left">
 
-                <td class="p-3">
+No SO
 
-                    {{ $opname->opname_no }}
+</th>
 
-                </td>
+<th>
 
-                <td>
+Tanggal
 
-                    {{ \Carbon\Carbon::parse($opname->opname_date)->format('d-m-Y') }}
+</th>
 
-                </td>
+<th>
 
-                <td class="text-center">
+Status
 
-                    @if($opname->status=='OPEN')
+</th>
 
-                        <span class="text-orange-600 font-semibold">
-                            OPEN
-                        </span>
+<th>
 
-                    @else
+Item
 
-                        <span class="text-green-600 font-semibold">
-                            POSTED
-                        </span>
+</th>
 
-                    @endif
+<th>
 
-                </td>
+Operator
 
-                <td class="text-center">
+</th>
 
-                    {{ $opname->details_count }}
+<th>
 
-                </td>
+Aksi
 
-                <td class="text-center">
+</th>
 
-                    <a
-                        href="/stock-opname/{{ $opname->id }}"
-                        class="text-indigo-600 hover:underline"
-                    >
+</tr>
 
-                        {{ $opname->status=='OPEN' ? 'Lanjutkan' : 'Detail' }}
+</thead>
 
-                    </a>
+<tbody>
 
-                </td>
+@forelse($opnames as $so)
 
-            </tr>
+<tr class="border-t hover:bg-gray-50">
 
-        @empty
+<td class="p-3">
 
-            <tr>
+{{ $so->opname_no }}
 
-                <td
-                    colspan="5"
-                    class="text-center py-10 text-gray-500"
-                >
+</td>
 
-                    Belum ada Stock Opname.
+<td>
 
-                </td>
+{{ \Carbon\Carbon::parse($so->opname_date)->format('d-m-Y H:i') }}
 
-            </tr>
+</td>
 
-        @endforelse
+<td>
 
-        </tbody>
+@if($so->status=='OPEN')
 
-    </table>
+<span
+class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded"
+>
+
+OPEN
+
+</span>
+
+@else
+
+<span
+class="px-2 py-1 bg-green-100 text-green-700 rounded"
+>
+
+POSTED
+
+</span>
+
+@endif
+
+</td>
+
+<td class="text-center">
+
+{{ $so->details_count }}
+
+</td>
+
+<td>
+
+{{ $so->user_name }}
+
+</td>
+
+<td>
+
+<a
+href="/stock-opname/{{ $so->id }}"
+class="text-indigo-600 hover:underline"
+>
+
+Detail
+
+</a>
+
+</td>
+
+</tr>
+
+@empty
+
+<tr>
+
+<td
+colspan="6"
+class="text-center py-8 text-gray-500"
+>
+
+Belum ada data Stock Opname.
+
+</td>
+
+</tr>
+
+@endforelse
+
+</tbody>
+
+</table>
+
+<div class="p-4">
+
+{{ $opnames->links() }}
+
+</div>
 
 </div>
 

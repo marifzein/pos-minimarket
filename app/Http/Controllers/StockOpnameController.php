@@ -30,7 +30,8 @@ class StockOpnameController extends Controller
             'details'
         )
         ->latest()
-        ->get();
+        ->paginate(10);
+        // ->get();
 
         return view(
             'stock-opname.index',
@@ -314,6 +315,24 @@ class StockOpnameController extends Controller
 
             'Stock Opname berhasil diposting.'
 
+        );
+    }
+
+    public function print(
+        StockOpname $stockOpname
+    )
+    {
+        $details = $stockOpname
+            ->details()
+            ->with('product')
+            ->get();
+
+        return view(
+            'stock-opname.print',
+            compact(
+                'stockOpname',
+                'details'
+            )
         );
     }
 }

@@ -396,10 +396,10 @@
         
     </form>
     {{-- jika SO blm diclosing/diposting --}}
-    @if($stockOpname->status=='OPEN')
+    
 
-    <div class="mt-6">
-
+    <div class="mt-6 flex gap-3">
+    @if($stockOpname->status=='OPEN')    
     <form
         id="formFinishSO"
         method="POST"
@@ -417,12 +417,31 @@
 
     </button>
 
+    
+
     </form>
+    @endif
+    {{-- jika SO blm diclosing/diposting end--}}
+
+
+    {{-- button cetak --}}
+    <a
+    href="/stock-opname/{{ $stockOpname->id }}/print"
+    target="_blank"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg "
+    >
+
+    Cetak
+
+    </a>
+    {{-- button cetak end --}}
 
     </div>
 
-    @endif
-    {{-- jika SO blm diclosing/diposting end--}}
+    
+
+    
+
 </div>
 <script>
 
