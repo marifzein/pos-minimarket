@@ -24,6 +24,11 @@
         'resources/js/app.js'
     ])
 
+    <link
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
+        rel="stylesheet"
+    />
+
     <script defer
         src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js">
     </script>
@@ -32,105 +37,119 @@
 
 </head>
 
-<body class="bg-slate-100">
 
-    {{-- HEADER --}}
-    <div class="bg-white shadow border-b">
+<body class="bg-slate-100 text-slate-800">
 
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+<div class="flex h-screen">
 
-            <h1 class="text-2xl font-bold">
+    {{-- Sidebar --}}
+    @include('layouts.partials.sidebar')
 
-                POS Minimarket
+    {{-- Content --}}
+    <div class="flex-1 flex flex-col bg-slate-100">
 
-            </h1>
+    @include('layouts.partials.topbar')
 
-            @auth
+    <main class="flex-1 overflow-y-auto">
 
-            <div
-                class="flex items-center gap-4"
-            >
+        <div class="p-8">
 
-                <span
-                    class="text-gray-700"
-                >
+            <div class="rounded-2xl">
 
-                    {{ auth()->user()->name }}
-
-                </span>
-
-                <form
-                    method="POST"
-                    action="{{ route('logout') }}"
-                >
-
-                    @csrf
-
-                    <button
-                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-
-                        Logout
-
-                    </button>
-
-                </form>
-
-            </div>
-
-            @endauth
-
-        </div>
-
-    </div>
-
-    {{-- NAVBAR --}}
-    <div class="bg-indigo-600 text-white">
-
-        <div class="max-w-7xl mx-auto px-6">
-
-            <div class="flex gap-6 py-3">
-
-                <a href="/dashboard">
-                    Dashboard
-                </a>
-
-                <a href="/pos">
-                    POS
-                </a>
-
-                <a href="/transactions">
-                    Transaksi
-                </a>
-
-                <a href="/products">
-                    Produk
-                </a>
-
-                <a href="/stock-opname">
-                    Stock Opname
-                </a>
-
-                <a href="/users">
-                    Master User
-                </a>
+                @yield('content')
 
             </div>
 
         </div>
 
-    </div>
+    </main>
 
-    {{-- CONTENT --}}
-    <div
-        class="max-w-7xl mx-auto p-6"
-    >
+</div>
 
-        @yield('content')
+</div>
 
-    </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+{{-- pesan2 sesuai status transaksi success,error dsb --}}
+    @if(session('success'))
+
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        Swal.fire({
+
+            icon: 'success',
+
+            title: 'Sukses',
+
+            text: @json(session('success')),
+
+            timer: 2200,
+
+            showConfirmButton: false,
+
+            confirmButtonColor: '#4F46E5'
+
+        });
+
+    });
+
+    </script>
+
+    @endif
+
+
+    @if(session('error'))
+
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        Swal.fire({
+
+            icon: 'error',
+
+            title: 'Terjadi Kesalahan',
+
+            text: @json(session('error')),
+
+            confirmButtonColor: '#DC2626'
+
+        });
+
+    });
+
+    </script>
+
+    @endif
+
+
+    @if(session('warning'))
+
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        Swal.fire({
+
+            icon: 'warning',
+
+            title: 'Perhatian',
+
+            text: @json(session('warning')),
+
+            confirmButtonColor: '#F59E0B'
+
+        });
+
+    });
+
+    </script>
+
+    @endif
+{{--pesan2 end --}}
 
 @stack('scripts')
 </body>

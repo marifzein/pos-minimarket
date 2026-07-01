@@ -6,194 +6,231 @@
 
 @if(session('success'))
 
-<div class="mb-4 p-3 rounded bg-green-100 text-green-700">
+<x-alert>
 
     {{ session('success') }}
 
-</div>
+</x-alert>
 
 @endif
 
-<div class="flex justify-between items-center mb-6">
+<x-page-header
 
-    <h2 class="text-2xl font-bold">
+    title="Manajemen User"
 
-        Manajemen User
+    subtitle="Kelola akun pengguna sistem"
 
-    </h2>
+>
 
-    <a
-        href="/users/create"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg"
-    >
+    <x-slot:action>
 
-        + Tambah User
+        <a href="/users/create">
 
-    </a>
+            <x-button>
 
-</div>
+                <i class="ri-user-add-line"></i>
 
-<div class="bg-white rounded-xl shadow">
+                Tambah User
 
-    <table class="w-full">
+            </x-button>
 
-        <thead class="bg-gray-100">
+        </a>
+
+    </x-slot:action>
+
+</x-page-header>
+
+<x-card :padding="false">
+
+    <x-table>
+
+        <x-table-header>
 
             <tr>
 
-                <th class="p-3 text-left">
+                <x-table-head>
 
                     Nama
 
-                </th>
+                </x-table-head>
 
-                <th class="p-3 text-left">
+                <x-table-head>
 
                     Email
 
-                </th>
+                </x-table-head>
 
-                <th class="p-3 text-center">
+                <x-table-head class="text-center">
 
                     Role
 
-                </th>
+                </x-table-head>
 
-                <th class="p-3 text-center">
+                <x-table-head class="text-center">
 
                     Dibuat
 
-                </th>
+                </x-table-head>
 
-                <th class="p-3 text-center">
+                <x-table-head class="text-center">
 
                     Status
 
-                </th>
+                </x-table-head>
 
-                <th class="p-3 text-center">
+                <x-table-head class="text-center">
 
                     Aksi
 
-                </th>
+                </x-table-head>
 
             </tr>
 
-        </thead>
+        </x-table-header>
 
-        <tbody>
+        <x-table-body>
 
         @forelse($users as $user)
 
-        <tr class="border-t hover:bg-gray-50">
+            <x-table-row>
 
-            <td class="p-3">
+                <x-table-cell>
 
-                {{ $user->name }}
+                    <div class="font-medium text-slate-800">
 
-            </td>
+                        {{ $user->name }}
 
-            <td class="p-3">
+                    </div>
 
-                {{ $user->email }}
+                </x-table-cell>
 
-            </td>
+                <x-table-cell>
 
-            <td class="p-3 text-center">
+                    {{ $user->email }}
 
-                @if($user->role=='Admin')
+                </x-table-cell>
 
-                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">
+                <x-table-cell class="text-center">
 
-                        Admin
+                    @if($user->role=='Admin')
 
-                    </span>
+                        <x-badge color="red">
 
-                @elseif($user->role=='Supervisor')
+                            Admin
 
-                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                        </x-badge>
 
-                        Supervisor
+                    @elseif($user->role=='Supervisor')
 
-                    </span>
+                        <x-badge color="yellow">
 
-                @else
+                            Supervisor
 
-                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                        </x-badge>
 
-                        Kasir
+                    @else
 
-                    </span>
+                        <x-badge color="green">
 
-                @endif
+                            Kasir
 
-            </td>
+                        </x-badge>
 
-            <td class="p-3 text-center">
+                    @endif
 
-                {{ $user->created_at->format('d-m-Y') }}
+                </x-table-cell>
 
-            </td>
+                <x-table-cell class="text-center">
 
-            {{-- status --}}
-            <td class="p-3 text-center">
-            @if($user->is_active)
+                    {{ $user->created_at->format('d-m-Y') }}
 
-              <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                </x-table-cell>
 
-              Aktif
+                <x-table-cell class="text-center">
 
-              </span>
+                    @if($user->is_active)
 
-            @else
+                        <x-badge color="green">
 
-              <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            Aktif
 
-              Nonaktif
+                        </x-badge>
 
-              </span>
+                    @else
 
-            @endif
-            </td>
-            {{-- status end --}}
+                        <x-badge>
 
-            <td class="p-3 text-center">
+                            Nonaktif
 
-                <a
-                    href="/users/{{ $user->id }}/edit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                >
+                        </x-badge>
 
-                    Edit
+                    @endif
 
-                </a>
+                </x-table-cell>
 
-            </td>
+                <x-table-cell class="text-center">
 
-        </tr>
+                    <a href="/users/{{ $user->id }}/edit">
+
+                        <x-button
+
+                            color="blue"
+
+                            size="sm"
+
+                        >
+
+                            <i class="ri-edit-line"></i>
+
+                            Edit
+
+                        </x-button>
+
+                    </a>
+
+                </x-table-cell>
+
+            </x-table-row>
 
         @empty
 
-        <tr>
+            <tr>
 
-            <td
-                colspan="5"
-                class="text-center text-gray-500 py-6"
-            >
+                <td colspan="6">
 
-                Belum ada user.
+                    <x-empty-state
 
-            </td>
+                        title="Belum ada User"
 
-        </tr>
+                        description="Silakan tambahkan user pertama."
+
+                    >
+
+                        <a href="/users/create">
+
+                            <x-button>
+
+                                <i class="ri-user-add-line"></i>
+
+                                Tambah User
+
+                            </x-button>
+
+                        </a>
+
+                    </x-empty-state>
+
+                </td>
+
+            </tr>
 
         @endforelse
 
-        </tbody>
+        </x-table-body>
 
-    </table>
+    </x-table>
 
-</div>
+</x-card>
 
 <div class="mt-6">
 

@@ -1,135 +1,263 @@
 @extends('layouts.app')
 
-@section('title','Produk')
+@section('title','Master Produk')
 
 @section('content')
 
-<div class="flex justify-between mb-4">
+<x-page-header
 
-    <h2 class="text-2xl font-bold">
-        Master Produk
-    </h2>
+    title="Master Produk"
 
-    <a
-        href="/products/create"
-        class="bg-indigo-600 text-white px-4 py-2 rounded"
-    >
-        + Tambah Produk
-    </a>
+    subtitle="Kelola seluruh data produk minimarket"
 
-</div>
-
-<div
-    class="bg-white rounded-xl shadow"
 >
 
-    <table class="w-full">
+    <x-slot:action>
 
-        <thead>
+        <a href="/products/create">
 
-        <tr
-            class="bg-slate-100"
-        >
+            <x-button color="primary">
 
-            <th class="p-3 text-left">
-                Kode
-            </th>
+                <i class="ri-add-line"></i>
 
-            <th class="p-3 text-left">
-                Nama Barang
-            </th>
+                Tambah Produk
 
-            <th class="p-3 text-right">
-                Harga
-            </th>
+            </x-button>
 
-            <th class="p-3 text-right">
-                Stok
-            </th>
+        </a>
 
-            <th class="p-3 text-center">
-                Aksi
-            </th>
+    </x-slot:action>
 
-        </tr>
+</x-page-header>
 
-        </thead>
+
+<x-card>
+
+    {{-- Toolbar --}}
+    <div class="flex justify-between items-center mb-6">
+
+        <div class="relative w-80">
+
+            <i
+                class="ri-search-line
+                absolute left-4 top-1/2
+                -translate-y-1/2
+                text-slate-400"
+            ></i>
+
+            <input
+
+                type="text"
+
+                placeholder="Cari produk..."
+
+                class="w-full
+                rounded-xl
+                border
+                border-slate-300
+                pl-11
+                pr-4
+                py-3
+                focus:border-indigo-500
+                focus:ring-4
+                focus:ring-indigo-100"
+
+            >
+
+        </div>
+
+    </div>
+
+
+    <x-table >
+
+        {{-- <thead> --}}
+        <x-table-header >
+
+            <tr>
+                 
+                {{-- <th class="text-left  py-4 px-3">Produk</th> --}}
+                <x-table-head class="text-left">Produk</x-table-head>
+                <x-table-head class="text-left">Barcode</x-table-head>
+                <x-table-head class="text-right">Harga</x-table-head>
+                <x-table-head class="text-right">Stock</x-table-head>
+                <x-table-head class="text-center">Status</x-table-head>
+                <x-table-head class="text-center">Aksi</x-table-head>
+
+                {{-- <th class="text-left  py-4">Barcode</th> --}}
+
+                {{-- <th class="text-right  py-4">Harga</th> --}}
+
+                {{-- <th class="text-right  py-4">Stock</th> --}}
+
+                {{-- <th class="text-center  py-4">Status</th>
+
+                <th class="text-center  py-4">Aksi</th> --}}
+
+            </tr>
+        </x-table-header >    
+        {{-- </thead> --}}
 
         <tbody>
 
-        @forelse($products as $item)
+        @forelse($products as $product)
 
-        <tr
-            class="border-b"
-        >
+            <tr>
 
-            <td class="p-3">
-                {{ $item->kode_barang }}
-            </td>
+                <x-table-cell class="text-left">
 
-            <td class="p-3">
-                {{ $item->nama_barang }}
-            </td>
+                    {{-- <div class="font-semibold"> --}}
 
-            <td class="p-3 text-right">
-                Rp {{ number_format($item->harga,0,',','.') }}
-            </td>
+                        {{ $product->nama_barang }} 
 
-            <td class="p-3 text-right">
-                {{ $item->stok }}
-            </td>
+                    {{-- </div> --}}
 
-            <td
-                class="p-3 text-center"
-            >
+                </x-table-cell>
 
-                <a
-                    href="/products/{{ $item->id }}/edit"
-                    class="text-blue-600"
-                >
-                    Edit
-                </a>
+                <x-table-cell class="text-left">
 
-                |
+                    {{ $product->barcode }}
 
-                <a
-                    href="/products/{{ $item->id }}/stock-card"
-                    class="text-green-600"
-                >
-                    Kartu Stok
-                </a>
+                </x-table-cell>
 
-            </td>
+                
 
-        </tr>
+                <x-table-cell class="text-right">
+
+                    Rp {{ number_format($product->harga,0,',','.') }}
+
+                </x-table-cell>
+
+                <x-table-cell class="text-right">
+
+                    @if($product->stock <= 5)
+
+                        <x-badge color="red">
+
+                            {{ $product->stok }}
+
+                        </x-badge>
+
+                    @elseif($product->stock <= 15)
+
+                        <x-badge color="yellow">
+
+                            {{ $product->stok }}
+
+                        </x-badge>
+
+                    @else
+
+                        <x-badge color="green">
+
+                            {{ $product->stok }}
+
+                        </x-badge>
+
+                    @endif
+
+                </x-table-cell>
+
+                <x-table-cell class="text-center">
+
+                    @if($product->stok > 0)
+
+                        <x-badge color="green">
+
+                            Tersedia
+
+                        </x-badge>
+
+                    @else
+
+                        <x-badge color="red">
+
+                            Habis
+
+                        </x-badge>
+
+                    @endif
+
+                </x-table-cell>
+
+                <x-table-cell class="text-center">
+
+                    <div class="flex justify-center gap-2">
+
+                        <a
+                            href="/products/{{ $product->id }}/stock-card"
+                        >
+
+                            <x-button
+
+                                color="gray"
+
+                                size="sm"
+
+                            >
+
+                                <i class="ri-file-chart-line"></i>
+
+                            </x-button>
+
+                        </a>
+
+                        <a
+                            href="/products/{{ $product->id }}/edit"
+                        >
+
+                            <x-button
+
+                                color="blue"
+
+                                size="sm"
+
+                            >
+
+                                <i class="ri-edit-line"></i>
+
+                            </x-button>
+
+                        </a>
+
+                    </div>
+
+                </x-table-cell>
+
+            </tr>
 
         @empty
 
-        <tr>
+            <tr>
 
-            <td
-                colspan="5"
-                class="p-6 text-center text-gray-500"
-            >
+                <td colspan="7">
 
-                Belum ada data produk
+                    <x-empty-state
 
-            </td>
+                        icon="ri-box-3-line"
 
-        </tr>
+                        title="Belum ada produk"
+
+                        description="Klik tombol Tambah Produk untuk membuat data baru."
+
+                    />
+
+                </td>
+
+            </tr>
 
         @endforelse
 
         </tbody>
 
-    </table>
+    </x-table>
 
-</div>
+    <div class="mt-6">
 
-<div class="mt-4">
+        {{ $products->links() }}
 
-    {{ $products->links() }}
+    </div>
 
-</div>
+</x-card>
 
 @endsection

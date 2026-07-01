@@ -4,13 +4,19 @@
 
 @section('content')
 
-<h2
-    class="text-2xl font-bold mb-6"
->
-    Dashboard
-</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div class="mb-8 ">
+            <h2
+                class="text-2xl font-bold"
+            >
+                Dashboard
+            </h2>
+            <p class="text-slate-500 mt-1">
+                Ringkasan aktivitas hari ini
+            </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4 ">
+        
 
         <div class="bg-green-500 text-white rounded-xl shadow p-5">
 
@@ -267,7 +273,7 @@
     </div>
 
 @push('scripts')
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
 
         const ctx =

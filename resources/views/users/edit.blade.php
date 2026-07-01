@@ -4,239 +4,374 @@
 
 @section('content')
 
-<div class="max-w-3xl mx-auto">
+<x-page-header
 
-    <h2 class="text-2xl font-bold mb-6">
+    title="Edit User"
 
-        Edit User
+    subtitle="Perbarui informasi akun pengguna"
 
-    </h2>
+>
 
-    @if ($errors->any())
+    <x-slot:action>
 
-    <div class="mb-4 bg-red-100 border border-red-300 text-red-700 rounded-xl p-4">
+        <a href="{{ route('users.index') }}">
 
-        <ul class="list-disc ml-5">
+            <x-button color="gray">
 
-            @foreach($errors->all() as $error)
+                <i class="ri-arrow-left-line"></i>
 
-                <li>{{ $error }}</li>
+                Kembali
 
-            @endforeach
+            </x-button>
 
-        </ul>
+        </a>
+
+    </x-slot:action>
+
+</x-page-header>
+
+@if($errors->any())
+
+<x-alert type="error">
+
+    <div class="font-semibold mb-2">
+
+        Terdapat kesalahan:
 
     </div>
 
-    @endif
+    <ul class="list-disc ml-5">
 
-    @if(session('success'))
+        @foreach($errors->all() as $error)
 
-    <div class="mb-4 bg-green-100 border border-green-300 text-green-700 rounded-xl p-4">
+            <li>{{ $error }}</li>
 
-        {{ session('success') }}
+        @endforeach
 
-    </div>
+    </ul>
 
-    @endif
+</x-alert>
 
-    <div class="bg-white rounded-2xl shadow-lg p-8">
+@endif
 
-        <form
-            method="POST"
-            action="{{ route('users.update',$user) }}"
+<x-card>
+
+<form
+
+    method="POST"
+
+    action="{{ route('users.update',$user) }}"
+
+>
+
+@csrf
+@method('PUT')
+
+<div class="grid grid-cols-2 gap-6">
+
+    <x-input
+
+        label="Nama Lengkap"
+
+        name="name"
+
+        icon="ri-user-line"
+
+        :value="$user->name"
+
+        required
+
+    />
+
+    <x-input
+
+        label="Email"
+
+        name="email"
+
+        type="email"
+
+        icon="ri-mail-line"
+
+        :value="$user->email"
+
+        required
+
+    />
+
+    <x-select
+
+        label="Role"
+
+        name="role"
+
+        icon="ri-shield-user-line"
+
+        required
+
+    >
+
+        <option value="Admin"
+
+            @selected($user->role=='Admin')
+
         >
 
-            @csrf
-            @method('PUT')
+            Admin
 
-            <div class="grid md:grid-cols-2 gap-6">
+        </option>
 
-                {{-- Nama --}}
+        <option value="Supervisor"
 
-                <div>
+            @selected($user->role=='Supervisor')
 
-                    <label class="block font-semibold mb-2">
+        >
 
-                        Nama
+            Supervisor
 
-                    </label>
+        </option>
 
-                    <input
-                        type="text"
-                        name="name"
-                        value="{{ old('name',$user->name) }}"
-                        class="w-full border rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
-                        required
-                    >
+        <option value="Kasir"
 
-                </div>
+            @selected($user->role=='Kasir')
 
-                {{-- Email --}}
+        >
 
-                <div>
+            Kasir
 
-                    <label class="block font-semibold mb-2">
+        </option>
 
-                        Email
+    </x-select>
 
-                    </label>
+    <x-select
 
-                    <input
-                        type="email"
-                        name="email"
-                        value="{{ old('email',$user->email) }}"
-                        class="w-full border rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
-                        required
-                    >
+        label="Status"
 
-                </div>
+        name="is_active"
 
-                {{-- Role --}}
+        icon="ri-user-settings-line"
 
-                <div>
+        required
 
-                    <label class="block font-semibold mb-2">
+    >
 
-                        Role
+        <option value="1"
 
-                    </label>
+            @selected($user->is_active)
 
-                    <select
-                        name="role"
-                        class="w-full border rounded-xl px-4 py-2"
-                    >
+        >
 
-                        <option
-                            value="Admin"
-                            {{ $user->role=='Admin' ? 'selected' : '' }}
-                        >
-                            Admin
-                        </option>
+            Aktif
 
-                        <option
-                            value="Supervisor"
-                            {{ $user->role=='Supervisor' ? 'selected' : '' }}
-                        >
-                            Supervisor
-                        </option>
+        </option>
 
-                        <option
-                            value="Kasir"
-                            {{ $user->role=='Kasir' ? 'selected' : '' }}
-                        >
-                            Kasir
-                        </option>
+        <option value="0"
 
-                    </select>
+            @selected(!$user->is_active)
 
-                </div>
+        >
 
-                {{-- Status --}}
+            Nonaktif
 
-                <div>
+        </option>
 
-                    <label class="block font-semibold mb-2">
+    </x-select>
 
-                        Status
+    <div class="col-span-2">
 
-                    </label>
+        <x-input
 
-                    <select
-                        name="is_active"
-                        class="w-full border rounded-xl px-4 py-2"
-                    >
+            label="Password Baru"
 
-                        <option
-                            value="1"
-                            {{ $user->is_active ? 'selected' : '' }}
-                        >
-                            Aktif
-                        </option>
+            name="password"
 
-                        <option
-                            value="0"
-                            {{ !$user->is_active ? 'selected' : '' }}
-                        >
-                            Nonaktif
-                        </option>
+            type="password"
 
-                    </select>
+            icon="ri-lock-password-line"
 
-                </div>
+            placeholder="Kosongkan jika tidak ingin mengubah password"
 
-            </div>
+        />
 
-            <hr class="my-8">
+    </div>
 
-            <div class="flex flex-wrap gap-3">
+</div>
 
-                <button
-                    type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl"
-                >
+{{-- <div class="flex justify-between items-center mt-8"> --}}
+<div class="mt-8 flex justify-end">    
 
-                    Simpan Perubahan
+   
 
-                </button>
+    <div class="flex gap-3">
+    {{-- <div class="flex justify-end gap-3 mt-8"> --}}
 
-                <a
-                    href="{{ route('users.index') }}"
-                    class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-xl"
-                >
+        <a href="{{ route('users.index') }}">
 
-                    Batal
+            <x-button color="gray">
 
-                </a>
+                <i class="ri-close-line"></i>
 
-            </div>
+                Batal
 
-        </form>
+            </x-button>
 
-        <hr class="my-8">
+        </a>
 
-        <div>
+        <x-button
 
-            <h3 class="font-bold text-lg mb-3">
+            color="primary"
 
-                Reset Password
+            type="submit"
+
+        >
+
+            <i class="ri-save-line"></i>
+
+            Simpan Perubahan
+
+        </x-button>
+
+    </div>
+
+</div>
+
+</form>
+
+</x-card>
+
+{{-- reset pwd --}}
+<x-card class="mt-6">
+
+    <div class="flex items-start gap-4">
+    {{-- <div class="mt-6 flex justify-end"> --}}
+
+        <div
+            class="w-12 h-12 rounded-xl
+            bg-amber-100
+            flex items-center justify-center"
+        >
+
+            <i
+                class="ri-lock-password-line
+                text-2xl
+                text-amber-600"
+            ></i>
+
+        </div>
+
+        <div class="flex-1">
+
+            <h3
+                class="text-lg font-semibold
+                text-slate-800"
+            >
+
+                Keamanan Akun
 
             </h3>
 
-            <p class="text-gray-500 mb-4">
-
-                Password akan direset menjadi:
-
-                <span class="font-bold">
-
-                    87654321
-
-                </span>
-
-            </p>
-
-            <form
-                method="POST"
-                action="{{ route('users.reset-password',$user) }}"
+            <p
+                class="mt-2 text-sm
+                text-slate-500"
             >
 
-                @csrf
+                Password pengguna tidak dapat
+                dilihat.
 
-                <button
-                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl"
-                    onclick="return confirm('Reset password user ini?')"
-                >
+                Jika diperlukan, Admin dapat
+                mereset password menjadi
+                password default sistem ( 87654321 ).
 
-                    Reset Password
-
-                </button>
-
-            </form>
+            </p>
 
         </div>
 
     </div>
 
-</div>
+    {{-- <div class="mt-6"> --}}
+    <div class="mt-6 flex justify-end">    
+        <form
+
+            id="formResetPassword"
+
+            method="POST"
+
+            action="{{ route('users.reset-password',$user) }}"
+
+        >
+        
+            @csrf
+        </form>
+
+        <x-button 
+            color="red"
+            id="btnResetPassword"
+                type="button"
+        >
+
+            <i class="ri-key-2-line"></i>
+
+            Reset Password
+
+        </x-button>
+
+        
+
+    </div>
+
+</x-card>
+{{-- reset pwd end --}}
+
+@push('scripts')
+
+<script>
+
+document
+.getElementById('btnResetPassword')
+.addEventListener('click',function(){
+
+    Swal.fire({
+
+        title:'Reset Password?',
+
+        html:`
+
+            Password akan direset menjadi:
+
+            <br><br>
+
+            <b>87654321</b>
+
+        `,
+
+        icon:'warning',
+
+        showCancelButton:true,
+
+        confirmButtonText:'Ya, Reset',
+
+        cancelButtonText:'Batal',
+
+        confirmButtonColor:'#4F46E5',
+
+        cancelButtonColor:'#94A3B8'
+
+    }).then((result)=>{
+
+        if(result.isConfirmed){
+
+            document
+            .getElementById('formResetPassword')
+            .submit();
+
+        }
+
+    });
+
+});
+
+</script>
+
+@endpush
 
 @endsection

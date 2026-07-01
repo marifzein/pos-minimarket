@@ -4,104 +4,125 @@
 
 @section('content')
 
-<h2 class="text-2xl font-bold mb-6">
+<x-page-header
 
-    Tambah User
+    title="Tambah User"
 
-</h2>
+    subtitle="Tambahkan akun pengguna baru"
+
+>
+
+    <x-slot:action>
+
+        <a href="/users">
+
+            <x-button color="gray">
+
+                <i class="ri-arrow-left-line"></i>
+
+                Kembali
+
+            </x-button>
+
+        </a>
+
+    </x-slot:action>
+
+</x-page-header>
 
 @if ($errors->any())
 
-<div class="mb-4 bg-red-100 border border-red-300 text-red-700 p-4 rounded">
+<x-alert type="error">
+
+    <div class="font-semibold mb-2">
+
+        Terdapat kesalahan:
+
+    </div>
 
     <ul class="list-disc ml-5">
 
         @foreach($errors->all() as $error)
 
-        <li>{{ $error }}</li>
+            <li>{{ $error }}</li>
 
         @endforeach
 
     </ul>
 
-</div>
+</x-alert>
 
 @endif
 
-<div class="bg-white rounded-xl shadow p-6 max-w-2xl">
+<x-card>
 
 <form
+
     method="POST"
+
     action="{{ route('users.store') }}"
+
 >
 
 @csrf
 
-<div class="mb-4">
+{{-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> --}}
+    <div class="grid grid-cols-2 gap-6 ">
 
-    <label class="block mb-2 font-semibold">
+    <x-input
 
-        Nama
+        label="Nama Lengkap"
 
-    </label>
-
-    <input
-        type="text"
         name="name"
-        value="{{ old('name') }}"
-        class="w-full border rounded-lg px-4 py-2 focus:ring focus:ring-indigo-200"
+
+        :value="old('name')"
+
+        icon="ri-user-line"
+
         required
-    >
 
-</div>
+    />
 
-<div class="mb-4">
+    <x-input
 
-    <label class="block mb-2 font-semibold">
+        label="Email"
 
-        Email
-
-    </label>
-
-    <input
-        type="email"
         name="email"
-        value="{{ old('email') }}"
-        class="w-full border rounded-lg px-4 py-2 focus:ring focus:ring-indigo-200"
+
+        type="email"
+
+        :value="old('email')"
+
+        icon="ri-mail-line"
+
         required
-    >
 
-</div>
+    />
 
-<div class="mb-4">
+    <x-input
 
-    <label class="block mb-2 font-semibold">
+        label="Password"
 
-        Password
-
-    </label>
-
-    <input
-        type="password"
         name="password"
-        class="w-full border rounded-lg px-4 py-2 focus:ring focus:ring-indigo-200"
+
+        type="password"
+
+        icon="ri-lock-password-line"
+
         required
-    >
 
-</div>
+    />
 
-<div class="mb-6">
+    <x-select
 
-    <label class="block mb-2 font-semibold">
+        label="Role"
 
-        Role
-
-    </label>
-
-    <select
         name="role"
-        class="w-full border rounded-lg px-4 py-2"
+
+        icon="ri-shield-user-line"
+
         required
+
     >
 
         <option value="">
@@ -111,8 +132,11 @@
         </option>
 
         <option
+
             value="Admin"
+
             {{ old('role')=='Admin' ? 'selected' : '' }}
+
         >
 
             Admin
@@ -120,8 +144,11 @@
         </option>
 
         <option
+
             value="Supervisor"
+
             {{ old('role')=='Supervisor' ? 'selected' : '' }}
+
         >
 
             Supervisor
@@ -129,42 +156,53 @@
         </option>
 
         <option
+
             value="Kasir"
+
             {{ old('role')=='Kasir' ? 'selected' : '' }}
+
         >
 
             Kasir
 
         </option>
 
-    </select>
+    </x-select>
 
 </div>
 
-<div class="flex gap-3">
+<div class="flex justify-end gap-3 mt-8">
 
-    <button
-        type="submit"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg"
-    >
+    <a href="/users">
 
-        Simpan
+        <x-button color="gray">
 
-    </button>
+            <i class="ri-close-line"></i>
 
-    <a
-        href="/users"
-        class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg"
-    >
+            Batal
 
-        Batal
+        </x-button>
 
     </a>
+
+    <x-button
+
+        type="submit"
+
+        color="primary"
+
+    >
+
+        <i class="ri-save-line"></i>
+
+        Simpan User
+
+    </x-button>
 
 </div>
 
 </form>
 
-</div>
+</x-card>
 
 @endsection
