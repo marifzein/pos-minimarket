@@ -83,6 +83,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
 
             <a href="/pos"
                 class="submenu {{ request()->is('pos*') ? 'submenu-active' : '' }}">
+                <i class="ri-shopping-cart-2-line"></i>
                 POS
             </a>
 
@@ -122,6 +123,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 !request()->is('products/import*')
                 ? 'submenu-active':''
                 }}">
+                <i class="ri-box-3-line"></i>
                 Produk
             </a>
 
@@ -131,21 +133,25 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 request()->is('products/import*')
                 ? 'submenu-active':''
                 }}">
+                <i class="ri-file-upload-line   "></i>
                 Import Produk
             </a>
 
             <a href="/categories"
                 class="submenu {{ request()->is('categories*') ? 'submenu-active':'' }}">
+                <i class="ri-price-tag-3-line"></i>
                 Kategori
             </a>
 
             <a href="/suppliers"
                 class="submenu {{ request()->is('suppliers*') ? 'submenu-active':'' }}">
+                <i class="ri-truck-line"></i>
                 Supplier
             </a>
 
             <a href="/customers"
                 class="submenu {{ request()->is('customers*') ? 'submenu-active':'' }}">
+                <i class="ri-user-heart-line"></i>
                 Pelanggan
             </a>
 
@@ -179,11 +185,13 @@ class="w-64 shadow-lg z-30 flex flex-col">
 
             <a href="/purchasing"
                 class="submenu {{ request()->is('purchasing*') ? 'submenu-active':'' }}">
+                <i class="ri-store-2-line"></i>
                 Purchasing
             </a>
 
             <a href="/stock-opname"
                 class="submenu {{ request()->is('stock-opname*') ? 'submenu-active':'' }}">
+                <i class="ri-todo-line"></i>
                 Stock Opname
             </a>
 
@@ -217,6 +225,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
 
             <a href="/transactions"
                 class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}">
+                <i class="ri-price-tag-3-line"></i>
                 Transaksi
             </a>
 
@@ -250,12 +259,20 @@ class="w-64 shadow-lg z-30 flex flex-col">
 
             <a href="/users"
                 class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}">
+                <i class="ri-group-line"></i>
                 User
             </a>
 
             <a href="/developer"
                 class="submenu {{ request()->is('developer*') ? 'submenu-active':'' }}">
+                <i class="ri-code-s-slash-line"></i>
                 Developer
+            </a>
+
+            <a href="{{ route('backup.index') }}"
+                class="submenu {{ request()->is('backup*') ? 'submenu-active' : '' }}">
+                <i class="ri-hard-drive-2-line mr-2"></i>
+                Backup Database
             </a>
 
         </div>
