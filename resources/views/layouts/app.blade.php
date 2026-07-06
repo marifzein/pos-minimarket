@@ -35,6 +35,124 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    {{-- sidemenu --}}
+    <style>
+
+aside{
+    background:#0F172A;
+    color:#E2E8F0;
+}
+
+.menu-group{
+    color:#E2E8F0;
+    font-weight:600;
+}
+
+.menu-parent{
+    color:#CBD5E1;
+    transition:all .25s ease;
+}
+
+.menu-parent:hover{
+    background:#1E293B;
+    color:#fff;
+}
+
+.submenu{
+    display:block;
+    padding:10px 20px 10px 48px;
+    color:#94A3B8;
+    border-left:4px solid transparent;
+    transition:all .25s ease;
+}
+
+.submenu:hover{
+    background:#1E293B;
+    color:#fff;
+    padding-left:54px;
+}
+
+.submenu-active{
+    background:#334155;
+    color:#fff;
+    border-left:4px solid #6366F1;
+}
+
+/* ---------- Accordion ---------- */
+
+.menu-content{
+
+    overflow:hidden;
+
+    max-height:0;
+
+    opacity:0;
+
+    transition:
+        max-height .35s cubic-bezier(.4,0,.2,1),
+        opacity .25s ease;
+
+}
+
+.menu-content.open{
+
+    max-height:500px;
+
+    opacity:1;
+
+}
+
+/* ---------- Footer ---------- */
+
+.sidebar-footer{
+    border-top:1px solid #1E293B;
+}
+
+.logout-btn{
+    color:#F87171;
+}
+
+.logout-btn:hover{
+    background:#7F1D1D;
+    color:#fff;
+}
+
+/* ---------- Arrow ---------- */
+
+#icon-kasir,
+#icon-master,
+#icon-inventory,
+#icon-penjualan,
+#icon-system{
+
+    transition:transform .30s ease;
+
+}
+
+.rotate{
+
+    transform:rotate(90deg);
+
+}
+
+/* ---------- Scrollbar ---------- */
+
+aside::-webkit-scrollbar{
+    width:6px;
+}
+
+aside::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:20px;
+}
+
+aside::-webkit-scrollbar-track{
+    background:#0F172A;
+}
+
+</style>
+    {{-- sidemenu --}}
+
 </head>
 
 
@@ -150,6 +268,76 @@
 
     @endif
 {{--pesan2 end --}}
+
+<script>
+
+const menus=[
+    'kasir',
+    'master',
+    'inventory',
+    'penjualan',
+    'system'
+];
+
+function toggleMenu(name){
+
+    menus.forEach(function(item){
+
+        const menu=document.getElementById('menu-'+item);
+
+        const icon=document.getElementById('icon-'+item);
+
+        if(item===name){
+
+            if(menu.classList.contains('open')){
+
+                menu.classList.remove('open');
+
+                icon.classList.remove('rotate');
+
+                localStorage.removeItem('activeMenu');
+
+            }else{
+
+                menu.classList.add('open');
+
+                icon.classList.add('rotate');
+
+                localStorage.setItem('activeMenu',item);
+
+            }
+
+        }else{
+
+            menu.classList.remove('open');
+
+            icon.classList.remove('rotate');
+
+        }
+
+    });
+
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+
+    let active=localStorage.getItem('activeMenu');
+
+    if(active){
+
+        document
+            .getElementById('menu-'+active)
+            ?.classList.add('open');
+
+        document
+            .getElementById('icon-'+active)
+            ?.classList.add('rotate');
+
+    }
+
+});
+
+</script>
 
 @stack('scripts')
 </body>

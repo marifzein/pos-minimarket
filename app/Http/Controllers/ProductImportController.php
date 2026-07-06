@@ -65,7 +65,7 @@ class ProductImportController extends Controller
 
             0  = Kode Barang
             1  = Barcode
-            2  = Nama Barang
+            2  = Nama <Barang></Barang>
             3  = Stock
             4  = Harga Jual
             5  = Kategori

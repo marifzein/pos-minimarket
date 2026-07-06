@@ -1,5 +1,7 @@
+{{-- <aside
+class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}}
 <aside
-class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col">
+class="w-64 shadow-lg z-30 flex flex-col">
 
     {{-- Logo --}}
     <div class="px-6 py-6 ">
@@ -37,161 +39,232 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col">
     </div>
 
     {{-- Menu --}}
-    <nav class="flex-1 py-5">
+    <nav class="flex-1 py-5 overflow-hidden">
 
-        <p
-            class="px-6 mb-2
-            text-xs font-bold
-            uppercase tracking-wider
-            text-slate-400">
-
-            Menu Utama
-
-        </p>
-
-        @php
-
-        $menus=[
-
-            [
-                'title'=>'Dashboard',
-                'url'=>'/dashboard',
-                'icon'=>'ri-home-5-line'
-            ],
-
-            [
-                'title'=>'POS',
-                'url'=>'/pos',
-                'icon'=>'ri-shopping-cart-2-line'
-            ],
-
-            [
-                'title'=>'Transaksi',
-                'url'=>'/transactions',
-                'icon'=>'ri-file-list-3-line'
-            ],
-
-            [
-                'title'=>'Produk',
-                'url'=>'/products',
-                'icon'=>'ri-box-3-line'
-            ],
-
-            [
-                'title'=>'Import Produk',
-                'url'=>'/products/import',
-                'icon'=>'ri-file-excel-2-line'
-            ],            
-
-            [
-                'title'=>'Kategori',
-                'url'=>'/categories',
-                'icon'=>'ri-price-tag-3-line'  
-            ],
-
-            [
-                'title' => 'Pelanggan',
-                'url' => '/customers',
-                'icon' => 'ri-user-star-line'
-            ],
-
-            [
-                'title'=>'Supplier',
-                'url'=>'/suppliers',
-                'icon'=>'ri-truck-line'
-            ],
-
-            [
-                'title'=>'Purchasing',
-                'url'=>'/purchasing',
-                'icon'=>'ri-file-paper-2-line'
-            ],
-
-            [
-                'title'=>'Stock Opname',
-                'url'=>'/stock-opname',
-                'icon'=>'ri-clipboard-line'
-            ],
-
-        ];
-
-        @endphp
-
-        @foreach($menus as $menu)
-
-        <a
-
-            href="{{ $menu['url'] }}"
-
-            class="mx-3 mb-1
-            flex items-center gap-3
-            rounded-xl
-            px-4 py-3
-            transition
-
-            {{-- {{ request()->is(ltrim($menu['url'],'/').'*')
-                ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
-                : 'text-slate-700 hover:bg-slate-100'
-            }}" --}}
-            {{ 
-                ($menu['url'] === '/products' && request()->is('products/import*'))
-                ? 'text-slate-700 hover:bg-slate-100'
-                : (request()->is(ltrim($menu['url'],'/').'*')
-                    ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
-                    : 'text-slate-700 hover:bg-slate-100')
-            }}
-
-        >
-
-            <i class="{{ $menu['icon'] }} text-lg"></i>
-
-            <span>
-
-                {{ $menu['title'] }}
-
-            </span>
-
+        {{-- Dashboard --}}
+        {{-- <a
+            class="
+            mx-3 mb-1 flex items-center gap-3 rounded-xl px-4 py-3 transition
+            submenu {{ request()->is('dashboard*') ? 'submenu-active' : '' }}"
+            href="/dashboard">
+            <i class="ri-home-5-line text-lg"></i>
+            Dashboard
+        </a> --}}
+        <a href="/dashboard"
+        class="menu-parent menu-group w-full flex items-center gap-3 px-4 py-3
+        {{ request()->is('dashboard*') ? 'submenu-active' : '' }}">
+            <i class="ri-home-5-line"></i>
+            <span>Dashboard</span>
         </a>
 
-        @endforeach
+        {{-- ===================== --}}
+        {{-- KASIR --}}
+        {{-- ===================== --}}
+
+        <button
+            type="button"
+            onclick="toggleMenu('kasir')"
+            class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+                <i class="ri-shopping-cart-2-line"></i>
+
+                <span>Kasir</span>
+
+            </div>
+
+            <i id="icon-kasir"
+                class="ri-arrow-right-s-line transition-all"></i>
+
+        </button>
+
+        <div id="menu-kasir" class="menu-content">
+
+            <a href="/pos"
+                class="submenu {{ request()->is('pos*') ? 'submenu-active' : '' }}">
+                POS
+            </a>
+
+        </div>
 
 
-        <p
-            class="px-6 mt-8 mb-2
-            text-xs font-bold
-            uppercase tracking-wider
-            text-slate-400">
 
-            Master Data
+        {{-- ===================== --}}
+        {{-- MASTER DATA --}}
+        {{-- ===================== --}}
 
-        </p>
+        <button
+            type="button"
+            onclick="toggleMenu('master')"
+            class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
 
-        <a
+            <div class="flex items-center gap-3">
 
-            href="/users"
+                <i class="ri-database-2-line"></i>
 
-            class="mx-3
-            flex items-center gap-3
-            rounded-xl
-            px-4 py-3
+                <span>Master Data</span>
 
-            {{ request()->is('users*')
-                ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
-                : 'text-slate-700 hover:bg-slate-100'
-            }}"
+            </div>
 
-        >
+            <i id="icon-master"
+                class="ri-arrow-right-s-line transition-all"></i>
 
-            <i class="ri-user-settings-line text-lg"></i>
+        </button>
 
-            User
+        <div id="menu-master" class="menu-content">
 
-        </a>
+            <a href="/products"
+                class="submenu
+                {{
+                request()->is('products*')
+                &&
+                !request()->is('products/import*')
+                ? 'submenu-active':''
+                }}">
+                Produk
+            </a>
+
+            <a href="/products/import"
+                class="submenu
+                {{
+                request()->is('products/import*')
+                ? 'submenu-active':''
+                }}">
+                Import Produk
+            </a>
+
+            <a href="/categories"
+                class="submenu {{ request()->is('categories*') ? 'submenu-active':'' }}">
+                Kategori
+            </a>
+
+            <a href="/suppliers"
+                class="submenu {{ request()->is('suppliers*') ? 'submenu-active':'' }}">
+                Supplier
+            </a>
+
+            <a href="/customers"
+                class="submenu {{ request()->is('customers*') ? 'submenu-active':'' }}">
+                Pelanggan
+            </a>
+
+        </div>
+
+
+
+        {{-- ===================== --}}
+        {{-- INVENTORY --}}
+        {{-- ===================== --}}
+
+        <button
+            type="button"
+            onclick="toggleMenu('inventory')"
+            class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+                <i class="ri-archive-line"></i>
+
+                <span>Inventory</span>
+
+            </div>
+
+            <i id="icon-inventory"
+                class="ri-arrow-right-s-line transition-all"></i>
+
+        </button>
+
+        <div id="menu-inventory" class="menu-content">
+
+            <a href="/purchasing"
+                class="submenu {{ request()->is('purchasing*') ? 'submenu-active':'' }}">
+                Purchasing
+            </a>
+
+            <a href="/stock-opname"
+                class="submenu {{ request()->is('stock-opname*') ? 'submenu-active':'' }}">
+                Stock Opname
+            </a>
+
+        </div>
+
+
+
+        {{-- ===================== --}}
+        {{-- PENJUALAN --}}
+        {{-- ===================== --}}
+
+        <button
+            type="button"
+            onclick="toggleMenu('penjualan')"
+            class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+                <i class="ri-file-list-3-line"></i>
+
+                <span>Penjualan</span>
+
+            </div>
+
+            <i id="icon-penjualan"
+                class="ri-arrow-right-s-line transition-all"></i>
+
+        </button>
+
+        <div id="menu-penjualan" class="menu-content">
+
+            <a href="/transactions"
+                class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}">
+                Transaksi
+            </a>
+
+        </div>
+
+
+
+        {{-- ===================== --}}
+        {{-- SISTEM --}}
+        {{-- ===================== --}}
+
+        <button
+            type="button"
+            onclick="toggleMenu('system')"
+            class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+                <i class="ri-settings-3-line"></i>
+
+                <span>Sistem</span>
+
+            </div>
+
+            <i id="icon-system"
+                class="ri-arrow-right-s-line transition-all"></i>
+
+        </button>
+
+        <div id="menu-system" class="menu-content">
+
+            <a href="/users"
+                class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}">
+                User
+            </a>
+
+            <a href="/developer"
+                class="submenu {{ request()->is('developer*') ? 'submenu-active':'' }}">
+                Developer
+            </a>
+
+        </div>
 
     </nav>
 
-    {{-- Logout --}}
-    <div class="border-t p-4">
+
+{{-- Logout --}}
+    <div class="sidebar-footer p-4">
 
         <form
             method="POST"
@@ -200,16 +273,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col">
             @csrf
 
             <button
-
-                class="w-full
-                flex items-center gap-3
-                px-4 py-3
-                rounded-xl
-                hover:bg-red-50
-                text-red-600
-                transition"
-
-            >
+                class="logout-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition">
 
                 <i class="ri-logout-box-r-line"></i>
 
