@@ -86,7 +86,7 @@
 
             text: @json(session('success')),
 
-            timer: 2200,
+            timer: 1200,
 
             showConfirmButton: false,
 

@@ -49,7 +49,7 @@
         @endif
 
         <select
-
+            
             id="{{ $name }}"
 
             name="{{ $name }}"
@@ -61,7 +61,7 @@
                 'class'=>
 
                 'w-full
-
+                
                 rounded-xl
 
                 border
@@ -103,6 +103,15 @@
             {{ $slot }}
 
         </select>
+
+        {{-- <i class="ri-arrow-down-s-line
+              absolute
+              right-4
+              top-1/2
+              -translate-y-1/2
+              text-slate-400
+              pointer-events-none">
+        </i> --}}
 
     </div>
 

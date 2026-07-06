@@ -9,6 +9,13 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\ProductImportController;
+use App\Http\Controllers\DeveloperController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,77 +44,67 @@ Route::middleware('auth')->group(function () {
 
     //MODUL2 ROLE ADMIN 
     Route::middleware('role:Admin')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | MASTER DATA
+    |--------------------------------------------------------------------------
+    */
+        // supplier
+        Route::resource(
+            'suppliers', 
+            SupplierController::class
+        )->except([
+            'show',
+            'destroy'
+        ]);
 
         // Produk
-        Route::get(
-            '/products',
-            [ProductController::class,'index']
-        );
+        Route::resource(
+            'products',
+            ProductController::class
+        )->except([
+            'show',
+            'destroy'
+        ]);
 
-        Route::get(
-            '/products/create',
-            [ProductController::class,'create']
-        );
+        // PO
+        Route::resource(
+            'purchasing',
+            PurchaseOrderController::class
+        )->except([
+            'show',
+            'destroy'
+        ]);
+        
+        // User
+        Route::resource(
+            'users',
+            UserController::class
+        )->except([
+            'show',
+            'destroy'
+        ]);
 
-        Route::post(
-            '/products',
-            [ProductController::class,'store']
-        );
+        // Customers
+        Route::resource('customers', CustomerController::class);
 
-        Route::get(
-            '/products/{product}/edit',
-            [ProductController::class,'edit']
-        );
-
-        Route::put(
-            '/products/{product}',
-            [ProductController::class,'update']
-        );
-
-        Route::get(
-            '/products/{product}/stock-card',
-            [ProductController::class,'stockCard']
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | USER MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
-
-        Route::get(
-            '/users',
-            [UserController::class,'index']
-        )->name('users.index');
-
-        Route::get(
-            '/users/create',
-            [UserController::class,'create']
-        )->name('users.create');
-
-        Route::post(
-            '/users',
-            [UserController::class,'store']
-        )->name('users.store');
-
-        Route::get(
-            '/users/{user}/edit',
-            [UserController::class,'edit']
-        )->name('users.edit');
-
-        Route::put(
-            '/users/{user}',
-            [UserController::class,'update']
-        )->name('users.update');
-
-        Route::post(
-            '/users/{user}/reset-password',
-            [UserController::class,'resetPassword']
-        )->name('users.reset-password');
-
-        // user end----------------------------------------------
+        // kategori
+        Route::resource(
+            'categories',
+            CategoryController::class
+        )->except([
+            'show',
+            'destroy'
+        ]);
+        
 
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | TRANSAKSI
+    |--------------------------------------------------------------------------
+    */
 
     // POS
     Route::get(
@@ -156,7 +153,95 @@ Route::middleware('auth')->group(function () {
 
     });
 
+    /* 
+    ============================================================|
+    RESET DAN SEEDING BUAT TEST
+    ============================================================|
+    */
     
+
+    Route::prefix('developer')
+        ->name('developer.')
+        ->group(function () {
+
+            Route::get(
+                '/',
+                [DeveloperController::class,'index']
+            )->name('index');
+
+            Route::post(
+                '/reset-transaksi',
+                [DeveloperController::class,'resetTransaksi']
+            )->name('reset.transaksi');
+
+            Route::post(
+                '/reset-master',
+                [DeveloperController::class,'resetMaster']
+            )->name('reset.master');
+
+            Route::post(
+                '/seed',
+                [DeveloperController::class,'seedDemo']
+            )->name('seed');
+
+        });
+
+
+
+
+
+    /* 
+    ============================================================|  
+    BACKUP DB
+    ============================================================|  
+    */  
+    Route::prefix('backup')
+    ->group(function () {
+
+        Route::get(
+            '/',
+            [BackupController::class,'index']
+        )->name('backup.index');
+
+        Route::post(
+            '/create',
+            [BackupController::class,'backup']
+        )->name('backup.create');
+
+        Route::get(
+            '/download/{file}',
+            [BackupController::class,'download']
+        )->name('backup.download');
+
+        Route::delete(
+            '/delete/{file}',
+            [BackupController::class,'destroy']
+        )->name('backup.destroy');
+
+    });
+    /*
+    IMPORT PRODUK VIA FILE EXCELL
+    */
+    
+
+    Route::prefix('products')
+        ->group(function () {
+
+            Route::get(
+                '/import',
+                [ProductImportController::class,'index']
+            )->name('products.import');
+
+            Route::post(
+                '/import',
+                [ProductImportController::class,'import']
+            )->name('products.import.store');
+
+        });
+
+
+
+
     /*
     |--------------------------------------------------------------------------
     | STOCK OPNAME

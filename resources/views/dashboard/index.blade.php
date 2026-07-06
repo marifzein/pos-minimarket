@@ -17,40 +17,78 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4 ">
         
+        <x-stat-card
 
-        <div class="bg-green-500 text-white rounded-xl shadow p-5">
+            title="Penjualan"
 
-            <div class="text-sm opacity-80">
+            :value="'Rp '.number_format($todaySales,0,',','.')"
 
-                Penjualan Hari Ini
+            color="green"
 
-            </div>
+            icon="ri-money-dollar-circle-line"
 
-            <div class="text-3xl font-bold mt-2">
+            subtitle="Hari ini"
 
-                Rp {{ number_format($todaySales,0,',','.') }}
+        />
 
-            </div>
+        <x-stat-card
 
-        </div>
+            title="Transaksi"
 
-        <div class="bg-blue-500 text-white rounded-xl shadow p-5">
+            :value="number_format($todayTransactions,0,',','.')"
 
-            <div class="text-sm opacity-80">
+            color="blue"
 
-                Transaksi
+            icon="ri-shopping-cart-2-line"
 
-            </div>
+            subtitle="Hari ini"
 
-            <div class="text-3xl font-bold mt-2">
+        />
 
-                {{ $todayTransactions }}
+        
+        <x-stat-card
 
-            </div>
+            title="Produk"
 
-        </div>
+            :value="number_format($totalProducts,0,',','.')"
 
-        <div class="bg-orange-500 text-white rounded-xl shadow p-5">
+            color="orange"
+
+            icon="ri-box-3-line"
+
+            subtitle="Total Produk"
+
+        />
+
+        <x-stat-card
+
+            title="Stock"
+
+            :value="number_format($totalStock,0,',','.')"
+
+            color="purple"
+
+            icon="ri-archive-stack-line"
+
+            subtitle="Total Stock"
+
+        />
+
+        <x-stat-card
+
+            title="Stock Opname"
+
+            :value="$lastOpname?->opname_no ?? '-'"
+
+            color="indigo"
+
+            icon="ri-clipboard-line"
+
+            subtitle="terakhir"
+
+        />
+
+        {{-- <div class="bg-orange-500 text-white rounded-xl shadow p-5">
 
             <div class="text-sm opacity-80">
 
@@ -64,9 +102,9 @@
 
             </div>
 
-        </div>
+        </div> --}}
 
-        <div class="bg-purple-500 text-white rounded-xl shadow p-5">
+        {{-- <div class="bg-purple-500 text-white rounded-xl shadow p-5">
 
             <div class="text-sm opacity-80">
 
@@ -80,9 +118,9 @@
 
             </div>
 
-        </div>
+        </div> --}}
 
-        <div class="bg-indigo-500 text-white rounded-xl shadow p-5">
+        {{-- <div class="bg-indigo-500 text-white rounded-xl shadow p-5">
 
             <div class="text-sm opacity-80">
 
@@ -102,7 +140,7 @@
 
             </div>
 
-        </div>
+        </div> --}}
     </div>
 
 

@@ -1,75 +1,81 @@
 @props([
 
-'label'=>'',
+'label' => '',
 
 'name',
 
-'rows'=>4,
+'rows' => 4,
 
-'placeholder'=>''
+'placeholder' => '',
+
+'value' => '',
 
 ])
 
 <div class="space-y-2">
 
-@if($label)
+    @if($label)
 
-<label class="block text-sm font-semibold text-slate-700">
+        <label
+            for="{{ $name }}"
+            class="block text-sm font-semibold text-slate-700"
+        >
+            {{ $label }}
+        </label>
 
-{{ $label }}
+    @endif
 
-</label>
+    <textarea
 
-@endif
+        id="{{ $name }}"
 
-<textarea
+        name="{{ $name }}"
 
-name="{{ $name }}"
+        rows="{{ $rows }}"
 
-rows="{{ $rows }}"
+        placeholder="{{ $placeholder }}"
 
-placeholder="{{ $placeholder }}"
+        {{ $attributes->merge([
 
-{{ $attributes->merge([
+            'class'=>
 
-'class'=>
+            'w-full
 
-'w-full
+            rounded-xl
 
-rounded-xl
+            border
 
-border
+            border-slate-300
 
-border-slate-300
+            hover:border-slate-400
 
-hover:border-slate-400
+            px-4
 
-px-4
+            py-3
 
-py-3
+            focus:border-indigo-500
 
-focus:border-indigo-500
+            focus:ring-4
 
-focus:ring-4
+            focus:ring-indigo-100
 
-focus:ring-indigo-100
+            outline-none
 
-outline-none
+            transition'
 
-transition'
+        ]) }}
 
-]) }}
+    >{{ old($name, $value ? $value : $slot) }}</textarea>
+    {{-- >{{ old($name, $slot) }}</textarea> --}}
 
->{{ old($name) }}</textarea>
+    @error($name)
 
-@error($name)
+        <p class="text-sm text-red-500">
 
-<p class="text-red-500 text-sm">
+            {{ $message }}
 
-{{ $message }}
+        </p>
 
-</p>
-
-@enderror
+    @enderror
 
 </div>

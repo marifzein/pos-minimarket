@@ -78,6 +78,36 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col">
             ],
 
             [
+                'title'=>'Import Produk',
+                'url'=>'/products/import',
+                'icon'=>'ri-file-excel-2-line'
+            ],            
+
+            [
+                'title'=>'Kategori',
+                'url'=>'/categories',
+                'icon'=>'ri-price-tag-3-line'  
+            ],
+
+            [
+                'title' => 'Pelanggan',
+                'url' => '/customers',
+                'icon' => 'ri-user-star-line'
+            ],
+
+            [
+                'title'=>'Supplier',
+                'url'=>'/suppliers',
+                'icon'=>'ri-truck-line'
+            ],
+
+            [
+                'title'=>'Purchasing',
+                'url'=>'/purchasing',
+                'icon'=>'ri-file-paper-2-line'
+            ],
+
+            [
                 'title'=>'Stock Opname',
                 'url'=>'/stock-opname',
                 'icon'=>'ri-clipboard-line'
@@ -99,10 +129,17 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col">
             px-4 py-3
             transition
 
-            {{ request()->is(ltrim($menu['url'],'/').'*')
+            {{-- {{ request()->is(ltrim($menu['url'],'/').'*')
                 ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
                 : 'text-slate-700 hover:bg-slate-100'
-            }}"
+            }}" --}}
+            {{ 
+                ($menu['url'] === '/products' && request()->is('products/import*'))
+                ? 'text-slate-700 hover:bg-slate-100'
+                : (request()->is(ltrim($menu['url'],'/').'*')
+                    ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
+                    : 'text-slate-700 hover:bg-slate-100')
+            }}
 
         >
 

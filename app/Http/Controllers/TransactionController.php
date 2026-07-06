@@ -8,6 +8,7 @@ use App\Models\TransactionDetail;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Customer;
 
 class TransactionController extends Controller
 {
@@ -49,6 +50,17 @@ class TransactionController extends Controller
             ], 422);
         }
 
+        $customer = null;
+
+        if ($request->pelanggan) {
+
+            $customer = Customer::where(
+                'kode_pelanggan',
+                $request->pelanggan
+            )->first();
+
+        }
+        
         $subtotal =
             (float) $request->subtotal;
 
@@ -83,12 +95,25 @@ class TransactionController extends Controller
             // $noNota ='INV-' . now()->format('YmdHis');
             $noNota = Transaction::generateNoNota();
 
+             $customer = null;
+
+            if ($request->pelanggan) {
+
+                $customer = Customer::where(
+                    'kode_pelanggan',
+                    $request->pelanggan
+                )->first();
+
+            }
+
             $transaction = Transaction::create([
 
                 'no_nota'      => $noNota,
                 'user_id'      => 1,
 
-                'pelanggan'    => $request->pelanggan,
+                'pelanggan' => $request->pelanggan,
+
+                'telp' => $customer?->telepon,
 
                 'subtotal'     => $request->subtotal,
 
@@ -216,9 +241,25 @@ class TransactionController extends Controller
             Transaction::with('details')
             ->findOrFail($id);
 
+        $customer = null;
+
+        if ($transaction->pelanggan) {
+
+            $customer = Customer::where(
+                'kode_pelanggan',
+                $transaction->pelanggan
+            )->first();
+
+        }
+
         return view(
             'transactions.print',
-            compact('transaction')
+            compact(
+                'transaction',
+                'customer'
+            )
         );
     }
+
+    
 }

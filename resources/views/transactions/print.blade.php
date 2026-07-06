@@ -6,7 +6,7 @@
     <title>Print Struk</title>
 
     <style>
-        /* printer thermal 58mm */
+
         body{
             font-family: monospace;
             width:58mm;
@@ -16,10 +16,6 @@
 
         .center{
             text-align:center;
-        }
-
-        .right{
-            text-align:right;
         }
 
         hr{
@@ -32,7 +28,7 @@
             font-size:13px;
         }
 
-        @media print {
+        @media print{
 
             button{
                 display:none;
@@ -50,13 +46,9 @@
 
     <h3>TOKO ANDA</h3>
 
-    <div>
-        Jl. Contoh No.123
-    </div>
+    <div>Jl. Contoh No.123</div>
 
-    <div>
-        Telp 08123456789
-    </div>
+    <div>Telp 08123456789</div>
 
 </div>
 
@@ -76,6 +68,21 @@
 
 </div>
 
+<div>
+
+    Pelanggan :
+    {{-- {{ $transaction->pelanggan ?: 'Umum' }} --}}
+    {{ $customer->nama ?? 'Umum' }}
+
+</div>
+
+<div>
+
+    Kasir :
+    {{ $transaction->user->name ?? 'Admin' }}
+
+</div>
+
 <hr>
 
 <table width="100%">
@@ -83,21 +90,31 @@
 @foreach($transaction->details as $item)
 
 <tr>
+
     <td colspan="2">
+
         {{ $item->nama_barang }}
+
     </td>
+
 </tr>
 
 <tr>
+
     <td>
+
         {{ $item->qty }}
         x
         {{ number_format($item->harga,0,',','.') }}
+
     </td>
 
     <td align="right">
+
         {{ number_format($item->subtotal,0,',','.') }}
+
     </td>
+
 </tr>
 
 @endforeach
@@ -109,24 +126,39 @@
 <table width="100%">
 
 <tr>
+
     <td>Subtotal</td>
+
     <td align="right">
+
         {{ number_format($transaction->subtotal,0,',','.') }}
+
     </td>
+
 </tr>
 
 <tr>
-    <td>Voucher</td>
+
+    <td>Diskon</td>
+
     <td align="right">
-        {{ number_format($transaction->voucher,0,',','.') }}
+
+        0
+
     </td>
+
 </tr>
 
-<tr>
-    <td>Card</td>
+<tr class="total-row">
+
+    <td>TOTAL</td>
+
     <td align="right">
-        {{ number_format($transaction->card,0,',','.') }}
+
+        {{ number_format($transaction->grand_total,0,',','.') }}
+
     </td>
+
 </tr>
 
 </table>
@@ -135,37 +167,94 @@
 
 <table width="100%">
 
-<tr class="total-row">
-    <td><b>Total</b></td>
-    <td align="right">
-        <b>
-            {{ number_format($transaction->grand_total,0,',','.') }}
-        </b>
-    </td>
-</tr>
+@if($transaction->cash > 0)
 
 <tr>
-    <td>Bayar</td>
+
+    <td>Cash</td>
+
     <td align="right">
+
         {{ number_format($transaction->cash,0,',','.') }}
+
     </td>
+
 </tr>
+
+@endif
+
+@if($transaction->voucher > 0)
 
 <tr>
-    <td>Kembali</td>
+
+    <td>Voucher</td>
+
     <td align="right">
-        {{ number_format($transaction->kembalian,0,',','.') }}
+
+        {{ number_format($transaction->voucher,0,',','.') }}
+
     </td>
+
 </tr>
 
-</table>  
+@endif
+
+@if($transaction->card > 0)
+
+<tr>
+
+    <td>Card</td>
+
+    <td align="right">
+
+        {{ number_format($transaction->card,0,',','.') }}
+
+    </td>
+
+</tr>
+
+@endif
+
+<tr>
+
+    <td><b>Kembali</b></td>
+
+    <td align="right">
+
+        <b>
+
+            {{ number_format($transaction->kembalian,0,',','.') }}
+
+        </b>
+
+    </td>
+
+</tr>
+
+</table>
+
+<hr>
+
+<div>
+
+    Total Item :
+    {{ $transaction->details->sum('qty') }}
+
+</div>
 
 <hr>
 
 <div class="center">
 
+    Terima Kasih
+
+    <br>
+
     Barang yang sudah dibeli
-tidak dapat ditukar
+
+    <br>
+
+    tidak dapat ditukar
 
 </div>
 
@@ -179,16 +268,20 @@ tidak dapat ditukar
 
 <script>
 
-window.onload = function()
-{
+window.onload=function(){
+
     window.print();
+
 };
 
-window.onafterprint = function()
-{
+window.onafterprint=function(){
+
     window.close();
+
 };
 
 </script>
+
 </body>
+
 </html>

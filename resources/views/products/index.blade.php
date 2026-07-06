@@ -36,37 +36,104 @@
     {{-- Toolbar --}}
     <div class="flex justify-between items-center mb-6">
 
-        <div class="relative w-80">
+    <form
+        method="GET"
+        action="{{ url('/products') }}"
+        class="flex gap-3 items-center"
+    >
 
-            <i
-                class="ri-search-line
-                absolute left-4 top-1/2
-                -translate-y-1/2
-                text-slate-400"
-            ></i>
+        {{-- Search --}}
+        <x-search-box
 
-            <input
+            name="search"
 
-                type="text"
+            :value="request('search')"
 
-                placeholder="Cari produk..."
+            placeholder="Cari produk..."
 
-                class="w-full
-                rounded-xl
-                border
-                border-slate-300
-                pl-11
-                pr-4
-                py-3
-                focus:border-indigo-500
-                focus:ring-4
-                focus:ring-indigo-100"
+        />
+       
 
+        {{-- Kategori --}}
+        <x-select
+            name="category"
+            class="w-40"
+        >
+
+            <option value="">
+
+                Semua Kategori
+
+            </option>
+
+            @foreach($categories as $category)
+
+                <option
+
+                    value="{{ $category->id }}"
+
+                    @selected(request('category')==$category->id)
+
+                >
+
+                    {{ $category->name }}
+
+                </option>
+
+            @endforeach
+
+        </x-select>
+
+        {{-- Stock --}}
+
+        <x-select
+            name="stock"
+            class="w-40"
+        >
+
+            <option value="">
+
+                Semua Stok
+
+            </option>
+
+            <option
+                value="available"
+                @selected(request('stock')=='available')
             >
+                Tersedia
+            </option>
 
-        </div>
+            <option
+                value="low"
+                @selected(request('stock')=='low')
+            >
+                Menipis
+            </option>
 
-    </div>
+            <option
+                value="empty"
+                @selected(request('stock')=='empty')
+            >
+                Habis
+            </option>
+
+        </x-select>
+
+        <x-button
+            color="gray"
+            type="submit"
+        >
+
+            <i class="ri-filter-3-line"></i>
+
+            Filter
+
+        </x-button>
+
+    </form>
+
+</div>
 
 
     <x-table >
@@ -130,7 +197,7 @@
 
                 <x-table-cell class="text-right">
 
-                    @if($product->stock <= 5)
+                    @if($product->stok <= 5)
 
                         <x-badge color="red">
 
@@ -138,7 +205,7 @@
 
                         </x-badge>
 
-                    @elseif($product->stock <= 15)
+                    @elseif($product->stok <= 15)
 
                         <x-badge color="yellow">
 

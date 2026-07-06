@@ -19,6 +19,9 @@ return [
 
     'default' => env('DB_CONNECTION', 'sqlite'),
 
+    'mysqldump_path' => env('MYSQLDUMP_PATH'),
+    // 'mysqldump_path' => env('MYSQLDUMP_PATH', 'mysqldump'),
+
     /*
     |--------------------------------------------------------------------------
     | Database Connections

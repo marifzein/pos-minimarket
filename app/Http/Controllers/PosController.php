@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Models\Customer;
 
 class PosController extends Controller
 {
@@ -21,11 +22,21 @@ class PosController extends Controller
 
         $noNota = Transaction::generateNoNota();
 
+        $customers = Customer::where('status',1)
+        ->orderBy('nama')
+        ->get([
+            'kode_pelanggan',
+            'nama',
+            'telepon',
+            'is_member'
+        ]);
+
         return view(
             'pos.index',
             compact(
                 'products',
-                'noNota'
+                'noNota',
+                'customers'
             )
         );
     }

@@ -14,14 +14,20 @@
 
     'icon' => null,
 
+    'width' => 'full',
+
 ])
+
+@php
+    $inputId = $attributes->get('id', $name);
+@endphp
 
 <div class="space-y-2">
 
     @if($label)
 
         <label
-            for="{{ $name }}"
+            for="{{ $inputId }}"
             class="block text-sm font-semibold text-slate-700 transition-colors duration-200 peer-focus-within:text-indigo-600"
         >
 
@@ -58,7 +64,7 @@
 
         <input
 
-            id="{{ $name }}"
+            id="{{ $inputId }}"
 
             name="{{ $name }}"
 
@@ -74,7 +80,11 @@
 
                 'class'=>
 
-                'w-full
+                ($width == 'full' ? 'w-full ' : $width . ' ')
+
+                .
+
+                '
 
                 rounded-xl
 

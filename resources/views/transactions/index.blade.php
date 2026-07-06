@@ -61,9 +61,13 @@
 
                         <a
                             href="{{ route('transactions.show',$trx->id) }}"
-                            class="bg-blue-500 text-white px-3 py-1 rounded"
+                            {{-- class="bg-blue-500 text-white px-3 py-1 rounded" --}}
                         >
-                            Detail
+                            <x-button color="green">
+                                <i class="ri-printer-line"></i>
+                                Detail
+                            </x-button>
+                            
                         </a>
 
                     </td>
