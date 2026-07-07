@@ -94,7 +94,7 @@ class PurchaseOrderController extends Controller
         $poNumber = DocumentNumber::generate(
             'purchase_orders',
             'po_number',
-            'PO'
+            'PO'    
         );
 
         return view(

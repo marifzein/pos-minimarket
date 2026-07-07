@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+
 
 class ProfileController extends Controller
 {
@@ -56,5 +59,35 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Menampilkan halaman form ganti password
+     */
+    public function changePassword()
+    {
+        return view('profile.change-password');
+    }
+
+    /**
+     * Memproses perubahan password user yang sedang login
+     */
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'current_password.current_password' => 'Password lama yang Anda masukkan salah.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Password Anda berhasil diperbarui.');
     }
 }

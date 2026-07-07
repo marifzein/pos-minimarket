@@ -16,6 +16,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ProductImportController;
 use App\Http\Controllers\DeveloperController;
+use App\Http\Controllers\StockAdjustmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +85,11 @@ Route::middleware('auth')->group(function () {
             'show',
             'destroy'
         ]);
+
+        Route::post(
+            'users/{user}/reset-password',
+            [UserController::class, 'resetPassword']
+        )->name('users.reset-password');
 
         // Customers
         Route::resource('customers', CustomerController::class);
@@ -281,6 +287,18 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Stock Adjustment (SA)
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show', 'destroy']);
+    
+    // Route khusus untuk memproses posting/closed dokumen SA
+    Route::post('/stock-adjustments/{stockAdjustment}/post', [StockAdjustmentController::class, 'post'])
+        ->name('stock-adjustments.post');
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Profile (Breeze)
     |--------------------------------------------------------------------------
     */
@@ -294,6 +312,10 @@ Route::middleware('auth')->group(function () {
         '/profile',
         [ProfileController::class,'update']
     )->name('profile.update');
+
+    // === ganti password ===
+    Route::get('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
+    Route::put('/password/change', [ProfileController::class, 'updatePassword'])->name('password.password-update');
 
     Route::delete(
         '/profile',

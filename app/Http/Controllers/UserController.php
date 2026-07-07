@@ -85,26 +85,33 @@ class UserController extends Controller
         $request->validate([
 
             'name'=>'required',
-
             'email'=>'required|email|unique:users,email,'.$user->id,
-
             'role'=>'required',
-
-            'is_active'=>'required'
-
-        ]);
-
-        $user->update([
-
-            'name'=>$request->name,
-
-            'email'=>$request->email,
-
-            'role'=>$request->role,
-
-            'is_active'=>$request->is_active
+            'is_active'=>'required',
+            'password'  => 'nullable|min:6',
 
         ]);
+
+        $data = [
+
+            'name'      => $request->name,
+
+            'email'     => $request->email,
+
+            'role'      => $request->role,
+
+            'is_active' => $request->is_active,
+
+        ];
+
+        // Jika password diisi, update password
+        if ($request->filled('password')) {
+
+            $data['password'] = Hash::make($request->password);
+
+        }
+
+        $user->update($data);
 
         return redirect()
 

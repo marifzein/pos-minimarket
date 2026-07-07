@@ -195,6 +195,12 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 Stock Opname
             </a>
 
+            <a href="/stock-adjustments"
+                class="submenu {{ request()->is('stock-adjustments*') ? 'submenu-active':'' }}">
+                <i class="ri-todo-line"></i>
+                Stock Adjusment
+            </a>
+
         </div>
 
 

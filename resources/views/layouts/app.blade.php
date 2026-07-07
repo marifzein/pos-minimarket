@@ -39,7 +39,7 @@
     <style>
 
 aside{
-    background:#0F172A;
+    background:#0A2947;
     color:#E2E8F0;
 }
 
@@ -54,28 +54,28 @@ aside{
 }
 
 .menu-parent:hover{
-    background:#1E293B;
+    background:#123A61;
     color:#fff;
 }
 
 .submenu{
     display:block;
     padding:10px 20px 10px 48px;
-    color:#94A3B8;
+    color:#94AFC7;
     border-left:4px solid transparent;
     transition:all .25s ease;
 }
 
 .submenu:hover{
-    background:#1E293B;
+    background:#123A61;
     color:#fff;
     padding-left:54px;
 }
 
 .submenu-active{
-    background:#334155;
+    background:#1A4F80;
     color:#fff;
-    border-left:4px solid #6366F1;
+    border-left:4px solid #60A5FA;
 }
 
 /* ---------- Accordion ---------- */
@@ -105,7 +105,7 @@ aside{
 /* ---------- Footer ---------- */
 
 .sidebar-footer{
-    border-top:1px solid #1E293B;
+    border-top:1px solid #123A61;
 }
 
 .logout-btn{
@@ -142,15 +142,17 @@ aside::-webkit-scrollbar{
 }
 
 aside::-webkit-scrollbar-thumb{
-    background:#334155;
+    background:#2A5D87;
     border-radius:20px;
 }
 
 aside::-webkit-scrollbar-track{
-    background:#0F172A;
+    background:#0A2947;
 }
 
 </style>
+
+
     {{-- sidemenu --}}
 
 </head>

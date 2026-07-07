@@ -181,7 +181,7 @@
 
         <x-input
 
-            label="Password Baru"
+            label="Password Baru (Opsional)"
 
             name="password"
 
