@@ -17,7 +17,7 @@
             </h2>
 
             <a
-                href="{{ asset('Template_Import_Produk_100_Data.xlsx') }}"
+                href="{{ asset('format-produk.xlsx') }}"
                 class="text-indigo-600 hover:underline"
             >
 

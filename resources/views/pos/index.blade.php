@@ -423,7 +423,13 @@
                                       </td>
 
                                       <td class="text-center">
+                                        {{-- @input="
 
+                                                if(item.qty<1) item.qty=1;
+
+                                                calculateItem(item)
+
+                                                " --}}
                                           <input
                                               type="number"
                                               min="1"
@@ -431,13 +437,7 @@
                                               x-model="item.qty"
                                               @change="validateQty(item)"
                                               @keydown.enter.prevent="$refs.barcodeInput.focus()"
-                                              @input="
-
-                                                if(item.qty<1) item.qty=1;
-
-                                                calculateItem(item)
-
-                                                "
+                                              @input="calculateItem(item)"
                                               class="w-20 border rounded text-center p-1"
                                           />
 

@@ -1,0 +1,304 @@
+@extends('layouts.app')
+
+@section('title','Master Produk')
+
+@section('content')
+
+<x-page-header
+
+    title="Kartu Stok"
+
+    subtitle="Monitoring mutasi stok"
+
+>
+
+    {{-- <x-slot:action>
+
+        <a href="/products/create">
+
+            <x-button color="primary">
+
+                <i class="ri-add-line"></i>
+
+                Tambah Produk
+
+            </x-button>
+
+        </a>
+
+    </x-slot:action> --}}
+
+</x-page-header>
+
+
+<x-card>
+
+    {{-- Toolbar --}}
+    <div class="flex justify-between items-center mb-6">
+
+    <form
+        method="GET"
+        action="{{ route('stock-cards.index') }}"
+        class="flex gap-3 items-center"
+    >
+
+        {{-- Search --}}
+        <x-search-box
+
+            name="search"
+
+            :value="request('search')"
+
+            placeholder="Cari produk..."
+
+        />
+       
+
+        {{-- Kategori --}}
+        <x-select
+            name="category"
+            class="w-40"
+        >
+
+            <option value="">
+
+                Semua Kategori
+
+            </option>
+
+            @foreach($categories as $category)
+
+                <option
+
+                    value="{{ $category->id }}"
+
+                    @selected(request('category')==$category->id)
+
+                >
+
+                    {{ $category->name }}
+
+                </option>
+
+            @endforeach
+
+        </x-select>
+
+        {{-- Stock --}}
+
+        <x-select
+            name="stock"
+            class="w-40"
+        >
+
+            <option value="">
+
+                Semua Stok
+
+            </option>
+
+            <option
+                value="available"
+                @selected(request('stock')=='available')
+            >
+                Tersedia
+            </option>
+
+            <option
+                value="low"
+                @selected(request('stock')=='low')
+            >
+                Menipis
+            </option>
+
+            <option
+                value="empty"
+                @selected(request('stock')=='empty')
+            >
+                Habis
+            </option>
+
+        </x-select>
+
+        <x-button
+            color="gray"
+            type="submit"
+        >
+
+            <i class="ri-filter-3-line"></i>
+
+            Filter
+
+        </x-button>
+
+    </form>
+
+</div>
+
+
+    <x-table >
+
+        {{-- <thead> --}}
+        <x-table-header >
+
+            <tr>
+                 
+                {{-- <th class="text-left  py-4 px-3">Produk</th> --}}
+                <x-table-head class="text-left">Produk</x-table-head>
+                <x-table-head class="text-left">Barcode</x-table-head>
+                <x-table-head class="text-right">Harga</x-table-head>
+                <x-table-head class="text-right">Stock</x-table-head>
+                <x-table-head class="text-center">Status</x-table-head>
+                <x-table-head class="text-center">View</x-table-head>
+                
+            </tr>
+        </x-table-header >    
+        {{-- </thead> --}}
+
+        <tbody>
+
+        @forelse($products as $product)
+
+            <tr>
+
+                <x-table-cell class="text-left">
+
+                    {{-- <div class="font-semibold"> --}}
+
+                        {{ $product->nama_barang }} 
+
+                    {{-- </div> --}}
+
+                </x-table-cell>
+
+                <x-table-cell class="text-left">
+
+                    {{ $product->barcode }}
+
+                </x-table-cell>
+
+                
+
+                <x-table-cell class="text-right">
+
+                    Rp {{ number_format($product->harga,0,',','.') }}
+
+                </x-table-cell>
+
+                <x-table-cell class="text-right">
+
+                    @if($product->stok <= 5)
+
+                        <x-badge color="red">
+
+                            {{ $product->stok }}
+
+                        </x-badge>
+
+                    @elseif($product->stok <= 15)
+
+                        <x-badge color="yellow">
+
+                            {{ $product->stok }}
+
+                        </x-badge>
+
+                    @else
+
+                        <x-badge color="green">
+
+                            {{ $product->stok }}
+
+                        </x-badge>
+
+                    @endif
+
+                </x-table-cell>
+
+                <x-table-cell class="text-center">
+
+                    @if($product->stok > 0)
+
+                        <x-badge color="green">
+
+                            Tersedia
+
+                        </x-badge>
+
+                    @else
+
+                        <x-badge color="red">
+
+                            Habis
+
+                        </x-badge>
+
+                    @endif
+
+                </x-table-cell>
+
+                <x-table-cell class="text-center">
+
+                    <div class="flex justify-center gap-2">
+
+                        <a
+                            href="/stock-cards/{{ $product->id }}"
+                        >
+
+                            <x-button
+
+                                color="blue"
+
+                                size="sm"
+
+                            >
+
+                                <i class="ri-file-chart-line"></i>
+
+                            </x-button>
+
+                        </a>
+
+                        
+
+                    </div>
+
+                </x-table-cell>
+
+            </tr>
+
+        @empty
+
+            <tr>
+
+                <td colspan="7">
+
+                    <x-empty-state
+
+                        icon="ri-box-3-line"
+
+                        title="Belum ada produk"
+
+                        description="Tambah Produk untuk membuat data baru."
+
+                    />
+
+                </td>
+
+            </tr>
+
+        @endforelse
+
+        </tbody>
+
+    </x-table>
+
+    <div class="mt-6">
+
+        {{ $products->links() }}
+
+    </div>
+
+</x-card>
+
+@endsection

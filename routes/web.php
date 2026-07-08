@@ -17,7 +17,11 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ProductImportController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\StockAdjustmentController;
-
+use App\Http\Controllers\StockCardController;
+use App\Http\Controllers\PenerimaanBarangController;    
+use App\Http\Controllers\LaporanPenjualanKasirController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ReturBarangController;
 /*
 |--------------------------------------------------------------------------
 | Redirect Root
@@ -68,14 +72,30 @@ Route::middleware('auth')->group(function () {
             'destroy'
         ]);
 
+        // Stock Card:
+        // Route::get(
+        //     'products/{product}/stock-card',
+        //     [ProductController::class, 'stockCard']
+        // )->name('products.stock-card');
+
+        /*
+        |--------------------------------------------------------------------------
+        | KARTU STOK (INVENTORY MODULE) real
+        |--------------------------------------------------------------------------
+        */
+        Route::get('stock-cards', [App\Http\Controllers\StockCardController::class, 'index'])->name('stock-cards.index');
+        Route::get('stock-cards/{product}', [App\Http\Controllers\StockCardController::class, 'show'])->name('stock-cards.show');
+
         // PO
         Route::resource(
             'purchasing',
             PurchaseOrderController::class
         )->except([
-            'show',
             'destroy'
         ]);
+        // Tempatkan di dalam grup Route::middleware('role:Admin')->group(function () { ... })
+        Route::get('purchasing/{purchasing}/print-pdf', [PurchaseOrderController::class, 'printPdf'])
+            ->name('purchasing.print-pdf');
         
         // User
         Route::resource(
@@ -105,6 +125,17 @@ Route::middleware('auth')->group(function () {
         
 
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | RETUR
+    |--------------------------------------------------------------------------
+    */
+        // Jalur API internal pencarian cepat produk retur
+        Route::get('/api/retur/search-products', [ReturBarangController::class, 'searchProducts'])->name('api.retur.search-products');
+
+        // Resource Route untuk Retur Barang (Hanya mengaktifkan index, create, store, dan show)
+        Route::resource('retur', ReturBarangController::class)->only(['index', 'create', 'store', 'show']);
 
     /*
     |--------------------------------------------------------------------------
@@ -158,6 +189,14 @@ Route::middleware('auth')->group(function () {
         ];
 
     });
+
+    // setting profile toko
+    Route::middleware(['auth'])->group(function () {
+        // Taruh di dalam grup middleware auth kamu
+        Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
+        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
+    });
+
 
     /* 
     ============================================================|
@@ -284,7 +323,19 @@ Route::middleware('auth')->group(function () {
         '/stock-opname/{stockOpname}/print',
         [StockOpnameController::class,'print']
     )->name('stock-opname.print');
-
+    
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Modul Penerimaan Barang
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/penerimaan-barang', [PenerimaanBarangController::class, 'index'])->name('penerimaan.index');
+    Route::get('/penerimaan-barang/create', [PenerimaanBarangController::class, 'create'])->name('penerimaan.create');
+    Route::post('/penerimaan-barang', [PenerimaanBarangController::class, 'store'])->name('penerimaan.store');
+    Route::get('/api/penerimaan/search-products', [PenerimaanBarangController::class, 'searchProducts']);
+    Route::get('/penerimaan-barang/{id}', [PenerimaanBarangController::class, 'show'])->name('penerimaan.show');
+    
     /*
     |--------------------------------------------------------------------------
     | Stock Adjustment (SA)
@@ -296,7 +347,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/stock-adjustments/{stockAdjustment}/post', [StockAdjustmentController::class, 'post'])
         ->name('stock-adjustments.post');
 
-
+    
     /*
     |--------------------------------------------------------------------------
     | Profile (Breeze)
@@ -323,6 +374,15 @@ Route::middleware('auth')->group(function () {
     )->name('profile.destroy');
 
 });
+
+/*
+|--------------------------------------------------------------------------
+| LAPORAN
+|--------------------------------------------------------------------------
+*/
+// laporan penjualan kasir
+Route::get('/laporan/penjualan-kasir', [LaporanPenjualanKasirController::class, 'index'])
+    ->name('laporan.penjualan-kasir');
 
 /*
 |--------------------------------------------------------------------------

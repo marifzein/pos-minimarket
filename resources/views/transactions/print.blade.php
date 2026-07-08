@@ -43,13 +43,9 @@
 <body>
 
 <div class="center">
-
-    <h3>TOKO ANDA</h3>
-
-    <div>Jl. Contoh No.123</div>
-
-    <div>Telp 08123456789</div>
-
+    <h3>{{ strtoupper($shopSetting->nama_toko) }}</h3>
+    <div>{{ $shopSetting->alamat }}</div>
+    <div>Telp {{ $shopSetting->telepon }}</div>
 </div>
 
 <hr>
@@ -244,7 +240,7 @@
 
 <hr>
 
-<div class="center">
+{{-- <div class="center">
 
     Terima Kasih
 
@@ -256,6 +252,10 @@
 
     tidak dapat ditukar
 
+</div> --}}
+
+<div class="center">
+    {!! nl2br(e($shopSetting->footer_nota)) !!}
 </div>
 
 <br>

@@ -9,6 +9,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -109,7 +110,7 @@ class TransactionController extends Controller
             $transaction = Transaction::create([
 
                 'no_nota'      => $noNota,
-                'user_id'      => 1,
+                'user_id'      => Auth::id(),
 
                 'pelanggan' => $request->pelanggan,
 
@@ -237,9 +238,11 @@ class TransactionController extends Controller
     // cetak struk
     public function print($id)
     {
-        $transaction =
-            Transaction::with('details')
-            ->findOrFail($id);
+        // $transaction =
+        //     Transaction::with('details')
+        //     ->findOrFail($id);
+
+        $transaction = Transaction::with(['details', 'user'])->findOrFail($id);
 
         $customer = null;
 
@@ -252,11 +255,20 @@ class TransactionController extends Controller
 
         }
 
+        // Ambil data pengaturan toko global
+        $shopSetting = \App\Models\Setting::first() ?? new \App\Models\Setting([
+            'nama_toko' => 'TOKO ANDA',
+            'alamat' => 'Jl. Contoh No.123',
+            'telepon' => '08123456789',
+            'footer_nota' => 'Terima Kasih\nBarang yang sudah dibeli\ntidak dapat ditukar'
+        ]);
+        
         return view(
             'transactions.print',
             compact(
                 'transaction',
-                'customer'
+                'customer',
+                'shopSetting'
             )
         );
     }

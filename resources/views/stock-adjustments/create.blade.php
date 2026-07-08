@@ -307,7 +307,7 @@ function renderTable() {
                 <input type="number" name="qty[]" min="1" value="${item.qty}" data-index="${index}" class="qty border rounded w-24 px-2 py-1 text-center font-bold text-indigo-600">
             </td>
             <td>
-                <input type="text" value="${item.notes}" data-index="${index}" placeholder="Alasan (Misal: Bocor, Expired)" class="item-notes border rounded w-full px-3 py-1 text-sm">
+                <input type="text" name="notes[]" value="${item.notes}" data-index="${index}" placeholder="Alasan (Misal: Bocor, Expired)" class="item-notes border rounded w-full px-3 py-1 text-sm">
             </td>
             <td class="text-center">
                 <button type="button" class="delete text-red-600 hover:text-red-800 p-1" data-index="${index}">

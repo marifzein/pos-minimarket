@@ -123,6 +123,7 @@ aside{
 #icon-master,
 #icon-inventory,
 #icon-penjualan,
+#icon-laporan,
 #icon-system{
 
     transition:transform .30s ease;
@@ -277,7 +278,7 @@ const menus=[
     'kasir',
     'master',
     'inventory',
-    'penjualan',
+    'laporan',
     'system'
 ];
 

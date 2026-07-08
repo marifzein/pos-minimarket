@@ -5,8 +5,8 @@
 @section('content')
 
 <x-page-header
-    title="Buat Purchase Order"
-    subtitle="Buat Purchase Order baru"
+    title="Edit Purchase Order"
+    subtitle="Edit Draft Purchase Order"
 >
     <x-slot:action>
 

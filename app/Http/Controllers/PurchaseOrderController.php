@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Helpers\DocumentNumber;
+use Barryvdh\DomPDF\Facade\Pdf; // Jika menggunakan dompdf
 
 class PurchaseOrderController extends Controller
 {
@@ -169,6 +170,7 @@ class PurchaseOrderController extends Controller
 
                 ]);
 
+                
                 $grandTotal += $subtotal;
             }
 
@@ -201,6 +203,12 @@ class PurchaseOrderController extends Controller
 
     public function edit(PurchaseOrder $purchasing)
     {
+        // KEAMANAN BACKEND: Jika status bukan DRAFT, tolak akses dan kembalikan dengan pesan error
+        if ($purchasing->status !== 'DRAFT') {
+            return redirect()->route('purchasing.index')
+                ->with('error', 'Purchase Order yang sudah diproses tidak dapat diedit.');
+        }
+
         $purchasing->load(
 
             'supplier',
@@ -354,5 +362,47 @@ class PurchaseOrderController extends Controller
     public function destroy(PurchaseOrder $purchasing)
     {
         //
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | View Detail (Readonly)
+    |--------------------------------------------------------------------------
+    */
+    public function show(PurchaseOrder $purchasing)
+    {
+        // Load relasi supplier dan item produk
+        $purchasing->load(['supplier', 'items.product']);
+
+        return view('purchasing.show', [
+            'po' => $purchasing
+        ]);
+    }
+
+    
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cetak PDF Purchase Order
+    |--------------------------------------------------------------------------
+    */
+    public function printPdf(PurchaseOrder $purchasing)
+    {
+        // Keamanan Tingkat Menengah: Hanya status ORDERED & RECEIVED yang boleh di-print
+        if (!in_array($purchasing->status, ['ORDERED', 'RECEIVED'])) {
+            return redirect()->route('purchasing.index')
+                ->with('error', 'Cetak gagal! Dokumen Purchase Order harus berstatus ORDERED.');
+        }
+
+        // Load data relasi lengkap
+        $purchasing->load(['supplier', 'items.product', 'user']);
+
+        // Render file view khusus cetak ke dalam format PDFStream
+        $pdf = Pdf::loadView('purchasing.print', [
+            'po' => $purchasing
+        ])->setPaper('a4', 'portrait');
+
+        // Download / Stream PDF ke browser dengan nama file yang rapi
+        return $pdf->stream("PO-{$purchasing->po_number}.pdf");
     }
 }

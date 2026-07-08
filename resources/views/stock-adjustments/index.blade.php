@@ -83,10 +83,15 @@
                             </a>
                         @else
                             <a href="{{ route('stock-adjustments.edit', $sa->id) }}">
+                                <x-button color="blue" size="sm" title="Lihat Detail">
+                                    <i class="ri-eye-line"></i>
+                                </x-button>
+                            </a>
+                            {{-- <a href="{{ route('stock-adjustments.edit', $sa->id) }}">
                                 <x-button color="gray" size="sm" class="opacity-50 cursor-not-allowed" title="Sudah Terkunci" >
                                     <i class="ri-lock-line"></i>
                                 </x-button>
-                            </a>
+                            </a> --}}
                         @endif
                     </div>
                 </x-table-cell>

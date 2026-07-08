@@ -38,6 +38,7 @@
         <form
             method="GET"
             class="flex gap-3"
+            action="{{ route('purchasing.index') }}"
         >
 
             <input
@@ -54,7 +55,7 @@
 
             >
 
-            <x-button>
+            <x-button type="submit">
 
                 <i class="ri-search-line"></i>
 
@@ -108,7 +109,7 @@
 
                 <x-table-cell>
 
-                    {{ $po->supplier->name }}
+                    {{ $po->supplier->nama }}
 
                 </x-table-cell>
 
@@ -170,7 +171,7 @@
 
                     <div class="flex justify-center gap-2">
 
-                        <a href="{{ route('purchasing.edit',$po) }}">
+                        {{-- <a href="{{ route('purchasing.edit',$po) }}">
 
                             <x-button color="blue" size="sm" >
 
@@ -178,19 +179,43 @@
 
                             </x-button>
 
-                        </a>
-
-                        <a href="#">
-
-                            <x-button color="green" size="sm">
-
-                                <i class="ri-eye-line"></i>
-
+                        </a> --}}
+                        {{-- Cek Apakah Statusnya DRAFT --}}
+                        @if($po->status === 'DRAFT')
+                            <a href="{{ route('purchasing.edit', $po) }}">
+                                <x-button color="blue" size="sm">
+                                    <i class="ri-edit-line"></i>
+                                </x-button>
+                            </a>
+                        @else
+                            {{-- Tampilkan tombol edit yang mati/disabled secara visual --}}
+                            <x-button color="gray" size="sm" class="opacity-50 cursor-not-allowed" disabled>
+                                <i class="ri-edit-line"></i>
                             </x-button>
+                        @endif
+
+                        <a href="#">
+
+                            <a href="{{ route('purchasing.show', $po) }}">
+                                <x-button color="green" size="sm" title="Lihat Detail">
+                                    <i class="ri-eye-line"></i>
+                                </x-button>
+                            </a>
 
                         </a>
 
-                        <a href="#">
+                        @if($po->status === 'ORDERED' || $po->status === 'RECEIVED')
+                            <a href="{{ route('purchasing.print-pdf', $po) }}" target="_blank">
+                                <x-button color="orange" size="sm" title="Cetak PO">
+                                    <i class="ri-printer-line"></i>
+                                </x-button>
+                            </a>
+                        @else
+                            <x-button color="gray" size="sm" class="opacity-40 cursor-not-allowed" title="Cetak hanya aktif jika status ORDERED" disabled>
+                                <i class="ri-printer-line"></i>
+                            </x-button>
+                        @endif
+                        {{-- <a href="#">
 
                             <x-button color="orange" size="sm">
 
@@ -198,7 +223,7 @@
 
                             </x-button>
 
-                        </a>
+                        </a> --}}
 
                     </div>
 

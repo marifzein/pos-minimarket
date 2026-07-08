@@ -58,7 +58,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
         </a>
 
         {{-- ===================== --}}
-        {{-- KASIR --}}
+        {{-- PENJUALAN --}}
         {{-- ===================== --}}
 
         <button
@@ -70,7 +70,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
 
                 <i class="ri-shopping-cart-2-line"></i>
 
-                <span>Kasir</span>
+                <span>Penjualan</span>
 
             </div>
 
@@ -85,6 +85,12 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 class="submenu {{ request()->is('pos*') ? 'submenu-active' : '' }}">
                 <i class="ri-shopping-cart-2-line"></i>
                 POS
+            </a>
+
+             <a href="/transactions"
+                class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}">
+                <i class="ri-price-tag-3-line"></i>
+                Riwayat Transaksi
             </a>
 
         </div>
@@ -186,59 +192,78 @@ class="w-64 shadow-lg z-30 flex flex-col">
             <a href="/purchasing"
                 class="submenu {{ request()->is('purchasing*') ? 'submenu-active':'' }}">
                 <i class="ri-store-2-line"></i>
-                Purchasing
+                Pembelian (PO)
             </a>
 
+            <a 
+                    href="{{ route('penerimaan.index') }}" 
+                    class=submenu {{ request()->is('penerimaan*') ? 'submenu-active':'' }}"
+                >
+                    <i class="ri-download-2-line"></i>
+                    Penerimaan Barang
+                </a>
+
+            <a href="/stock-cards"
+                class="submenu {{ request()->is('stock-cards*') ? 'submenu-active':'' }}">
+                <i class="ri-file-history-line"></i>
+                Kartu Stok
+            </a>
+
+            <!-- MENU RETUR BARANG TERBARU -->
+            <a 
+                href="{{ route('retur.index') }}" 
+                class="submenu {{ request()->is('retur*') ? 'submenu-active' : '' }}"
+            >
+                <i class="ri-arrow-go-back-line"></i>
+                Retur Barang
+            </a>
+            
             <a href="/stock-opname"
                 class="submenu {{ request()->is('stock-opname*') ? 'submenu-active':'' }}">
-                <i class="ri-todo-line"></i>
-                Stock Opname
+                <i class="ri-survey-line"></i>
+                Stok Opname
             </a>
 
             <a href="/stock-adjustments"
                 class="submenu {{ request()->is('stock-adjustments*') ? 'submenu-active':'' }}">
-                <i class="ri-todo-line"></i>
-                Stock Adjusment
+                <i class="ri-equalizer-line"></i>
+                Penyesuaian Stok
             </a>
 
         </div>
 
 
 
+        
         {{-- ===================== --}}
-        {{-- PENJUALAN --}}
+        {{-- LAPORAN --}}
         {{-- ===================== --}}
 
-        <button
+       <button
             type="button"
-            onclick="toggleMenu('penjualan')"
+            onclick="toggleMenu('laporan')"
             class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
 
             <div class="flex items-center gap-3">
-
                 <i class="ri-file-list-3-line"></i>
-
-                <span>Penjualan</span>
-
+                <span>Laporan</span>
             </div>
 
-            <i id="icon-penjualan"
-                class="ri-arrow-right-s-line transition-all"></i>
-
+            <i id="icon-laporan" class="ri-arrow-right-s-line transition-all"></i>
         </button>
 
-        <div id="menu-penjualan" class="menu-content">
-
-            <a href="/transactions"
-                class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}">
-                <i class="ri-price-tag-3-line"></i>
-                Transaksi
+        <div id="menu-laporan" class="menu-content">
+            <a href="{{ route('laporan.penjualan-kasir') }}" 
+                class="submenu {{ request()->routeIs('laporan.penjualan-kasir') ? 'submenu-active' : '' }}">
+                <i class="ri-line-chart-line"></i>
+                Penjualan Kasir
             </a>
-
+            
+            
         </div>
-
-
-
+        
+       
+        
         {{-- ===================== --}}
         {{-- SISTEM --}}
         {{-- ===================== --}}
@@ -262,7 +287,14 @@ class="w-64 shadow-lg z-30 flex flex-col">
         </button>
 
         <div id="menu-system" class="menu-content">
-
+            <!-- Bagian Menu Sistem di Sidebar -->
+            
+            <a href="{{ route('setting.index') }}" 
+            class="submenu {{ request()->routeIs('setting.index') ? 'submenu-active' : '' }}">
+                <i class="ri-settings-4-line mr-2 text-lg"></i>
+                Pengaturan Toko
+            </a>
+            
             <a href="/users"
                 class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}">
                 <i class="ri-group-line"></i>

@@ -52,6 +52,7 @@
                 type="date"
                 :value="date('Y-m-d', strtotime($stockAdjustment->tgl_sa))"
                 required
+                :readonly="$stockAdjustment->status === 'closed'"
             />
 
             <x-input
@@ -60,6 +61,7 @@
                 :value="$stockAdjustment->catatan"
                 placeholder="Contoh: Pembuangan barang rusak rak depan"
                 icon="ri-chat-4-line"
+                :readonly="$stockAdjustment->status === 'closed'"
             />
         </div>
     </x-card>
@@ -85,7 +87,8 @@
         </div>
       @endif
 
-        <div class="lg:col-span-2">
+        {{-- <div class="lg:col-span-2"> --}}
+        <div class="{{ $stockAdjustment->status === 'closed' ? 'lg:col-span-3' : 'lg:col-span-2' }}">    
             <x-card>
                 <div class="mb-4">
                     <h3 class="font-semibold">Daftar Item Dibuang / Dikurangi</h3>
@@ -108,12 +111,12 @@
     </div>
 
     <div class="flex justify-end gap-3 mt-6">
-        <a href="{{ route('stock-adjustments.index') }}">
+        {{-- <a href="{{ route('stock-adjustments.index') }}">
             <x-button color="secondary" type="button" full>
                 <i class="ri-close-circle-line text-red-500 text-base"></i>
                 {{ $stockAdjustment->status === 'closed' ? 'Kembali ke Index' : 'Batal' }}
             </x-button>
-        </a>
+        </a> --}}
         @if($stockAdjustment->status !== 'closed')
           <x-button color="orange" type="submit" name="action" value="draft" full>
               <i class="ri-save-line"></i>
@@ -242,24 +245,33 @@ function renderTable() {
     }
 
     let html = '';
+    // Ambil status dari PHP ke variabel JavaScript
+    const isClosed = "{{ $stockAdjustment->status }}" === 'closed';
+
     cart.forEach((item, index) => {
         html += `
-        <tr>
-            <td>
+        <tr class="hover:bg-slate-50 transition-colors duration-150">
+            <td class="border-b border-slate-200 py-3 px-2 text-slate-700">
                 <div class="font-semibold">${item.name}</div>
                 <div class="text-xs text-slate-400">${item.code}</div>
                 <input type="hidden" name="product_id[]" value="${item.id}">
             </td>
             <td class="text-center">
-                <input type="number" name="qty[]" min="1" value="${item.qty}" data-index="${index}" class="qty border rounded w-24 px-2 py-1 text-center font-bold text-indigo-600">
+                <input type="number" name="qty[]" min="1" value="${item.qty}" data-index="${index}" 
+                class="qty border border-slate-300 rounded-xl w-24 px-3 py-2 text-center font-bold text-indigo-600 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 hover:border-slate-400 ${isClosed ? 'bg-slate-100 opacity-70 cursor-not-allowed' : 'bg-white'}" 
+                ${isClosed ? 'disabled' : ''}>
             </td>
             <td>
-                <input type="text" name="notes[]" value="${item.notes}" data-index="${index}" placeholder="Alasan (Misal: Bocor, Expired)" class="item-notes border rounded w-full px-3 py-1 text-sm">
+                <input type="text" name="notes[]" value="${item.notes}" data-index="${index}" placeholder="Alasan (Misal: Bocor, Expired)" 
+                class="item-notes border border-slate-300 rounded-xl w-full px-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 hover:border-slate-400 ${isClosed ? 'bg-slate-100 opacity-70 cursor-not-allowed' : 'bg-white'}" 
+                ${isClosed ? 'disabled' : ''}>
             </td>
             <td class="text-center">
+                ${isClosed ? '<span class="text-slate-400">-</span>' : `
                 <button type="button" class="delete text-red-600 hover:text-red-800 p-1" data-index="${index}">
                     <i class="ri-delete-bin-line text-lg"></i>
                 </button>
+                `}
             </td>
         </tr>`;
     });
