@@ -38,6 +38,9 @@ $colors = [
     'orange' =>
     'bg-orange-500 hover:bg-orange-600 text-white',
 
+    'purple' =>
+    'bg-purple-500 hover:bg-purple-600 text-white',
+
 
 ];
 

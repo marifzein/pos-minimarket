@@ -136,6 +136,8 @@ Route::middleware('auth')->group(function () {
 
         // Resource Route untuk Retur Barang (Hanya mengaktifkan index, create, store, dan show)
         Route::resource('retur', ReturBarangController::class)->only(['index', 'create', 'store', 'show']);
+        //print retur
+        Route::get('/retur/{id}/print', [ReturBarangController::class, 'print'])->name('retur.print');
 
     /*
     |--------------------------------------------------------------------------
@@ -335,6 +337,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/penerimaan-barang', [PenerimaanBarangController::class, 'store'])->name('penerimaan.store');
     Route::get('/api/penerimaan/search-products', [PenerimaanBarangController::class, 'searchProducts']);
     Route::get('/penerimaan-barang/{id}', [PenerimaanBarangController::class, 'show'])->name('penerimaan.show');
+    Route::get('/penerimaan-barang/{id}/print', [PenerimaanBarangController::class, 'print'])->name('penerimaan.print');
     
     /*
     |--------------------------------------------------------------------------

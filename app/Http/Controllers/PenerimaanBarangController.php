@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenerimaanBarangController extends Controller
 {
@@ -101,7 +102,37 @@ class PenerimaanBarangController extends Controller
 
         return response()->json($products);
     }
+    
+    // print
+    public function print($id)
+    {
+        // 1. Ambil data induk penerimaan barang
+        $penerimaan = DB::table('penerimaan_barang')
+            ->join('suppliers', 'penerimaan_barang.supplier_id', '=', 'suppliers.id')
+            ->join('users', 'penerimaan_barang.user_id', '=', 'users.id')
+            ->select('penerimaan_barang.*', 'suppliers.nama as supplier_name', 'users.name as kasir_name')
+            ->where('penerimaan_barang.id', $id)
+            ->first();
 
+        if (!$penerimaan) {
+            return redirect()->route('penerimaan.index')->with('error', 'Data penerimaan tidak ditemukan.');
+        }
+
+        // 2. Ambil data rincian item produk yang masuk
+        $items = DB::table('penerimaan_barang_items')
+            ->join('products', 'penerimaan_barang_items.product_id', '=', 'products.id')
+            ->select('penerimaan_barang_items.*', 'products.nama_barang', 'products.kode_barang')
+            ->where('penerimaan_barang_items.penerimaan_barang_id', $id)
+            ->get();
+
+        // 3. Render view ke DomPDF
+        $pdf = Pdf::loadView('penerimaan.print', compact('penerimaan', 'items'));
+        
+        // Stream langsung ke browser dalam format PDF bersih
+        return $pdf->stream('Penerimaan-' . $penerimaan->no_penerimaan . '.pdf');
+    }
+
+    // save data
     public function store(Request $request)
     {
         $request->validate([

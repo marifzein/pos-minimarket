@@ -7,6 +7,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReturBarangController extends Controller
 {
@@ -139,5 +140,31 @@ class ReturBarangController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal memproses retur: ' . $e->getMessage())->withInput();
         }
+    }
+    // print============================
+    public function print($id)
+    {
+        $retur = DB::table('retur_barang')
+            ->join('suppliers', 'retur_barang.supplier_id', '=', 'suppliers.id')
+            ->join('users', 'retur_barang.user_id', '=', 'users.id')
+            ->select('retur_barang.*', 'suppliers.nama as supplier_name', 'users.name as kasir_name')
+            ->where('retur_barang.id', $id)
+            ->first();
+
+        if (!$retur) {
+            return redirect()->route('retur.index')->with('error', 'Data tidak ditemukan.');
+        }
+
+        $items = DB::table('retur_barang_items')
+            ->join('products', 'retur_barang_items.product_id', '=', 'products.id')
+            ->select('retur_barang_items.*', 'products.nama_barang', 'products.kode_barang')
+            ->where('retur_barang_items.retur_barang_id', $id)
+            ->get();
+
+        // Menggunakan ekstensi download PDF barryvdh
+        $pdf = Pdf::loadView('retur.print', compact('retur', 'items'));
+        
+        // Alirkan dokumen langsung tampil bersih di browser
+        return $pdf->stream('Retur-' . $retur->no_retur . '.pdf');
     }
 }

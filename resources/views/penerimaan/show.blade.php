@@ -12,9 +12,11 @@
                     <i class="ri-arrow-left-line"></i> Kembali
                 </x-button>
             </a>
-            <x-button color="blue" type="button" onclick="window.print()">
-                <i class="ri-printer-line"></i> Cetak Bukti
-            </x-button>
+            <a href="{{ route('penerimaan.print', $penerimaan->id) }}" target="_blank">
+                <x-button color="blue" type="button">
+                    <i class="ri-printer-line"></i> Cetak Bukti PDF
+                </x-button>
+            </a>
         </div>
     </x-slot:action>
 </x-page-header>
