@@ -21,57 +21,37 @@
             </p>
 
         </div>
-
-        <form
-            action="{{ route('backup.create') }}"
-            method="POST"
-        >
-            @csrf
-
-            {{-- <button
-                type="submit"
-                class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition"
+        <div class="flex items-center gap-3">
+            <form
+                action="{{ route('backup.create') }}"
+                method="POST"
             >
-                Backup Sekarang
-            </button> --}}
-            <x-button color="primary" type="submit">
+                @csrf
 
-              <i class="ri-save-fill"></i>
+                
+                <x-button color="primary" type="submit">
 
-                Backup Sekarang
+                <i class="ri-save-fill"></i>
 
-            </x-button>
-        </form>
+                    Backup Sekarang
 
+                </x-button>
+            </form>
+
+            @can('akses-owner-admin')
+            <!-- TOMBOL BARU: Buat Skema Cabang Baru -->
+            <form action="{{ route('backup.skema-only') }}" method="POST">
+                @csrf
+                <x-button color="green" type="submit">
+                    <i class="ri-git-branch-line"></i> Buat Skema Baru
+                </x-button>
+            </form>
+            @endcan
+        
+
+        </div>
     </div>
-
-    {{-- ALERT --}}
-
-    {{-- @if(session('success'))
-
-        <div
-            class="mb-5 rounded-xl border border-green-200 bg-green-50 p-4 text-green-700"
-        >
-
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-    @if(session('error'))
-
-        <div
-            class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700"
-        >
-
-            {{ session('error') }}
-
-        </div>
-
-    @endif --}}
-
-    {{-- TABLE --}}
+    
 
     <div
         class="bg-white rounded-2xl shadow border overflow-hidden"
@@ -158,6 +138,7 @@
 
                             </a> --}}
 
+                            @can('akses-owner-admin')
                             <form
 
                                 action="{{ route('backup.destroy',$file['name']) }}"
@@ -194,6 +175,7 @@
                                 </x-button>
 
                             </form>
+                            @endcan
 
                         </div>
 

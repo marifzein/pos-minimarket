@@ -1264,25 +1264,6 @@ function posKasir() {
 
 
         },
-        // potongan multiprice/grosiran
-        getDynamicPrice(product, qty) {
-            let hargaEceran = Number(product.harga);
-            let potonganTerpilih = 0;
-
-            // 💡 Pastikan membaca 'product_prices'
-            let grosirList = product.product_prices || []; 
-
-            if (grosirList && grosirList.length > 0) {
-                let sortedGrosir = [...grosirList].sort((a, b) => Number(b.min_qty) - Number(a.min_qty));
-                let match = sortedGrosir.find(g => Number(qty) >= Number(g.min_qty));
-                if (match) {
-                    potonganTerpilih = Number(match.potongan); 
-                }
-            }
-
-            return hargaEceran - potonganTerpilih;
-        },
-
 
         get grandTotal()
         {
@@ -1523,16 +1504,13 @@ function posKasir() {
        calculateItem(item)
         {
             item.qty = Number(item.qty);
-            // if (isNaN(item.qty) || item.qty < 1) item.qty = 1;
 
-            // 💡 HITUNG ULANG: Update harga jual jika kasir mengubah/mengetik angka Qty di tabel POS
-            if (item._originalProduct) {
-                item.harga = this.getDynamicPrice(item._originalProduct, item.qty);
-            }
+            item.harga = Number(item.harga);
 
-            // Bagian ini biarkan tetap dikalikan dengan item.harga yang sudah terupdate secara dinamis
-            item.total = item.qty * item.harga;
+            item.total =
+                item.qty * item.harga;
 
+            // this.recalculate();
             this.$nextTick(() => this.recalculate());
         },
        
@@ -1540,42 +1518,40 @@ function posKasir() {
         
         addToCart(product)
         {
-            let found = this.cart.find(
-                item => item.id === product.id
-            );
+
+            let found =
+                this.cart.find(
+                    item => item.id === product.id
+                );
 
             if(found)
             {
                 found.qty++;
-                // 💡 HITUNG ULANG: Update harga barang di cart berdasarkan qty baru setelah ditambah
-                found.harga = this.getDynamicPrice(found._originalProduct, found.qty);
             }
             else
             {
-                // 💡 AMBIL HARGA AWAL: Untuk qty = 1
-                let initialPrice = this.getDynamicPrice(product, 1);
-
                 this.cart.push({
                     id: product.id,
                     kode_barang: product.kode_barang,
                     nama_barang: product.nama_barang,
-                    harga: initialPrice,
-                    qty: 1,
-                    // 💡 WAJIB DISIMPAN: Menyimpan data produk asli (termasuk product_prices) 
-                    // sebagai acuan hitung grosir saat qty berubah nanti
-                    _originalProduct: product 
+                    harga: Number(product.harga),
+                    qty: 1
                 });
             }
 
             this.search = '';
             this.products = [];
+            
             this.selectedIndex = 0;
 
             this.recalculate();
 
             this.$nextTick(() => {
+                // this.$refs.barcodeInput.focus();
                 document.getElementById('barcodeInput')?.focus()
             });
+
+            
         },
 
         searchProduct()

@@ -136,145 +136,101 @@ class BackupController extends Controller
         );
     }
     // backup gmn
-    public function backup_gagal_maning()
+    
+    // Method Baru untuk Membuat Skema Bersih Tanpa Data Transaksi
+    // Method Baru untuk Membuat Skema Bersih (Hanya data User, Kategori, & Sistem Laravel yang diisi)
+    public function backupSkemaOnly()
     {
-        $mysqldump = config('database.mysqldump_path');
-        
-        // Jaga-jaga jika config belum terbaca, ambil langsung dari env
-        if (!$mysqldump) {
-            $mysqldump = env('MYSQLDUMP_PATH', 'mysqldump');
-        }
-
-        // Cek OS (Windows atau Linux)
+        $mysqldump = config('database.mysqldump_path') ?: env('MYSQLDUMP_PATH', 'mysqldump');
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
         
-        // Atur ekstensi file berdasarkan OS
-        $filename = 'backup_' . now()->format('Y-m-d_His') . ($isWindows ? '.sql' : '.sql.gz');
-        $filepath = storage_path('app/backups/' . $filename);
+        // File sementara untuk nampung full backup mentah sebelum disaring
+        $rawFilename = 'raw_backup_' . now()->format('Y-m-d_His') . '.sql';
+        $rawFilepath = storage_path('app/backups/' . $rawFilename);
 
         $database = config('database.connections.mysql.database');
         $username = config('database.connections.mysql.username');
         $password = config('database.connections.mysql.password');
-        $host     = config('database.connections.mysql.host');
+        $host     = config('database.connections.mysql.host') ?: '127.0.0.1';
 
-        // Pisahkan perintah berdasarkan OS (Windows lokal tidak punya gzip secara default)
-        if ($isWindows) {
-            $command = sprintf(
-                '"%s" -h %s -u %s -p"%s" %s > "%s"',
-                $mysqldump,
-                $host,
-                $username,
-                $password,
-                $database,
-                $filepath
-            );
-        } else {
-            $command = sprintf(
-                '"%s" -h %s -u %s -p"%s" %s | gzip > "%s"',
-                $mysqldump,
-                $host,
-                $username,
-                $password,
-                $database,
-                $filepath
-            );
-        }
-
-        // $process = Process::fromShellCommandline($command);
-        exec($command, $output, $returnCode);
-        // dd($returnCode, $output);
-
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            // Log error ke storage/logs/laravel.log untuk mempermudah debugging jika masih gagal
-            \Log::error("Backup Gagal: " . $process->getErrorOutput());
-            
-            return back()->with(
-                'error',
-                'Backup gagal mengeksekusi mysqldump. Periksa setelan DB.'
-            );
-        }
-
-        return back()->with(
-            'success',
-            'Backup berhasil : ' . $filename
+        // 1. Dump data mentah utuh dari database
+        $command = sprintf(
+            '"%s" --host=%s --user=%s --password="%s" --routines --triggers --events %s > "%s"',
+            $mysqldump, $host, $username, $password, $database, $rawFilepath
         );
-    }
 
-    public function backup_gagal()
-    {
-        $filename =
-            'backup_' .
-            now()->format('Y-m-d_His')
-            .
-            '.sql.gz';
+        exec($command, $output, $returnCode);
 
-        $mysqldump =
-            config('database.mysqldump_path');
-
-        $filepath =
-            storage_path(
-                'app/backups/' .
-                $filename
-            );
-
-        $database =
-            config(
-                'database.connections.mysql.database'
-            );
-
-        $username =
-            config(
-                'database.connections.mysql.username'
-            );
-
-        $password =
-            config(
-                'database.connections.mysql.password'
-            );
-
-        $host =
-            config(
-                'database.connections.mysql.host'
-            );
-
-        $process =
-            Process::fromShellCommandline(
-
-                sprintf(
-
-                    '"%s" -h%s -u%s -p%s %s | gzip > "%s"',
-
-                        $mysqldump,
-                        $host,
-                        $username,
-                        $password,
-                        $database,
-                        $filepath
-
-                    )
-
-            );
-
-        $process->run();
-
-        if(!$process->isSuccessful())
-        {
-            return back()
-                ->with(
-                    'error',
-                    'Backup gagal'
-                );
+        if ($returnCode !== 0 || !File::exists($rawFilepath)) {
+            $error = implode("\n", $output) ?: "Gagal dump data mentah.";
+            return back()->with('error', 'Gagal inisiasi skema: ' . $error);
         }
 
-        return back()
-            ->with(
-                'success',
-                'Backup berhasil : '
-                .
-                $filename
-            );
+        // 2. Tentukan nama file hasil akhir release skema bersih
+        $finalFilename = 'release_skema_' . now()->format('Y-m-d_His') . '.sql';
+        $finalFilepath = storage_path('app/backups/' . $finalFilename);
+
+        // 💡 SISTEM WHITELIST: Hanya tabel di daftar ini yang AMAN / Boleh ada datanya
+        $allowedDataTables = [
+            'users', 
+            'categories', 
+            'migrations' // Penting agar riwayat migrasi laravel tidak eror saat dibaca
+        ];
+
+        // 3. Proses Streaming pembacaan file mentah baris demi baris
+        $in = fopen($rawFilepath, 'r');
+        $out = fopen($finalFilepath, 'w');
+
+        if (!$in || !$out) {
+            return back()->with('error', 'Gagal memproses streaming penyaringan tabel.');
+        }
+
+        $skip = false;
+
+        while (($line = fgets($in)) !== false) {
+            // Jika dalam mode skip (melewati baris data tabel yang tidak diizinkan)
+            if ($skip) {
+                if (str_contains(trim($line), ';')) {
+                    $skip = false; // Berhenti skip kalau ketemu akhir perintah query ;
+                }
+                continue;
+            }
+
+            // Deteksi jika baris berisi perintah INSERT INTO `nama_tabel`
+            if (preg_match('/^INSERT INTO `(.*?)`/', $line, $m)) {
+                $table = $m[1];
+
+                // Jika nama tabel TIDAK ADA di daftar aman, buang/skip datanya!
+                if (!in_array($table, $allowedDataTables)) {
+                    $skip = true;
+                    if (str_contains(trim($line), ';')) {
+                        $skip = false;
+                    }
+                    continue; 
+                }
+
+                // 🔥 MODIFIKASI KHUSUS TABEL USERS: Paksa hanya isi 1 Admin Utama
+                if ($table === 'users') {
+                    // Password di bawah ini adalah hasil hash aman dari: 87654321
+                    $adminPasswordHash = '$2y$12$fGaEEiO6Hlcu7qm7C.XhoeD7Ck2Sm1eyZxaOrHu5zLl1/hCvkh5c2';
+                    $now = now()->format('Y-m-d H:i:s');
+                    
+                    // Kita timpa isi baris $line menjadi hanya 1 record Admin
+                    $line = "INSERT INTO `users` VALUES (1,'Admin','admin@gmail.com','Admin',1,NULL,'{$adminPasswordHash}',NULL,'{$now}','{$now}');\n";
+                }
+            }
+
+            // Tulis baris yang aman (struktur tabel, atau data dari tabel users, categories, migrations)
+            fwrite($out, $line);
+        }
+
+        fclose($in);
+        fclose($out);
+
+        // Hapus file mentah sementara agar storage tidak penuh
+        File::delete($rawFilepath);
+
+        return back()->with('success', 'Skema Cabang Baru Berhasil Dibuat: ' . $finalFilename);
     }
 
     public function download($file)
@@ -289,21 +245,5 @@ class BackupController extends Controller
         );
     }
 
-    // public function destroy($file)
-    // {
-    //     File::delete(
-
-    //         storage_path(
-    //             'app/backups/' .
-    //             $file
-    //         )
-
-    //     );
-
-    //     return back()
-    //         ->with(
-    //             'success',
-    //             'Backup dihapus'
-    //         );
-    // }
+    
 }

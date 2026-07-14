@@ -10,7 +10,6 @@ class PosController extends Controller
 {
     public function index()
     {
-        // 💡 Ambil kolom yang dibutuhkan, lalu ikut sertakan relasi productPrices
         $products = Product::select(
             'id',
             'kode_barang',
@@ -19,9 +18,7 @@ class PosController extends Controller
             'harga',
             'harga_diskon',
             'stok'
-        )
-        ->with('productPrices') // 💡 Data grosir dimasukkan ke sini, bos!
-        ->get();
+        )->get();
 
         $noNota = Transaction::generateNoNota();
 

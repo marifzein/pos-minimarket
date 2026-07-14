@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title','Import Produk')
+@section('title','Detail Transaksi')
 
 @section('content')
 {{-- <!DOCTYPE html>
@@ -67,9 +67,20 @@
 
             <div>
 
-                <div>
+                {{-- <div>
                     <b>Pelanggan :</b>
                     {{ $transaction->pelanggan ?? 'Umum' }}
+                </div> --}}
+                <div>
+                    <b>Pelanggan :</b>
+                    @php
+                        $customerData = null;
+                        if ($transaction->pelanggan) {
+                            // Cari data customer berdasarkan kode_pelanggan yang unique
+                            $customerData = \App\Models\Customer::where('kode_pelanggan', $transaction->pelanggan)->first();
+                        }
+                    @endphp
+                    {{ $customerData ? $customerData->nama : ($transaction->pelanggan ?? 'Umum') }}
                 </div>
 
             </div>

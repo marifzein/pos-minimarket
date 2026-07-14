@@ -120,6 +120,13 @@ class="w-64 shadow-lg z-30 flex flex-col">
         </button>
 
         <div id="menu-master" class="menu-content">
+            @can('akses-spv-keatas')
+            <a href="/users"
+                class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}">
+                <i class="ri-group-line"></i>
+                User
+            </a>
+            @endcan
 
             <a href="/products"
                 class="submenu
@@ -133,6 +140,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 Produk
             </a>
 
+            @can('akses-spv-keatas')
             <a href="/products/import"
                 class="submenu
                 {{
@@ -142,18 +150,23 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 <i class="ri-file-upload-line   "></i>
                 Import Produk
             </a>
+            @endcan
 
+            @can('akses-spv-keatas')
             <a href="/categories"
                 class="submenu {{ request()->is('categories*') ? 'submenu-active':'' }}">
                 <i class="ri-price-tag-3-line"></i>
                 Kategori
             </a>
+            @endcan
 
+            @can('akses-spv-keatas')
             <a href="/suppliers"
                 class="submenu {{ request()->is('suppliers*') ? 'submenu-active':'' }}">
                 <i class="ri-truck-line"></i>
                 Supplier
             </a>
+            @endcan
 
             <a href="/customers"
                 class="submenu {{ request()->is('customers*') ? 'submenu-active':'' }}">
@@ -168,7 +181,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
         {{-- ===================== --}}
         {{-- INVENTORY --}}
         {{-- ===================== --}}
-
+        @can('akses-spv-keatas')
         <button
             type="button"
             onclick="toggleMenu('inventory')"
@@ -188,7 +201,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
         </button>
 
         <div id="menu-inventory" class="menu-content">
-
+            
             <a href="/purchasing"
                 class="submenu {{ request()->is('purchasing*') ? 'submenu-active':'' }}">
                 <i class="ri-store-2-line"></i>
@@ -229,9 +242,9 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 <i class="ri-equalizer-line"></i>
                 Penyesuaian Stok
             </a>
-
+            
         </div>
-
+        @endcan
 
 
         
@@ -258,8 +271,23 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 <i class="ri-line-chart-line"></i>
                 Penjualan Kasir
             </a>
+
+            @can('akses-owner-admin')
+            <a href="{{ route('laporan.laba-rugi') }}" 
+                class="submenu {{ request()->routeIs('laporan.laba-rugi') ? 'submenu-active' : '' }}">
+                <i class="ri-money-dollar-box-line"></i>
+                Laba Rugi Kotor
+            </a>
+            @endcan
             
-            
+            <a href="/laporan/penjualan-produk" class="submenu {{ request()->routeIs('laporan/penjualan-produk') ? 'submenu-active' : '' }}">
+                <i class="ri-shopping-bag-3-line"></i>
+                Sales Per Produk
+            </a>
+            <a href="/laporan/penjualan-pelanggan" class="submenu {{ request()->is('laporan/penjualan-pelanggan') ? 'submenu-active' : '' }}">
+                <i class="ri-contacts-line"></i>
+                Sales Per Customer
+            </a>
         </div>
         
        
@@ -267,7 +295,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
         {{-- ===================== --}}
         {{-- SISTEM --}}
         {{-- ===================== --}}
-
+        @can('akses-spv-keatas')
         <button
             type="button"
             onclick="toggleMenu('system')"
@@ -291,30 +319,27 @@ class="w-64 shadow-lg z-30 flex flex-col">
             
             <a href="{{ route('setting.index') }}" 
             class="submenu {{ request()->routeIs('setting.index') ? 'submenu-active' : '' }}">
-                <i class="ri-settings-4-line mr-2 text-lg"></i>
+                <i class="ri-settings-4-line    "></i>
                 Pengaturan Toko
             </a>
-            
-            <a href="/users"
-                class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}">
-                <i class="ri-group-line"></i>
-                User
-            </a>
-
+                        
+            @can('akses-developer')
             <a href="/developer"
                 class="submenu {{ request()->is('developer*') ? 'submenu-active':'' }}">
                 <i class="ri-code-s-slash-line"></i>
                 Developer
             </a>
+            @endcan
 
+            
             <a href="{{ route('backup.index') }}"
                 class="submenu {{ request()->is('backup*') ? 'submenu-active' : '' }}">
-                <i class="ri-hard-drive-2-line mr-2"></i>
+                <i class="ri-hard-drive-2-line"></i>
                 Backup Database
             </a>
-
+            
         </div>
-
+        @endcan
     </nav>
 
 

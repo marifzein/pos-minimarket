@@ -131,6 +131,7 @@
 
         </option>
 
+        @can('akses-developer')
         <option
 
             value="Admin"
@@ -142,6 +143,22 @@
             Admin
 
         </option>
+        @endcan
+        
+        @can('akses-owner-admin')
+        <option
+
+            value="Owner"
+
+            {{ old('role')=='Owner' ? 'selected' : '' }}
+
+        >
+
+            Owner
+
+        </option>
+        @endcan
+
 
         <option
 

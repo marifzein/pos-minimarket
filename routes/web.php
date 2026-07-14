@@ -22,375 +22,174 @@ use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\LaporanPenjualanKasirController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ReturBarangController;
+use App\Http\Controllers\LaporanLabaRugiController;
+use App\Http\Controllers\LaporanPenjualanProdukController;
+use App\Http\Controllers\LaporanPenjualanPelangganController;
+
 /*
 |--------------------------------------------------------------------------
 | Redirect Root
 |--------------------------------------------------------------------------
 */
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| Semua menu POS harus login
-|--------------------------------------------------------------------------
-*/
-
 Route::redirect('/', '/login');
 
 Route::middleware('auth')->group(function () {
 
-    // Dashboard
-    Route::get(
-    '/dashboard',
-    [DashboardController::class,'index']
-        )->name('dashboard');
-
-    //MODUL2 ROLE ADMIN 
-    Route::middleware('role:Admin')->group(function () {
     /*
     |--------------------------------------------------------------------------
-    | MASTER DATA
+    | 1. GRUP TRANSAKSI POS HARI-HARI (Semua Role Boleh Akses)
     |--------------------------------------------------------------------------
     */
-        // supplier
-        Route::resource(
-            'suppliers', 
-            SupplierController::class
-        )->except([
-            'show',
-            'destroy'
-        ]);
+    Route::middleware(['can:akses-pos'])->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Produk
-        Route::resource(
-            'products',
-            ProductController::class
-        )->except([
-            'show',
-            'destroy'
-        ]);
-
-        // Stock Card:
-        // Route::get(
-        //     'products/{product}/stock-card',
-        //     [ProductController::class, 'stockCard']
-        // )->name('products.stock-card');
-
-        /*
-        |--------------------------------------------------------------------------
-        | KARTU STOK (INVENTORY MODULE) real
-        |--------------------------------------------------------------------------
-        */
-        Route::get('stock-cards', [App\Http\Controllers\StockCardController::class, 'index'])->name('stock-cards.index');
-        Route::get('stock-cards/{product}', [App\Http\Controllers\StockCardController::class, 'show'])->name('stock-cards.show');
-
-        // PO
-        Route::resource(
-            'purchasing',
-            PurchaseOrderController::class
-        )->except([
-            'destroy'
-        ]);
-        // Tempatkan di dalam grup Route::middleware('role:Admin')->group(function () { ... })
-        Route::get('purchasing/{purchasing}/print-pdf', [PurchaseOrderController::class, 'printPdf'])
-            ->name('purchasing.print-pdf');
+        // POS & API Pendukung
+        Route::get('/pos', [PosController::class, 'index']);
+        Route::get('/api/products/search', [ProductController::class, 'search']);
+        Route::post('/api/transactions', [TransactionController::class, 'store']);
         
-        // User
-        Route::resource(
-            'users',
-            UserController::class
-        )->except([
-            'show',
-            'destroy'
-        ]);
+        // Transaksi & Print
+        Route::get('/transactions', [TransactionController::class, 'index']);
+        Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+        Route::get('/transactions/{id}/print', [TransactionController::class, 'print'])->name('transactions.print');
 
-        Route::post(
-            'users/{user}/reset-password',
-            [UserController::class, 'resetPassword']
-        )->name('users.reset-password');
-
-        // Customers
+        // Pelanggan
         Route::resource('customers', CustomerController::class);
 
-        // kategori
-        Route::resource(
-            'categories',
-            CategoryController::class
-        )->except([
-            'show',
-            'destroy'
-        ]);
-        
+        // Laporan Penjualan Kasir
+        Route::get('/laporan/penjualan-kasir', [LaporanPenjualanKasirController::class, 'index'])->name('laporan.penjualan-kasir');
 
-    });
+        // Laporan Penjualan per produk
+        Route::get('/laporan/penjualan-produk', [LaporanPenjualanProdukController::class, 'index']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | RETUR
-    |--------------------------------------------------------------------------
-    */
-        // Jalur API internal pencarian cepat produk retur
+        // Laporan Penjualan per pelanggan
+        Route::get('/laporan/penjualan-pelanggan', [LaporanPenjualanPelangganController::class, 'index']);
+
+        // Retur Barang
         Route::get('/api/retur/search-products', [ReturBarangController::class, 'searchProducts'])->name('api.retur.search-products');
-
-        // Resource Route untuk Retur Barang (Hanya mengaktifkan index, create, store, dan show)
         Route::resource('retur', ReturBarangController::class)->only(['index', 'create', 'store', 'show']);
-        //print retur
         Route::get('/retur/{id}/print', [ReturBarangController::class, 'print'])->name('retur.print');
 
-    /*
-    |--------------------------------------------------------------------------
-    | TRANSAKSI
-    |--------------------------------------------------------------------------
-    */
+        // Profile (Breeze) & Ganti Password
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
+        Route::put('/password/change', [ProfileController::class, 'updatePassword'])->name('password.password-update');
 
-    // POS
-    Route::get(
-        '/pos',
-        [PosController::class,'index']
-    );
-
-    // Search produk
-    Route::get(
-        '/api/products/search',
-        [ProductController::class,'search']
-    );
-
-    // Simpan transaksi
-    Route::post(
-        '/api/transactions',
-        [TransactionController::class,'store']
-    );
-
-    // Daftar transaksi
-    Route::get(
-        '/transactions',
-        [TransactionController::class,'index']
-    );
-
-    // Detail transaksi
-    Route::get(
-        '/transactions/{id}',
-        [TransactionController::class,'show']
-    )->name('transactions.show');
-
-    // Print transaksi
-    Route::get(
-        '/transactions/{id}/print',
-        [TransactionController::class,'print']
-    )->name('transactions.print');
-
-    // Cek Jam
-    Route::get('/cekjam', function () {
-
-        return [
-            'now_string'=>now()->format('Y-m-d H:i:s'),
-            'php'=>date('Y-m-d H:i:s'),
-            'timezone'=>config('app.timezone')
-        ];
-
+        // Cek Jam System
+        Route::get('/cekjam', function () {
+            return [
+                'now_string' => now()->format('Y-m-d H:i:s'),
+                'php'        => date('Y-m-d H:i:s'),
+                'timezone'   => config('app.timezone')
+            ];
+        });
     });
 
-    // setting profile toko
-    Route::middleware(['auth'])->group(function () {
-        // Taruh di dalam grup middleware auth kamu
+    /*
+    |--------------------------------------------------------------------------
+    | 2. GRUP OPERASIONAL TINGGI (Supervisor, Admin, Owner Boleh Akses)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['can:akses-spv-keatas'])->group(function () {
+        // Master Data (Produk, Supplier, Kategori)
+        // Manajemen Akun Karyawan (User)
+        Route::resource('users', UserController::class)->except(['show', 'destroy']);
+        Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+
+        Route::resource('suppliers', SupplierController::class)->except(['show', 'destroy']);
+        Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+        Route::resource('categories', CategoryController::class)->except(['show', 'destroy']);
+
+        // Import Excel Produk
+        Route::prefix('products')->group(function () {
+            Route::get('/import', [ProductImportController::class, 'index'])->name('products.import');
+            Route::post('/import', [ProductImportController::class, 'import'])->name('products.import.store');
+        });
+
+        // Purchase Order (PO) & Cetak PDF
+        Route::resource('purchasing', PurchaseOrderController::class)->except(['destroy']);
+        Route::get('purchasing/{purchasing}/print-pdf', [PurchaseOrderController::class, 'printPdf'])->name('purchasing.print-pdf');
+
+        // Kartu Stok
+        Route::get('stock-cards', [StockCardController::class, 'index'])->name('stock-cards.index');
+        Route::get('stock-cards/{product}', [StockCardController::class, 'show'])->name('stock-cards.show');
+
+        // Penerimaan Barang
+        Route::get('/penerimaan-barang', [PenerimaanBarangController::class, 'index'])->name('penerimaan.index');
+        Route::get('/penerimaan-barang/create', [PenerimaanBarangController::class, 'create'])->name('penerimaan.create');
+        Route::post('/penerimaan-barang', [PenerimaanBarangController::class, 'store'])->name('penerimaan.store');
+        Route::get('/api/penerimaan/search-products', [PenerimaanBarangController::class, 'searchProducts']);
+        Route::get('/penerimaan-barang/{id}', [PenerimaanBarangController::class, 'show'])->name('penerimaan.show');
+        Route::get('/penerimaan-barang/{id}/print', [PenerimaanBarangController::class, 'print'])->name('penerimaan.print');
+
+        // Stok Opname
+        Route::get('/stock-opname', [StockOpnameController::class, 'index']);
+        Route::post('/stock-opname/start', [StockOpnameController::class, 'start']);
+        Route::get('/stock-opname/{stockOpname}', [StockOpnameController::class, 'show']);
+        Route::post('/stock-opname/{stockOpname}', [StockOpnameController::class, 'store']);
+        Route::post('/stock-opname/{stockOpname}/finish', [StockOpnameController::class, 'finish']);
+        Route::get('/stock-opname/{stockOpname}/print', [StockOpnameController::class, 'print'])->name('stock-opname.print');
+
+        // Penyesuaian Stok (Stock Adjustment)
+        Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show', 'destroy']);
+        Route::post('/stock-adjustments/{stockAdjustment}/post', [StockAdjustmentController::class, 'post'])->name('stock-adjustments.post');
+
+        // Pengaturan Profil Toko
         Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
         Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
-    });
 
-
-    /* 
-    ============================================================|
-    RESET DAN SEEDING BUAT TEST
-    ============================================================|
-    */
-    
-
-    Route::prefix('developer')
-        ->name('developer.')
-        ->group(function () {
-
-            Route::get(
-                '/',
-                [DeveloperController::class,'index']
-            )->name('index');
-
-            Route::post(
-                '/reset-transaksi',
-                [DeveloperController::class,'resetTransaksi']
-            )->name('reset.transaksi');
-
-            Route::post(
-                '/reset-master',
-                [DeveloperController::class,'resetMaster']
-            )->name('reset.master');
-
-            Route::post(
-                '/seed',
-                [DeveloperController::class,'seedDemo']
-            )->name('seed');
-
+        // Backup Database
+        Route::prefix('backup')->group(function () {
+        Route::get('/', [BackupController::class, 'index'])->name('backup.index');
+        Route::post('/create', [BackupController::class, 'backup'])->name('backup.create');
+        Route::get('/download/{file}', [BackupController::class, 'download'])->name('backup.download');
+        
+        Route::post('/backup/skema-only', [BackupController::class, 'backupSkemaOnly'])->name('backup.skema-only');
         });
 
-
-
-
-
-    /* 
-    ============================================================|  
-    BACKUP DB
-    ============================================================|  
-    */  
-    Route::prefix('backup')
-    ->group(function () {
-
-        Route::get(
-            '/',
-            [BackupController::class,'index']
-        )->name('backup.index');
-
-        Route::post(
-            '/create',
-            [BackupController::class,'backup']
-        )->name('backup.create');
-
-        Route::get(
-            '/download/{file}',
-            [BackupController::class,'download']
-        )->name('backup.download');
-
-        Route::delete(
-            '/delete/{file}',
-            [BackupController::class,'destroy']
-        )->name('backup.destroy');
-
     });
+
     /*
-    IMPORT PRODUK VIA FILE EXCELL
+    |--------------------------------------------------------------------------
+    | 3. GRUP STRATEGIS & KEUANGAN (Hanya Owner & Admin IT)
+    |--------------------------------------------------------------------------
     */
-    
+    Route::middleware(['can:akses-owner-admin'])->group(function () {
+        
+        // Laporan Rugi Laba Kotor
+        Route::get('/laporan/laba-rugi', [LaporanLabaRugiController::class, 'index'])->name('laporan.laba-rugi');
+        Route::get('/laporan/laba-rugi/excel', [LaporanLabaRugiController::class, 'exportExcel'])->name('laporan.laba-rugi.excel');
+        Route::get('/laporan/laba-rugi/pdf', [LaporanLabaRugiController::class, 'exportPdf'])->name('laporan.laba-rugi.pdf');
 
-    Route::prefix('products')
-        ->group(function () {
+        //delete backup
+        Route::delete('/delete/{file}', [BackupController::class, 'destroy'])->name('backup.destroy');
+    });
 
-            Route::get(
-                '/import',
-                [ProductImportController::class,'index']
-            )->name('products.import');
-
-            Route::post(
-                '/import',
-                [ProductImportController::class,'import']
-            )->name('products.import.store');
-
+    /*
+    |--------------------------------------------------------------------------
+    | 4. GRUP TEKNIS DEVELOPER (Murni Hanya Admin IT)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['can:akses-developer'])->group(function () {
+        // Developer Tool
+        Route::prefix('developer')->name('developer.')->group(function () {
+            Route::get('/', [DeveloperController::class, 'index'])->name('index');
+            Route::post('/reset-transaksi', [DeveloperController::class, 'resetTransaksi'])->name('reset.transaksi');
+            Route::post('/reset-master', [DeveloperController::class, 'resetMaster'])->name('reset.master');
+            Route::post('/seed', [DeveloperController::class, 'seedDemo'])->name('seed');
         });
 
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | STOCK OPNAME
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/stock-opname',
-        [StockOpnameController::class,'index']
-    );
-
-    Route::post(
-        '/stock-opname/start',
-        [StockOpnameController::class,'start']
-    );
-
-    Route::get(
-        '/stock-opname/{stockOpname}',
-        [StockOpnameController::class,'show']
-    );
-
-    Route::post(
-        '/stock-opname/{stockOpname}',
-        [StockOpnameController::class,'store']
-    );
-
-    Route::post(
-        '/stock-opname/{stockOpname}/finish',
-        [StockOpnameController::class,'finish']
-    );
-
-    // cetak SO
-    Route::get(
-        '/stock-opname/{stockOpname}/print',
-        [StockOpnameController::class,'print']
-    )->name('stock-opname.print');
-    
-    
-    /*
-    |--------------------------------------------------------------------------
-    | Modul Penerimaan Barang
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/penerimaan-barang', [PenerimaanBarangController::class, 'index'])->name('penerimaan.index');
-    Route::get('/penerimaan-barang/create', [PenerimaanBarangController::class, 'create'])->name('penerimaan.create');
-    Route::post('/penerimaan-barang', [PenerimaanBarangController::class, 'store'])->name('penerimaan.store');
-    Route::get('/api/penerimaan/search-products', [PenerimaanBarangController::class, 'searchProducts']);
-    Route::get('/penerimaan-barang/{id}', [PenerimaanBarangController::class, 'show'])->name('penerimaan.show');
-    Route::get('/penerimaan-barang/{id}/print', [PenerimaanBarangController::class, 'print'])->name('penerimaan.print');
-    
-    /*
-    |--------------------------------------------------------------------------
-    | Stock Adjustment (SA)
-    |--------------------------------------------------------------------------
-    */
-    Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show', 'destroy']);
-    
-    // Route khusus untuk memproses posting/closed dokumen SA
-    Route::post('/stock-adjustments/{stockAdjustment}/post', [StockAdjustmentController::class, 'post'])
-        ->name('stock-adjustments.post');
-
-    
-    /*
-    |--------------------------------------------------------------------------
-    | Profile (Breeze)
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/profile',
-        [ProfileController::class,'edit']
-    )->name('profile.edit');
-
-    Route::patch(
-        '/profile',
-        [ProfileController::class,'update']
-    )->name('profile.update');
-
-    // === ganti password ===
-    Route::get('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
-    Route::put('/password/change', [ProfileController::class, 'updatePassword'])->name('password.password-update');
-
-    Route::delete(
-        '/profile',
-        [ProfileController::class,'destroy']
-    )->name('profile.destroy');
+        
+    });
 
 });
 
 /*
 |--------------------------------------------------------------------------
-| LAPORAN
+| Auth Routes (Breeze/Laravel Internal)
 |--------------------------------------------------------------------------
 */
-// laporan penjualan kasir
-Route::get('/laporan/penjualan-kasir', [LaporanPenjualanKasirController::class, 'index'])
-    ->name('laporan.penjualan-kasir');
-
-/*
-|--------------------------------------------------------------------------
-| Login Register Logout
-|--------------------------------------------------------------------------
-*/
-
 require __DIR__.'/auth.php';

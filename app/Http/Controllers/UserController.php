@@ -5,14 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
 
     public function index()
     {
+        // Ambil role user yang sedang login saat ini
+        $currentUserRole = Auth::user()->role;
 
-        $users = User::latest()->paginate(10);
+        // $users = User::latest()->paginate(10);
+        $users = User::query()
+        // JIKA yang login adalah Supervisor, maka FILTER/BUANG data user yang rolenya Admin atau Owner
+        ->when($currentUserRole === 'Supervisor', function ($query) {
+            return $query->whereNotIn('role', ['Admin', 'Owner']);
+        })
+        ->latest() 
+        ->paginate(10); 
 
         return view(
             'users.index',
@@ -68,6 +79,11 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        // tambahan kalo spv tdk bisa edit admin dan owner
+        // Cek jika yang login adalah Supervisor, dan yang mau diedit adalah Admin/Owner
+        if (Auth::user()->role === 'Supervisor' && in_array($user->role, ['Admin', 'Owner'])) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data akun ini.');
+        }
 
         return view(
             'users.edit',
@@ -81,6 +97,11 @@ class UserController extends Controller
         User $user
     )
     {
+
+        // Cek proteksi yang sama sebelum data sempat disimpan
+        if (Auth::user()->role === 'Supervisor' && in_array($user->role, ['Admin', 'Owner'])) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data akun ini.');
+        }
 
         $request->validate([
 

@@ -131,59 +131,88 @@ class TransactionController extends Controller
 
             foreach ($cart as $item) {
 
-                if (!isset($item['qty']) || $item['qty'] < 1) {
-                    throw new \Exception('Qty tidak valid');
-                }
-
-                // 💡 Menggunakan eager load relasi productPrices agar tidak memicu query berulang-ulang
-                $product = Product::with('productPrices')->findOrFail($item['id']);
-
-                if ($product->stok < $item['qty']) {
-                    throw new \Exception($product->nama_barang . ' stok tidak cukup');
-                }
-
-                // Kalkulasi harga setelah potongan grosir
-                $hargaFinal = (float) $product->harga;
-                
-                // 💡 Disesuaikan dengan nama relasi di model Product: productPrices
-                if ($product->productPrices && $product->productPrices->count() > 0) {
-                    // Diurutkan dari min_qty terbesar (descending) untuk mencocokkan tier grosir teratas
-                    $grosirList = $product->productPrices->sortByDesc('min_qty');
-
-                    foreach ($grosirList as $grosir) {
-                        if ($item['qty'] >= $grosir->min_qty) {
-                            $hargaFinal = (float) $product->harga - (float) $grosir->potongan;
-                            break; 
-                        }
+                if (
+                        !isset($item['qty'])
+                        ||
+                        $item['qty'] < 1
+                    )
+                    {
+                        throw new \Exception(
+                            'Qty tidak valid'
+                        );
                     }
-                }
 
-                $itemSubtotal = $hargaFinal * $item['qty'];
+                $product =
+                    Product::findOrFail(
+                        $item['id']
+                    );
+
+                if (
+                    $product->stok <
+                    $item['qty']
+                ) {
+                    throw new \Exception(
+                        $product->nama_barang .
+                        ' stok tidak cukup'
+                    );
+                }
 
                 TransactionDetail::create([
-                    'transaction_id' => $transaction->id,
-                    'product_id'     => $product->id,
-                    'kode_barang'    => $product->kode_barang,
-                    'nama_barang'    => $product->nama_barang,
-                    'harga'          => $hargaFinal,
-                    'qty'            => $item['qty'],
-                    'subtotal'       => $itemSubtotal
+
+                    'transaction_id' =>
+                        $transaction->id,
+
+                    'product_id' =>
+                        $product->id,
+
+                    'kode_barang' =>
+                        $product->kode_barang,
+
+                    'nama_barang' =>
+                        $product->nama_barang,
+
+                    'harga' =>
+                        $item['harga'],
+
+                    'qty' =>
+                        $item['qty'],
+
+                    'subtotal' =>
+                        $item['harga'] *
+                        $item['qty']
                 ]);
 
-                $stokSebelum = $product->stok;
-                $stokSesudah = $stokSebelum - $item['qty'];
+                $stokSebelum =
+                    $product->stok;
+
+                $stokSesudah =
+                    $stokSebelum -
+                    $item['qty'];
 
                 $product->update([
-                    'stok' => $stokSesudah
+                    'stok' =>
+                        $stokSesudah
                 ]);
 
                 StockMovement::create([
-                    'product_id'   => $product->id,
-                    'type'         => 'SALE',
-                    'qty'          => -$item['qty'],
-                    'stock_before' => $stokSebelum,
-                    'stock_after'  => $stokSesudah,
-                    'reference_no' => $noNota
+
+                    'product_id' =>
+                        $product->id,
+
+                    'type' =>
+                        'SALE',
+
+                    'qty' =>
+                        -$item['qty'],
+
+                    'stock_before' =>
+                        $stokSebelum,
+
+                    'stock_after' =>
+                        $stokSesudah,
+
+                    'reference_no' =>
+                        $noNota
                 ]);
             }
 

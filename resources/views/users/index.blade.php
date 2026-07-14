@@ -111,12 +111,19 @@
                 </x-table-cell>
 
                 <x-table-cell class="text-center">
-
+                    
                     @if($user->role=='Admin')
-
+                        
                         <x-badge color="red">
 
                             Admin
+
+                        </x-badge>
+                    @elseif($user->role=='Owner')
+
+                        <x-badge color="purple">
+
+                            Owner
 
                         </x-badge>
 
@@ -169,7 +176,10 @@
                 </x-table-cell>
 
                 <x-table-cell class="text-center">
-
+                    {{-- yg bisa edit hanya admin atau owner --}}
+                    {{-- @if(auth()->user()->role === 'Supervisor' && in_array($user->role, ['Admin', 'Owner']))
+                        <span class="text-xs text-slate-400 italic">n/a</span>
+                    @else --}}
                     <a href="/users/{{ $user->id }}/edit">
 
                         <x-button
@@ -187,7 +197,7 @@
                         </x-button>
 
                     </a>
-
+                    {{-- @endif --}}
                 </x-table-cell>
 
             </x-table-row>
