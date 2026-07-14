@@ -24,16 +24,19 @@
         'resources/js/app.js'
     ])
 
-    <link
+    {{-- <link
         href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
         rel="stylesheet"
-    />
+    /> --}}
+    {{-- <link href="{{ asset('css/remixicon.css') }}" rel="stylesheet" /> --}}
 
-    <script defer
+    {{-- <script defer
         src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js">
-    </script>
+    </script> --}}
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
+    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
     {{-- sidemenu --}}
     <style>
