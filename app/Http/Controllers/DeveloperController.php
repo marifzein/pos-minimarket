@@ -28,13 +28,31 @@ class DeveloperController extends Controller
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
-        DB::table('transaction_details')->truncate();
-        DB::table('transactions')->truncate();
-
-        DB::table('stock_movements')->truncate();
+        DB::table('penerimaan_barang')->truncate();
+        DB::table('penerimaan_barang_items')->truncate();
 
         DB::table('purchase_order_items')->truncate();
         DB::table('purchase_orders')->truncate();
+
+        DB::table('retur_barang_items')->truncate();
+        DB::table('retur_barang')->truncate();
+
+        DB::table('shifts')->truncate();
+        
+        DB::table('stock_adjustments')->truncate();
+        DB::table('stock_adjustment_details')->truncate();
+        
+        DB::table('stock_movements')->truncate();
+        
+        DB::table('stock_opname_details')->truncate();
+        DB::table('stock_opnames')->truncate();
+
+        DB::table('transaction_details')->truncate();
+        DB::table('transactions')->truncate();
+
+        
+
+        
 
         DB::table('stock_opname_details')->truncate();
         DB::table('stock_opnames')->truncate();
@@ -50,15 +68,21 @@ class DeveloperController extends Controller
     public function resetMaster()
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        DB::table('categories')->truncate();
 
+        DB::table('customers')->truncate();
+        
         DB::table('product_prices')->truncate();
         DB::table('products')->truncate();
 
-        DB::table('customers')->truncate();
-
+        DB::table('settings')->truncate();
+        
+        DB::table('shifts')->truncate();
+        
         DB::table('suppliers')->truncate();
 
-        DB::table('categories')->truncate();
+        
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
@@ -92,7 +116,6 @@ class DeveloperController extends Controller
                 'Perawatan',
                 'ATK',
                 'Frozen Food',
-                'Rokok',
                 'Lainnya'
 
             ];
@@ -163,22 +186,38 @@ class DeveloperController extends Controller
             */
 
             $customerData = [
-                'Ahmad Ridwan', 'Siti Aminah', 'Budi Santoso', 'Dewi Lestari', 
-                'Rian Hidayat', 'Mega Utami', 'Eko Prasetyo', 'Diana Putri', 
-                'Andi Wijaya', 'Fitri Handayani', 'Hendra Wijaya', 'Anisa Rahmawati', 
-                'Rudi Hermawan', 'Sri Wahyuni', 'Doni Setiawan', 'Larasati Putri', 
-                'Fajar Nugroho', 'Indah Permatasari', 'Bambang Pamungkas', 'Novianti'
+                ['nama' => 'Ahmad Ridwan', 'alamat' => 'Jl. Pemuda No. 12, Bojonegoro'],
+                ['nama' => 'Siti Aminah', 'alamat' => 'Jl. Diponegoro Gang 3, Bojonegoro'],
+                ['nama' => 'Budi Santoso', 'alamat' => 'Jl. Veteran No. 45, Bojonegoro'],
+                ['nama' => 'Dewi Lestari', 'alamat' => 'Perumahan Pondok Indah Blok C-4, Bojonegoro'],
+                ['nama' => 'Rian Hidayat', 'alamat' => 'Jl. Panglima Sudirman No. 88, Bojonegoro'],
+                ['nama' => 'Mega Utami', 'alamat' => 'Jl. Gajah Mada Gang Kelinci, Bojonegoro'],
+                ['nama' => 'Eko Prasetyo', 'alamat' => 'Jl. Basuki Rahmat No. 101, Bojonegoro'],
+                ['nama' => 'Diana Putri', 'alamat' => 'Jl. Untung Suropati No. 23, Bojonegoro'],
+                ['nama' => 'Andi Wijaya', 'alamat' => 'Jl. Kartini No. 5, Bojonegoro'],
+                ['nama' => 'Fitri Handayani', 'alamat' => 'Jl. Teuku Umar No. 14, Bojonegoro'],
+                ['nama' => 'Hendra Wijaya', 'alamat' => 'Jl. Rajawali Gang Damai, Bojonegoro'],
+                ['nama' => 'Anisa Rahmawati', 'alamat' => 'Perum Asri Mulia Blok A-12, Bojonegoro'],
+                ['nama' => 'Rudi Hermawan', 'alamat' => 'Jl. Hayam Wuruk No. 67, Bojonegoro'],
+                ['nama' => 'Sri Wahyuni', 'alamat' => 'Jl. Imam Bonjol No. 9, Bojonegoro'],
+                ['nama' => 'Doni Setiawan', 'alamat' => 'Jl. Ki Hajar Dewantara No. 34, Bojonegoro'],
+                ['nama' => 'Larasati Putri', 'alamat' => 'Jl. Dr. Wahidin No. 56, Bojonegoro'],
+                ['nama' => 'Fajar Nugroho', 'alamat' => 'Jl. Ronggolawe Gang 2, Bojonegoro'],
+                ['nama' => 'Indah Permatasari', 'alamat' => 'Jl. Mastrip No. 78, Bojonegoro'],
+                ['nama' => 'Bambang Pamungkas', 'alamat' => 'Jl. Lettu Suyitno No. 112, Bojonegoro'],
+                ['nama' => 'Novianti', 'alamat' => 'Jl. Patimura No. 40, Bojonegoro']
             ];
 
-            foreach ($customerData as $i => $namaCustomer) {
+            foreach ($customerData as $i => $data) {
 
                 Customer::firstOrCreate(
                     [
-                        'nama' => $namaCustomer
+                        'nama' => $data['nama']
                     ],
                     [
                         'kode_pelanggan' => 'CUST' . str_pad($i + 1, 4, '0', STR_PAD_LEFT),
-                        'telepon' => '08' . rand(111111111, 999999999)
+                        'telepon'        => '08' . rand(111111111, 999999999),
+                        'alamat'         => $data['alamat'] // 💡 SEKARANG ALAMAT SUDAH MASUK SEEDER!
                     ]
                 );
 

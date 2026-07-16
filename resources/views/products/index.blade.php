@@ -12,6 +12,25 @@
 
 >
 
+@php
+    // Helper untuk mempertahankan seluruh filter yang sedang aktif saat sort diklik
+    $getSortLink = function($column) use ($sortBy, $sortDir) {
+        $nextDir = ($sortBy === $column && $sortDir === 'asc') ? 'desc' : 'asc';
+        return request()->fullUrlWithQuery([
+            'sort_by'  => $column,
+            'sort_dir' => $nextDir,
+            'page'     => 1 // Reset ke halaman 1 tiap ganti sort
+        ]);
+    };
+    
+    // Helper render panah indikator
+    $renderArrow = function($column) use ($sortBy, $sortDir) {
+        if ($sortBy !== $column) return '';
+        return $sortDir === 'asc' ? ' ▲' : ' ▼';
+    };
+@endphp
+
+
     <x-slot:action>
 
         <a href="/products/create">
@@ -138,32 +157,50 @@
 
     <x-table >
 
-        {{-- <thead> --}}
-        <x-table-header >
-
+       
+        <x-table-header>
             <tr>
-                 
-                {{-- <th class="text-left  py-4 px-3">Produk</th> --}}
-                <x-table-head class="text-left">Produk</x-table-head>
-                <x-table-head class="text-left">Barcode</x-table-head>
-                <x-table-head class="text-right">Harga</x-table-head>
-                <x-table-head class="text-right">Stock</x-table-head>
-                <x-table-head class="text-center">Status</x-table-head>
-                <x-table-head class="text-center">Aksi</x-table-head>
+                <!-- Kolom Produk -->
+                <x-table-head class="p-0 text-left hover:bg-slate-200 transition">
+                    <a href="{{ $getSortLink('nama_barang') }}" class="block p-3 w-full h-full font-bold">
+                        Produk<span class="text-blue-600 text-xs">{{ $renderArrow('nama_barang') }}</span>
+                    </a>
+                </x-table-head>
 
-                {{-- <th class="text-left  py-4">Barcode</th> --}}
+                <!-- Kolom Barcode -->
+                <x-table-head class="p-0 text-left hover:bg-slate-200 transition">
+                    <a href="{{ $getSortLink('barcode') }}" class="block p-3 w-full h-full font-bold">
+                        Barcode<span class="text-blue-600 text-xs">{{ $renderArrow('barcode') }}</span>
+                    </a>
+                </x-table-head>
 
-                {{-- <th class="text-right  py-4">Harga</th> --}}
+                <!-- Kolom Harga Beli -->
+                <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
+                    <a href="{{ $getSortLink('harga_beli') }}" class="block p-3 w-full h-full font-bold">
+                        Harga Beli<span class="text-blue-600 text-xs">{{ $renderArrow('harga_beli') }}</span>
+                    </a>
+                </x-table-head>
 
-                {{-- <th class="text-right  py-4">Stock</th> --}}
+                <!-- Kolom Harga Jual -->
+                <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
+                    <a href="{{ $getSortLink('harga') }}" class="block p-3 w-full h-full font-bold">
+                        Harga Jual<span class="text-blue-600 text-xs">{{ $renderArrow('harga') }}</span>
+                    </a>
+                </x-table-head>
 
-                {{-- <th class="text-center  py-4">Status</th>
+                <!-- Kolom Stok -->
+                <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
+                    <a href="{{ $getSortLink('stok') }}" class="block p-3 w-full h-full font-bold">
+                        Stock<span class="text-blue-600 text-xs">{{ $renderArrow('stok') }}</span>
+                    </a>
+                </x-table-head>
 
-                <th class="text-center  py-4">Aksi</th> --}}
-
+                <!-- Kolom Non-Sortable (Status & Aksi) -->
+                <x-table-head class="text-center p-3 font-bold">Status</x-table-head>
+                <x-table-head class="text-center p-3 font-bold">Aksi</x-table-head>
             </tr>
-        </x-table-header >    
-        {{-- </thead> --}}
+        </x-table-header>  
+        
 
         <tbody>
 
@@ -187,7 +224,15 @@
 
                 </x-table-cell>
 
-                
+                <x-table-cell class="text-right">
+                    @if(!$product->harga_beli || $product->harga_beli == 0)
+                        <span class="text-red-600 font-bold bg-red-50 px-2 py-1 rounded border border-red-200 text-xs inline-block animate-pulse">
+                            ⚠️ Rp 0
+                        </span>
+                    @else
+                        Rp {{ number_format($product->harga_beli, 0, ',', '.') }}
+                    @endif
+                </x-table-cell>
 
                 <x-table-cell class="text-right">
 

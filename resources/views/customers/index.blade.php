@@ -65,11 +65,13 @@ Cari
 
 <tr>
 
-<x-table-head>Kode</x-table-head>
 
-<x-table-head>Nama</x-table-head>
 
-<x-table-head>Telepon</x-table-head>
+<x-table-head class="text-left">Nama</x-table-head>
+
+<x-table-head class="text-left">Alamat</x-table-head>
+
+<x-table-head class="text-left">Telepon</x-table-head>
 
 <x-table-head>Member</x-table-head>
 
@@ -91,31 +93,31 @@ Aksi
 
 <tr>
 
-<x-table-cell>
 
-{{ $customer->kode_pelanggan  }}
 
-</x-table-cell>
-
-<x-table-cell>
+<x-table-cell class="text-left">
 
 {{ $customer->nama }}
 
 </x-table-cell>
 
-<x-table-cell>
+<x-table-cell class="max-w-xs truncate text-left">
+    {{ $customer->alamat ?: '-' }}
+</x-table-cell>
+
+<x-table-cell class="text-left">
 
 {{ $customer->telepon  }}
 
 </x-table-cell>
 
-<x-table-cell>
+<x-table-cell class="text-center">
 
 {{ $customer->is_member ? 'Member' : '-' }}
 
 </x-table-cell>
 
-<x-table-cell>
+<x-table-cell class="text-center">
 
 @if($customer->status)
     <x-badge color="green">

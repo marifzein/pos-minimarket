@@ -82,9 +82,15 @@ class="w-64 shadow-lg z-30 flex flex-col">
         <div id="menu-kasir" class="menu-content">
 
             <a href="/pos"
-                class="submenu {{ request()->is('pos*') ? 'submenu-active' : '' }}">
+                class="submenu {{ request()->is('pos') ? 'submenu-active' : '' }}">
                 <i class="ri-shopping-cart-2-line"></i>
                 POS
+            </a>
+
+            <a href="/pos/close-shift"
+                class="submenu {{ request()->is('pos/close-shift*') ? 'submenu-active' : '' }}">
+                <i class="ri-shut-down-line"></i>
+                Tutup Shift
             </a>
 
              <a href="/transactions"
@@ -251,7 +257,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
         {{-- ===================== --}}
         {{-- LAPORAN --}}
         {{-- ===================== --}}
-
+        
        <button
             type="button"
             onclick="toggleMenu('laporan')"
@@ -280,6 +286,8 @@ class="w-64 shadow-lg z-30 flex flex-col">
             </a>
             @endcan
             
+            <!-- Hanya Supervisor ke atas yang bisa melihat laporan stok & sales global -->
+            @can('akses-spv-keatas')
             <a href="/laporan/penjualan-produk" class="submenu {{ request()->routeIs('laporan/penjualan-produk') ? 'submenu-active' : '' }}">
                 <i class="ri-shopping-bag-3-line"></i>
                 Sales Per Produk
@@ -288,6 +296,12 @@ class="w-64 shadow-lg z-30 flex flex-col">
                 <i class="ri-contacts-line"></i>
                 Sales Per Customer
             </a>
+            {{-- laporan nilai aset stock--}}
+            <a href="{{ route('laporan.nilai-aset') }}" class="submenu {{ request()->is('laporan.nilai-aset') ?  'submenu-active' : '' }}">
+                <i class="ri-bank-card-line mr-2 text-lg"></i>
+                <span>Nilai Aset Stok</span>
+            </a>
+            @endcan
         </div>
         
        

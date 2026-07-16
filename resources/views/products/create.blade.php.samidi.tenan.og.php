@@ -54,7 +54,8 @@
 
 <x-card>
 
-<form id="formProduk" method="POST" action="{{ url('/products') }}">
+<!-- <form method="POST" action="{{ url('/products') }}"> -->
+<form id="productForm">
 
 @csrf
 
@@ -228,8 +229,9 @@
     </a>
 
     <x-button
+        id="btnSimpan"
         color="primary"
-        type="submit"
+        type="button"
     >
 
         <i class="ri-save-line"></i>
@@ -246,113 +248,95 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // 1. FUNGSI UTK TAMBAH BARIS GROSIR BARU
-    const btnTambahGrosir = document.getElementById('btnTambahGrosir');
-    if (btnTambahGrosir) {
-        btnTambahGrosir.addEventListener('click', function() {
-            let html = `
-            <div class="grid grid-cols-12 gap-2 mb-2 grosir-row">
-                <div class="col-span-5">
-                    <input type="number" name="min_qty[]" placeholder="Min Qty" class="w-full rounded-xl border border-slate-300 p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
-                </div>
-                <div class="col-span-5">
-                    <input type="number" name="potongan[]" placeholder="Potongan / pcs" class="w-full rounded-xl border border-slate-300 p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
-                </div>
-                <div class="col-span-2">
-                    <button type="button" class="hapus w-full bg-red-500 hover:bg-red-600 text-white rounded-xl h-full flex items-center justify-center font-bold text-base transition duration-200">✕</button>
-                </div>
-            </div>
-            `;
-            document.getElementById('grosir-container').insertAdjacentHTML('beforeend', html);
-        });
+// 1. FUNGSI UTK TAMBAH BARIS GROSIR BARU (Layout disamakan grid-12)
+document.getElementById('btnTambahGrosir').addEventListener('click', function() {
+    let html = `
+    <div class="grid grid-cols-12 gap-2 mb-2 grosir-row">
+        <div class="col-span-5">
+            <input
+                type="number"
+                name="min_qty[]"
+                placeholder="Min Qty"
+                class="w-full rounded-xl border border-slate-300 p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+            >
+        </div>
+
+        <div class="col-span-5">
+            <input
+                type="number"
+                name="potongan[]"
+                placeholder="Potongan / pcs"
+                class="w-full rounded-xl border border-slate-300 p-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition"
+            >
+        </div>
+
+        <div class="col-span-2">
+            <button
+                type="button"
+                class="hapus w-full bg-red-500 hover:bg-red-600 text-white rounded-xl h-full flex items-center justify-center font-bold text-base transition duration-200"
+            >
+                ✕
+            </button>
+        </div>
+    </div>
+    `;
+
+    document.getElementById('grosir-container').insertAdjacentHTML('beforeend', html);
+});
+
+// 2. FUNGSI HAPUS BARIS
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('hapus')) {
+        e.target.closest('.grosir-row').remove();
     }
+});
 
-    // 2. FUNGSI HAPUS BARIS
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('hapus')) {
-            e.target.closest('.grosir-row').remove();
-        }
+// 3. VALIDASI SEBELUM SUBMIT FORM PRODUK
+
+    document.getElementById('btnSimpan').addEventListener('click', async function () {
+
+        alert('BUTTON CLICK');
+
     });
+    
 
-    // 3. VALIDASI KETAT PADA FORM TARGET ID
-    const formProduk = document.getElementById('formProduk');
-    if (formProduk) {
-        formProduk.addEventListener('submit', function(e) {
-            // KUNCI GERBANG UTAMA SECARA INSTAN!
-            e.preventDefault();
-            e.stopPropagation(); 
+    // ==========================================
+    // VALIDASI DATA GROSIR 
+    // ==========================================
+    const minQtyInputs = document.querySelectorAll('input[name="min_qty[]"]');
+    const potonganInputs = document.querySelectorAll('input[name="potongan[]"]');
 
-            const formElement = this;
+    for (let i = 0; i < minQtyInputs.length; i++) {
+        let qtyVal = minQtyInputs[i].value.trim();
+        let potonganVal = potonganInputs[i].value.trim();
 
-            // Ambil element input berdasarkan attribute name komponen blade secara akurat
-            const elBeli = formElement.querySelector('input[name="harga_beli"]');
-            const elJual = formElement.querySelector('input[name="harga"]');
-            
-            let numericHargaBeli = elBeli ? Number(elBeli.value || 0) : 0;
-            let numericHargaJual = elJual ? Number(elJual.value || 0) : 0;
+        let numericQty = Number(qtyVal || 0);
+        let numericPotongan = Number(potonganVal || 0);
 
-            // ==========================================
-            // SELEKSI 1: VALIDASI HARGA BELI & HARGA JUAL
-            // ==========================================
-            if (numericHargaBeli <= 0 || numericHargaJual <= 0) {
-                Swal.fire({ 
-                    icon: 'error', 
-                    title: 'Harga Tidak Valid!',
-                    text: 'Harga Beli (HPP) dan Harga Jual wajib diisi dan nilainya tidak boleh Rp 0!',
-                    confirmButtonText: 'Perbaiki Data',
+        // Jika salah satu kolom diisi, pasangannya wajib diisi juga & tidak boleh 0
+        if (qtyVal !== "" || potonganVal !== "" || numericQty > 0 || numericPotongan > 0) {
+            if (numericQty <= 0 || numericPotongan <= 0) {
+                // Stop/Gagalkan submit form ke backend
+                e.preventDefault();
+
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Grosir Belum Lengkap',
+                    text: `Pada level grosir baris ke-${i + 1}, nilai 'Min Qty' dan 'Potongan' harus diisi lebih dari 0!`,
+                    confirmButtonText: 'Perbaiki',
                     confirmButtonColor: '#4f46e5',
                     returnFocus: false
-                }).then(() => {
-                    if (numericHargaBeli <= 0 && elBeli) {
-                        elBeli.focus();
-                    } else if (elJual) {
-                        elJual.focus();
-                    }
                 });
-                return false; 
-            }
 
-            // ==========================================
-            // SELEKSI 2: VALIDASI DATA GROSIR 
-            // ==========================================
-            const minQtyInputs = formElement.querySelectorAll('input[name="min_qty[]"]');
-            const potonganInputs = formElement.querySelectorAll('input[name="potongan[]"]');
-
-            for (let i = 0; i < minQtyInputs.length; i++) {
-                let qtyVal = minQtyInputs[i].value.trim();
-                let potonganVal = potonganInputs[i].value.trim();
-
-                let numericQty = Number(qtyVal || 0);
-                let numericPotongan = Number(potonganVal || 0);
-
-                if (qtyVal !== "" || potonganVal !== "" || numericQty > 0 || numericPotongan > 0) {
-                    if (numericQty <= 0 || numericPotongan <= 0) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Data Grosir Belum Lengkap',
-                            text: `Pada level grosir baris ke-${i + 1}, nilai 'Min Qty' dan 'Potongan' harus diisi lebih dari 0!`,
-                            confirmButtonText: 'Perbaiki',
-                            confirmButtonColor: '#4f46e5',
-                            returnFocus: false
-                        }).then(() => {
-                            if (numericQty <= 0) {
-                                minQtyInputs[i].focus();
-                            } else {
-                                potonganInputs[i].focus();
-                            }
-                        });
-                        return false; 
-                    }
+                // Fokuskan otomatis kursor ke field yang bermasalah
+                if (numericQty <= 0) {
+                    minQtyInputs[i].focus();
+                } else {
+                    potonganInputs[i].focus();
                 }
+                return;
             }
-
-            // ==========================================
-            // KELULUSAN FINAL: SUBMIT SECARA MANUAL
-            // ==========================================
-            formElement.submit();
-        });
+        }
     }
 });
 </script>

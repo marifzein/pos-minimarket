@@ -52,4 +52,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function customerRelation()
+    {
+        // Menghubungkan kolom 'pelanggan' di transactions ke 'kode_pelanggan' di customers
+        return $this->belongsTo(Customer::class, 'pelanggan', 'kode_pelanggan');
+    }
 }

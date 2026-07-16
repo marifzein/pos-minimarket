@@ -43,6 +43,18 @@ class ProductController extends Controller
         $products = Product::with('category');
 
         // ======================
+        // Ambil Parameter Sorting 
+        // ======================
+        $sortBy = $request->get('sort_by', 'nama_barang'); // Default urut nama barang
+        $sortDir = $request->get('sort_dir', 'asc');       // Default urut A-Z
+
+        // Validasi kolom yang boleh disortir agar query aman
+        $allowedSorts = ['nama_barang', 'barcode', 'harga_beli', 'harga', 'stok'];
+        if (!in_array($sortBy, $allowedSorts)) $sortBy = 'nama_barang';
+        if (!in_array($sortDir, ['asc', 'desc'])) $sortDir = 'asc';
+        
+
+        // ======================
         // Search
         // ======================
 
@@ -106,9 +118,18 @@ class ProductController extends Controller
             }
 
         }
+        
 
+        // 💡 TAMBAHKAN FILTER HARGA BELI NOL=>dari dashboard
+        if ($request->input('filter') === 'harga_beli_nol') {
+            $products->where(function($q) {
+                $q->where('harga_beli', 0)
+                ->orWhereNull('harga_beli');
+            });
+        }
+        
         $products = $products
-            ->orderBy('nama_barang')
+            ->orderBy($sortBy, $sortDir)
             ->paginate(20)
             ->withQueryString();
 
@@ -118,7 +139,9 @@ class ProductController extends Controller
             'products.index',
             compact(
                 'products',
-                'categories'
+                'categories',
+                'sortBy',
+                'sortDir'
             )
         );
     }
@@ -146,9 +169,9 @@ class ProductController extends Controller
 
             'nama_barang' =>
                 'required',
-
-            'harga' =>
-                'required|numeric|min:0',
+            
+            'harga_beli' => 'required|numeric|gt:0',
+            'harga'      => 'required|numeric|gt:0',
 
             'stok' =>
                 'required|integer|min:0',
@@ -170,6 +193,8 @@ class ProductController extends Controller
             'nama_barang'   => $request->nama_barang,
 
             'category_id'   => $request->category_id,
+
+            'harga_beli'    => $request->harga_beli,
 
             'harga'         => $request->harga,
 
@@ -277,7 +302,8 @@ class ProductController extends Controller
         $request->validate([
             'nama_barang' => 'required',
             'category_id' => 'nullable|exists:categories,id',
-            'harga'        => 'required|numeric|min:0',
+            'harga_beli' => 'required|numeric|gt:0',
+            'harga'      => 'required|numeric|gt:0',
             'harga_diskon' => 'nullable|numeric|min:0',
             'min_stok'     => 'required|integer|min:0',
             'satuan'       => 'required',
@@ -291,6 +317,7 @@ class ProductController extends Controller
             'barcode'      => $request->barcode,
             'nama_barang'  => $request->nama_barang,
             'category_id'  => $request->category_id,
+            'harga_beli'   => $request->harga_beli,
             'harga'        => $request->harga,
             'harga_diskon' => $request->harga_diskon,
             'min_stok'     => $request->min_stok,

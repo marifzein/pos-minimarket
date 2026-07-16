@@ -14,15 +14,14 @@ class LaporanLabaRugiController extends Controller
         $dari_tanggal = $request->get('dari_tanggal', Carbon::now()->startOfMonth()->toDateString());
         $sampai_tanggal = $request->get('sampai_tanggal', Carbon::now()->toDateString());
 
-        // Subquery untuk menghitung omzet & HPP per item terelasi, di-group berdasarkan TANGGAL
+        // Subquery di-group berdasarkan TANGGAL (Menggunakan detail harga beli yang dikunci)
         $reports = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->select(
                 DB::raw('DATE(transactions.created_at) as tanggal'),
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
-                DB::raw('SUM(transaction_details.qty * products.harga_beli) as total_hpp'),
-                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * products.harga_beli) as laba_kotor')
+                DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
+                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->groupBy(DB::raw('DATE(transactions.created_at)'))
@@ -33,11 +32,10 @@ class LaporanLabaRugiController extends Controller
         // Hitung total akumulasi di bagian bawah (Footer)
         $totals = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->select(
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
-                DB::raw('SUM(transaction_details.qty * products.harga_beli) as total_hpp'),
-                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * products.harga_beli) as laba_kotor')
+                DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
+                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->first();
@@ -51,15 +49,13 @@ class LaporanLabaRugiController extends Controller
         $dari_tanggal = $request->get('dari_tanggal', Carbon::now()->startOfMonth()->toDateString());
         $sampai_tanggal = $request->get('sampai_tanggal', Carbon::now()->toDateString());
 
-        // Tarik semua data tanpa pagination untuk laporan penuh
         $reports = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->select(
                 DB::raw('DATE(transactions.created_at) as tanggal'),
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
-                DB::raw('SUM(transaction_details.qty * products.harga_beli) as total_hpp'),
-                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * products.harga_beli) as laba_kotor')
+                DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
+                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->groupBy(DB::raw('DATE(transactions.created_at)'))
@@ -68,18 +64,16 @@ class LaporanLabaRugiController extends Controller
 
         $totals = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->select(
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
-                DB::raw('SUM(transaction_details.qty * products.harga_beli) as total_hpp'),
-                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * products.harga_beli) as laba_kotor')
+                DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
+                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->first();
 
         $filename = "Laporan_Laba_Rugi_" . $dari_tanggal . "_s_d_" . $sampai_tanggal . ".xls";
 
-        // Menggunakan return response bawaan Laravel agar output buffer aman dan resmi
         return response()
             ->view('laporan.laba-rugi-excel', compact('reports', 'totals', 'dari_tanggal', 'sampai_tanggal'))
             ->header('Content-Type', 'application/vnd.ms-excel')
@@ -96,12 +90,11 @@ class LaporanLabaRugiController extends Controller
 
         $reports = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->select(
                 DB::raw('DATE(transactions.created_at) as tanggal'),
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
-                DB::raw('SUM(transaction_details.qty * products.harga_beli) as total_hpp'),
-                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * products.harga_beli) as laba_kotor')
+                DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
+                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->groupBy(DB::raw('DATE(transactions.created_at)'))
@@ -110,11 +103,10 @@ class LaporanLabaRugiController extends Controller
 
         $totals = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->select(
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
-                DB::raw('SUM(transaction_details.qty * products.harga_beli) as total_hpp'),
-                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * products.harga_beli) as laba_kotor')
+                DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
+                DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->first();

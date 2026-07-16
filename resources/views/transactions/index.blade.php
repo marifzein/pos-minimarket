@@ -28,6 +28,14 @@
                     Tanggal
                 </th>
 
+                <th class="p-3 text-left">
+                    Kasir
+                </th>
+
+                <th class="p-3 text-left">
+                    Pelanggan
+                </th>
+
                 <th class="p-3 text-right">
                     Total
                 </th>
@@ -51,6 +59,21 @@
 
                     <td class="p-3">
                         {{ $trx->created_at }}
+                    </td>
+
+                    <td class="p-3 text-slate-600">
+                        {{ $trx->user?->name ?? 'System' }}
+                    </td>
+
+                    <!-- 💡 Menampilkan Nama Pelanggan / Kode Pelanggan -->
+                    <td class="p-3">
+                        @if($trx->pelanggan)
+                            <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md text-xs font-medium">
+                                {{ $trx->customerRelation->nama }}
+                            </span>
+                        @else
+                            <span class="text-gray-400 text-xs italic">Umum (Non-Member)</span>
+                        @endif
                     </td>
 
                     <td class="p-3 text-right">

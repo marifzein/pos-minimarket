@@ -59,7 +59,7 @@
                         Pelanggan
                     </label>
 
-                    {{-- <button
+                    <button
 
                         type="button"
 
@@ -69,13 +69,6 @@
 
                         + Tambah Pelanggan Baru
 
-                    </button> --}}
-                    <button
-                        type="button"
-                        @click="$dispatch('open-customer-modal')"
-                        class="text-indigo-600 text-sm hover:underline mb-1"
-                    >
-                        + Tambah Pelanggan Baru
                     </button>
                     
                     <div class="relative"
@@ -146,13 +139,10 @@
                                         x-text="customer.nama"
                                     ></div>
 
-                                    <!-- 💡 GANTI KODE JADI ALAMAT / TELEPON PADA DROPDOWN -->
-                                    <div class="text-xs text-slate-500" x-text="customer.alamat || customer.telepon || 'Tidak ada alamat/telp'"></div>
-
-                                    {{-- <div
+                                    <div
                                         class="text-xs text-slate-500"
                                         x-text="customer.kode_pelanggan"
-                                    ></div> --}}
+                                    ></div>
 
                                 </div>
 
@@ -162,7 +152,38 @@
 
                     </div>
 
-                   
+                    {{-- <div
+                        class="mt-3"
+                        x-show="selectedCustomer"
+                    >
+
+                        <div class="rounded-xl bg-indigo-50 p-3">
+
+                            <div
+                                class="font-semibold"
+                                x-text="selectedCustomer?.nama"
+                            ></div>
+
+                            <div
+                                class="text-sm text-slate-500"
+                                x-text="selectedCustomer?.kode_pelanggan"
+                            ></div>
+
+                            <button
+
+                                @click="clearCustomer()"
+
+                                class="mt-2 text-red-600 text-sm"
+
+                            >
+
+                                Kosongkan Pelanggan
+
+                            </button>
+
+                        </div>
+
+                    </div> --}}
 
                     <!-- Ganti x-show dengan template x-if -->
                     <template x-if="selectedCustomer">
@@ -175,15 +196,11 @@
                                     class="font-semibold"
                                     x-text="selectedCustomer.nama"
                                 ></div>
-                                
-                                <div class="text-sm text-slate-600 mt-0.5" x-text="selectedCustomer.alamat || 'Alamat tidak diisi'"></div>
 
-                                <div class="text-xs text-slate-400" x-show="selectedCustomer.telepon" x-text="'Telp: ' + selectedCustomer.telepon"></div>
-                                
-                                {{-- <div
+                                <div
                                     class="text-sm text-slate-500"
                                     x-text="selectedCustomer.kode_pelanggan"
-                                ></div> --}}
+                                ></div>
 
                                 <button
                                     @click="clearCustomer()"
@@ -200,7 +217,27 @@
 
                 </div>
 
-                
+                {{-- <div class="bg-white rounded-xl shadow p-4">
+
+                    <h2 class="font-bold text-lg mb-3">
+                        Pelanggan
+                    </h2>
+
+                    <input
+                        type="text"
+                        x-model="customerSearch"
+                        @input="searchCustomer()"
+                        placeholder="Cari nama / kode pelanggan"
+                        class="w-full border rounded-lg p-2 mb-3"
+                    >
+
+                    <input
+                        type="text"
+                        placeholder="No HP"
+                        class="w-full border rounded-lg p-2"
+                    >
+
+                </div> --}}
 
                 <!-- shortcut help -->
                  <div class="bg-white rounded-xl shadow p-4">
@@ -501,7 +538,18 @@
 
                                 <hr>
 
-                                
+                                {{-- ======================= --}}
+                                {{-- CASH --}}
+                                {{-- ======================= --}}
+                                {{-- <x-input
+                                    label="Sayar"
+                                    name="byr"
+                                    icon="ri-wallet-3-line"
+                                    :value="0"
+                                    class="text-right"
+                                    width="w-40"
+                                    type="number"
+                                /> --}}
                                 
                                 <div class="flex justify-between items-center mb-3">
 
@@ -805,7 +853,152 @@
 
                             </div>    
 
+                            {{-- REFACTOR PEMBAYARAN END >>>>>>>> --}}
+        {{-- =========================================================================== --}}
+                            <!-- SUBTOTAL -->
+
+                            {{-- <div class="flex justify-between items-center mb-3">
+
+                                <span class="font-medium">
+                                    Subtotal
+                                </span>
+
+                                <span
+                                    class="font-medium"
+                                    x-text="'Rp ' + subtotal.toLocaleString('id-ID')"
+                                ></span>
+
+                            </div> --}}
+
+                            <!-- VOUCHER -->
+
+                            {{-- <div class="flex justify-between items-center mb-3">
+
+                                <label class="font-medium">
+                                    Voucher
+                                </label>
+
+                                <input
+                                    type="number"
+                                    x-model.number="voucher"
+                                    min="0"
+                                    class="w-40 border rounded-lg p-2 text-right"
+                                >
+
+                            </div> --}}
+
+                            <!-- CARD -->
+
+                            {{-- <div class="flex justify-between items-center mb-3">
+
+                                <label class="font-medium">
+                                    Card
+                                </label>
+
+                                <input
+                                    type="number"
+                                    x-model.number="card"
+                                    min="0"
+                                    class="w-40 border rounded-lg p-2 text-right"
+                                >
+
+                            </div> --}}
+
+                            {{-- krg bayar --}}
+                            {{-- <div
+                                class="flex justify-between items-center
+                                text-red-600
+                                font-bold text-xl
+                                mb-3">
+
+                                <span>Kurang Bayar</span>
+
+                                <span
+                                x-text="'Rp ' + kurangBayar.toLocaleString('id-ID')"
+                                ></span>
+
+                            </div> --}}
+                            {{-- krg bayar end --}}
                             
+                            {{-- kembalian --}}
+                            {{-- <div
+                                class="flex justify-between items-center
+                                text-green-600
+                                font-bold text-2xl
+                                mb-4">
+
+                                <span>Kembalian</span>
+
+                                <span
+                                x-text="'Rp ' + kembalian.toLocaleString('id-ID')"
+                                ></span>
+
+                            </div> --}}
+                            {{-- kembalian end --}}
+
+
+                            <!-- TOTAL -->
+
+                            {{-- <div
+                                class="flex justify-between items-center
+                                    border-t pt-3 mb-4
+                                    font-bold text-xl"
+                            >
+
+                                <span>Total</span>
+
+                                <span
+                                    x-text="'Rp ' + grandTotal.toLocaleString('id-ID')"
+                                ></span>
+
+                            </div> --}}
+
+                            <!-- BAYAR -->
+
+                            {{-- <div class="flex justify-between items-center mb-4">
+
+                                <label class="font-medium">
+                                    Bayar
+                                </label>
+
+                                <input
+                                    x-ref="cashInput"
+                                    type="text"
+                                    :value="cashDisplay"
+                                    @input="updateCash($event.target.value)"
+                                    class="w-40 border rounded-lg p-2 text-right text-lg"
+                                >
+
+                            </div> --}}
+
+                            <!-- KEMBALIAN -->
+
+                            {{-- <div
+                                class="flex justify-between items-center
+                                    text-green-600
+                                    font-bold text-2xl
+                                    mb-4"
+                            >
+
+                                <span>Kembalian</span>
+
+                                <span
+                                    x-text="'Rp ' + kembalian.toLocaleString('id-ID')"
+                                ></span>
+
+                            </div> --}}
+
+                            <!-- BUTTON -->
+
+                            {{-- <button
+                                x-ref="saveButton"
+                                @click="saveTransaction()"
+                                class="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold"
+                            >
+
+                                SIMPAN TRANSAKSI (F10)
+
+                            </button> --}}
 
                         </div>
 
@@ -913,132 +1106,9 @@
         
         <!-- MODAL END -->
 
-        <!-- ========================================================== -->
-        <!-- MODAL TAMBAH PELANGGAN BARU (ISOLATED INLINE SCOPE) -->
-        <!-- ========================================================== -->
-        <div
-            x-data="{ 
-                showCustomerModal: false,
-                newCustomer: { nama: '', telepon: '', alamat: '' },
-                async saveNewCustomer() {
-                    if (!this.newCustomer.nama.trim()) {
-                        Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Nama pelanggan wajib diisi!' });
-                        return;
-                    }
-                    try {
-                        let response = await fetch('/api/customers', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name=&quot;csrf-token&quot;]').content
-                            },
-                            body: JSON.stringify(this.newCustomer)
-                        });
-                        let result = await response.json();
-                        if (result.success) {
-                            // 💡 Kirim data ke sistem kasir utama  menggunakan Custom Event
-                            window.dispatchEvent(new CustomEvent('customer-added', { detail: result.customer }));
-
-                            // Reset form
-                            this.newCustomer = { nama: '', telepon: '' , alamat: ''};
-                            this.showCustomerModal = false;
-                            
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: 'Pelanggan berhasil disimpan',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal menyimpan pelanggan' });
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem' });
-                    }
-                }
-            }"
-            
-            @open-customer-modal.window="showCustomerModal = true; $nextTick(() => $refs.newCustomerName.focus())"
-            x-show="showCustomerModal"
-            x-cloak
-            class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-            @keydown.escape.window="showCustomerModal = false;"
-        >
-        <!-- 💡 Listen ke event klik dari tombol luar -->
-            <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all" @click.outside="showCustomerModal = false">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-xl text-slate-800">
-                        <i class="ri-user-add-line mr-1 text-indigo-600"></i> Tambah Pelanggan Baru
-                    </h3>
-                    <button type="button" @click="showCustomerModal = false" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-                </div>
-
-                <!-- Form Body -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                        <input 
-                            x-ref="newCustomerName"
-                            type="text" 
-                            x-model="newCustomer.nama" 
-                            @keydown.enter.prevent="$refs.newCustomerPhone.focus()"
-                            placeholder="Masukkan nama pelanggan..." 
-                            class="w-full border rounded-xl p-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none"
-                        >
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon / HP</label>
-                        <input 
-                            x-ref="newCustomerPhone"
-                            type="text" 
-                            x-model="newCustomer.telepon" 
-                            @keydown.enter.prevent="saveNewCustomer()"
-                            placeholder="Contoh: 081234567xx (Opsional)" 
-                            class="w-full border rounded-xl p-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none"
-                        >
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-                        <textarea 
-                            x-ref="newCustomerAlamat"
-                            x-model="newCustomer.alamat" 
-                            rows="2"
-                            placeholder="Masukkan alamat pelanggan... (Opsional)" 
-                            class="w-full border rounded-xl p-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none"
-                        ></textarea>
-                    </div>
-                </div>
-
-                <!-- Form Action Buttons -->
-                <div class="mt-6 flex justify-end gap-2">
-                    <button 
-                        type="button" 
-                        @click="showCustomerModal = false" 
-                        class="px-4 py-2 border rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"
-                    >
-                        Batal
-                    </button>
-                    <button 
-                        type="button" 
-                        @click="saveNewCustomer()" 
-                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium shadow-sm flex items-center"
-                    >
-                        <i class="ri-save-3-line mr-1"></i> Simpan Pelanggan
-                    </button>
-                </div>
-            </div>
-        </div>
         
 
     </div>
-
-
-        
-
 <script>
 
 function posKasir() {
@@ -1262,50 +1332,6 @@ function posKasir() {
 
          init()
         {
-            // xamidi==============================================
-            // 📡 Dengarkan kiriman data dari modal pelanggan baru
-            window.addEventListener('customer-added', (e) => {
-                const newCustomer = e.detail;
-
-                // ==========================================
-                // SOLUSI NO 2: MASUKKAN KE MEMORI PENCARIAN
-                // ==========================================
-                // 1. Masukkan ke array global window agar sinkron
-                if (window.ALL_CUSTOMERS) {
-                    window.ALL_CUSTOMERS.push(newCustomer);
-                }
-
-                // 2. Masukkan ke array local Alpine.js agar langsung bisa dicari saat diketik
-                if (this.allCustomers) {
-                    this.allCustomers.push(newCustomer);
-                }
-
-                // ==========================================
-                // SOLUSI NO 1: OTOMATIS PILIH PELANGGAN BARU
-                // ==========================================
-                // Jalankan fungsi selectCustomer bawaan POS  (jika ada)
-                if (typeof this.selectCustomer === 'function') {
-                    this.selectCustomer(newCustomer);
-                } else {
-                    // Jika tidak ada fungsi selectCustomer, kita set manual statenya
-                    this.selectedCustomer = newCustomer;
-                    this.customerSearch = newCustomer.nama; // Isi kolom pencarian dengan nama baru
-                    this.customerResults = []; // Bersihkan dropdown pencarian
-                }
-
-                // [OPSIONAL] JIKA POS  MENGGUNAKAN SELECT2 (Dropdown Biasa)
-                // Jika  menggunakan select2 untuk pilihan pelanggan, aktifkan kode di bawah ini:
-                /*
-                let select2El = $('#customer-select'); // Sesuaikan ID element select2 bos
-                if (select2El.length) {
-                    let newOption = new Option(newCustomer.nama, newCustomer.id, true, true);
-                    select2El.append(newOption).trigger('change');
-                }
-                */
-            });
-            // xamidi end==========================================
-
-
             window.addEventListener(
                 'keydown',
                 this.handleShortcut.bind(this)

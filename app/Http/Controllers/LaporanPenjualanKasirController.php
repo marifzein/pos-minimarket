@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // 💡 Jangan lupa import Auth di atas bos
 use Carbon\Carbon;
 
 class LaporanPenjualanKasirController extends Controller
@@ -14,7 +15,7 @@ class LaporanPenjualanKasirController extends Controller
         $dari_tanggal = $request->get('dari_tanggal', Carbon::now()->startOfMonth()->toDateString());
         $sampai_tanggal = $request->get('sampai_tanggal', Carbon::now()->toDateString());
 
-        // Perbaikan Query: cash dikurangi kembalian agar mencerminkan omzet riil kasir
+        // Base Query untuk Laporan
         $query = DB::table('transactions')
             ->join('users', 'transactions.user_id', '=', 'users.id')
             ->select(
@@ -30,18 +31,27 @@ class LaporanPenjualanKasirController extends Controller
             ->orderBy('tanggal', 'asc')
             ->orderBy('nama_kasir', 'asc');
 
-        $reports = $query->paginate(20)->withQueryString();
-
-        // Perbaikan hitungan total footer bawah agar sinkron seirama
-        $totals = DB::table('transactions')
+        // Base Query untuk Total di Footer
+        $totalsQuery = DB::table('transactions')
             ->select(
                 DB::raw('SUM(transactions.cash - transactions.kembalian) as total_cash'),
                 DB::raw('SUM(transactions.card) as total_card'),
                 DB::raw('SUM(transactions.voucher) as total_voucher'),
                 DB::raw('SUM((transactions.cash - transactions.kembalian) + transactions.card + transactions.voucher) as total_grand')
             )
-            ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
-            ->first();
+            ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal]);
+
+        // 🔑 PROTEKSI MULTI-ROLE:
+        // Jika yang login memiliki role 'kasir', batasi hanya melihat datanya sendiri.
+        // Silakan sesuaikan string 'kasir' dengan value role yang ada di DB Anda.
+        if (strtolower(Auth::user()->role) === 'kasir') {
+            $query->where('transactions.user_id', Auth::id());
+            $totalsQuery->where('transactions.user_id', Auth::id());
+        }
+
+        // Eksekusi data setelah filter role diterapkan
+        $reports = $query->paginate(20)->withQueryString();
+        $totals = $totalsQuery->first();
 
         return view('laporan.penjualan-kasir', compact('reports', 'totals', 'dari_tanggal', 'sampai_tanggal'));
     }

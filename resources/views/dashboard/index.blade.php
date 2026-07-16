@@ -46,20 +46,35 @@
         />
 
         
-        <x-stat-card
-
-            title="Produk"
-
-            :value="number_format($totalProducts,0,',','.')"
-
-            color="orange"
-
-            icon="ri-box-3-line"
-
-            subtitle="Total Produk"
-
-        />
-
+        <!-- 💡 CARD PRODUK DENGAN DETEKSI WARNING HPP 0 -->
+        @if($hargaBeliNolCount > 0)
+            <!-- KONDISI WARNING: Card berubah merah, ada efek pulse lembut, dan border merah -->
+            <div class="bg-red-600 text-white rounded-xl shadow p-5 border-2 border-red-400 animate-pulse relative overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center opacity-90 text-sm">
+                        <span>Produk</span>
+                        <i class="ri-error-warning-fill text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mt-2">
+                        {{ number_format($totalProducts, 0, ',', '.') }}
+                    </div>
+                </div>
+                <div class="mt-4 pt-2 border-t border-red-500">
+                    <a href="{{ route('products.index', ['filter' => 'harga_beli_nol']) }}" class="text-xs bg-white text-red-700 px-2 py-1 rounded font-bold hover:bg-red-50 transition block text-center shadow-sm">
+                        ⚠️ {{ $hargaBeliNolCount }} Produk HPP Rp 0
+                    </a>
+                </div>
+            </div>
+        @else
+            <!-- KONDISI NORMAL: Kembali ke komponen stat-card orange bawaan bos jika aman -->
+            <x-stat-card
+                title="Produk"
+                :value="number_format($totalProducts, 0, ',', '.')"
+                color="orange"
+                icon="ri-box-3-line"
+                subtitle="Total Produk"
+            />
+        @endif
         <x-stat-card
 
             title="Stock"
@@ -88,59 +103,7 @@
 
         />
 
-        {{-- <div class="bg-orange-500 text-white rounded-xl shadow p-5">
-
-            <div class="text-sm opacity-80">
-
-                Produk
-
-            </div>
-
-            <div class="text-3xl font-bold mt-2">
-
-                {{ $totalProducts }}
-
-            </div>
-
-        </div> --}}
-
-        {{-- <div class="bg-purple-500 text-white rounded-xl shadow p-5">
-
-            <div class="text-sm opacity-80">
-
-                Total Stock
-
-            </div>
-
-            <div class="text-3xl font-bold mt-2">
-
-                {{ number_format($totalStock) }}
-
-            </div>
-
-        </div> --}}
-
-        {{-- <div class="bg-indigo-500 text-white rounded-xl shadow p-5">
-
-            <div class="text-sm opacity-80">
-
-                SO Terakhir
-
-            </div>
-
-            <div class="font-bold text-lg mt-2">
-
-                {{ $lastOpname?->opname_no ?? '-' }}
-
-            </div>
-
-            <div class="text-sm">
-
-                {{ $lastOpname?->status ?? '' }}
-
-            </div>
-
-        </div> --}}
+        
     </div>
 
 
@@ -174,9 +137,7 @@
                         {{ $item->nama_barang }}
                     </td>
 
-                    {{-- <td class="text-right text-red-600 font-bold">
-                        {{ $item->stok }}
-                    </td> --}}
+
                     <td class="text-right">
                         <span class="bg-red-100 text-red-700 px-2 py-1 rounded">
                             {{ $item->stok }}

@@ -54,6 +54,7 @@
 <x-card>
 
 <form
+     id="formProduk" 
     method="POST"
     action="/products/{{ $product->id }}"
 >
@@ -113,13 +114,13 @@
 
     </x-select>
 
-    {{-- <x-input
+    <x-input
         label="Harga Beli"
         name="harga_beli"
         type="number"
         icon="ri-money-dollar-circle-line"
         :value="$product->harga_beli"
-    /> --}}
+    />
 
     <x-input
         label="Harga Jual"
@@ -379,5 +380,88 @@
             `;
             container.appendChild(newRow);
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+    
+           
+            // 3. VALIDASI KETAT PADA FORM TARGET ID
+            const formProduk = document.getElementById('formProduk');
+            if (formProduk) {
+                formProduk.addEventListener('submit', function(e) {
+                    // KUNCI GERBANG UTAMA SECARA INSTAN!
+                    e.preventDefault();
+                    e.stopPropagation(); 
+
+                    const formElement = this;
+
+                    // Ambil element input berdasarkan attribute name komponen blade secara akurat
+                    const elBeli = formElement.querySelector('input[name="harga_beli"]');
+                    const elJual = formElement.querySelector('input[name="harga"]');
+                    
+                    let numericHargaBeli = elBeli ? Number(elBeli.value || 0) : 0;
+                    let numericHargaJual = elJual ? Number(elJual.value || 0) : 0;
+
+                    // ==========================================
+                    // SELEKSI 1: VALIDASI HARGA BELI & HARGA JUAL
+                    // ==========================================
+                    if (numericHargaBeli <= 0 || numericHargaJual <= 0) {
+                        Swal.fire({ 
+                            icon: 'error', 
+                            title: 'Harga Tidak Valid!',
+                            text: 'Harga Beli (HPP) dan Harga Jual wajib diisi dan nilainya tidak boleh Rp 0!',
+                            confirmButtonText: 'Perbaiki Data',
+                            confirmButtonColor: '#4f46e5',
+                            returnFocus: false
+                        }).then(() => {
+                            if (numericHargaBeli <= 0 && elBeli) {
+                                elBeli.focus();
+                            } else if (elJual) {
+                                elJual.focus();
+                            }
+                        });
+                        return false; 
+                    }
+
+                    // ==========================================
+                    // SELEKSI 2: VALIDASI DATA GROSIR 
+                    // ==========================================
+                    const minQtyInputs = formElement.querySelectorAll('input[name="min_qty[]"]');
+                    const potonganInputs = formElement.querySelectorAll('input[name="potongan[]"]');
+
+                    for (let i = 0; i < minQtyInputs.length; i++) {
+                        let qtyVal = minQtyInputs[i].value.trim();
+                        let potonganVal = potonganInputs[i].value.trim();
+
+                        let numericQty = Number(qtyVal || 0);
+                        let numericPotongan = Number(potonganVal || 0);
+
+                        if (qtyVal !== "" || potonganVal !== "" || numericQty > 0 || numericPotongan > 0) {
+                            if (numericQty <= 0 || numericPotongan <= 0) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Data Grosir Belum Lengkap',
+                                    text: `Pada level grosir baris ke-${i + 1}, nilai 'Min Qty' dan 'Potongan' harus diisi lebih dari 0!`,
+                                    confirmButtonText: 'Perbaiki',
+                                    confirmButtonColor: '#4f46e5',
+                                    returnFocus: false
+                                }).then(() => {
+                                    if (numericQty <= 0) {
+                                        minQtyInputs[i].focus();
+                                    } else {
+                                        potonganInputs[i].focus();
+                                    }
+                                });
+                                return false; 
+                            }
+                        }
+                    }
+
+                    // ==========================================
+                    // KELULUSAN FINAL: SUBMIT SECARA MANUAL
+                    // ==========================================
+                    formElement.submit();
+                });
+            }
+        });
     </script>
 @endsection

@@ -29,14 +29,30 @@ class TransactionController extends Controller
     // load page
     public function index()
     {
-        $transactions =
-            Transaction::latest()
-            ->paginate(20);
+        // $transactions =
+        //     Transaction::latest()
+        //     ->paginate(20);
+
+        // return view(
+        //     'transactions.index',
+        //     compact('transactions')
+        // );
+
+        // 1. Inisialisasi query transaksi dengan eager load relasi user (kasir)
+        $query = Transaction::with(['user', 'customerRelation'])->latest();
+
+        // 🔑 2. Proteksi Multi-Role: Jika yang login adalah Kasir, batasi hanya transaksinya sendiri
+        if (strtolower(Auth::user()->role) === 'kasir') {
+            $query->where('user_id', Auth::id());
+        }
+
+        // 3. Eksekusi paginasinya
+        $transactions = $query->paginate(20);
 
         return view(
             'transactions.index',
             compact('transactions')
-        );
+        );  
     }
 
     // save transaksi
@@ -89,6 +105,20 @@ class TransactionController extends Controller
             ], 422);
         }
 
+        // 💡 1. CARI SHIFT AKTIF UNTUK USER YANG SEDANG LOGIN SEBELUM MULAI TRANSACTION
+        $activeShift = \App\Models\Shift::where('user_id', Auth::id())
+                                        ->where('status', 'open')
+                                        ->first();
+
+        // Opsional: Kalau mau ketat, tolak transaksi jika kasir belum buka shift
+        if (!$activeShift) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda belum membuka shift kasir! Silakan buka shift terlebih dahulu.'
+            ], 403);
+        }
+
+
         DB::beginTransaction();
 
         try {
@@ -112,6 +142,8 @@ class TransactionController extends Controller
                 'no_nota'      => $noNota,
                 'user_id'      => Auth::id(),
 
+                'shift_id'     => $activeShift->id, // 🔥 shift_id aman tersimpan
+                
                 'pelanggan' => $request->pelanggan,
 
                 'telp' => $customer?->telepon,
@@ -166,6 +198,7 @@ class TransactionController extends Controller
                     'kode_barang'    => $product->kode_barang,
                     'nama_barang'    => $product->nama_barang,
                     'harga'          => $hargaFinal,
+                    'harga_beli'     => $product->harga_beli,
                     'qty'            => $item['qty'],
                     'subtotal'       => $itemSubtotal
                 ]);

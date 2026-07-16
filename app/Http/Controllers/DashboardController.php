@@ -29,6 +29,11 @@ class DashboardController extends Controller
 
         $totalProducts =
             Product::count();
+        
+        $hargaBeliNolCount = Product::where(function($query) {
+            $query->where('harga_beli', 0)
+                ->orWhereNull('harga_beli');
+        })->count();
 
         $totalStock =
             Product::sum('stok');
@@ -87,6 +92,7 @@ class DashboardController extends Controller
                 'todaySales',
                 'todayTransactions',
                 'totalProducts',
+                'hargaBeliNolCount',
                 'totalStock',
                 'lowStocks',
                 'latestTransactions',

@@ -25,6 +25,7 @@ use App\Http\Controllers\ReturBarangController;
 use App\Http\Controllers\LaporanLabaRugiController;
 use App\Http\Controllers\LaporanPenjualanProdukController;
 use App\Http\Controllers\LaporanPenjualanPelangganController;
+use App\Http\Controllers\Laporan\StockValuationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,10 +45,28 @@ Route::middleware('auth')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // POS & API Pendukung
-        Route::get('/pos', [PosController::class, 'index']);
-        Route::get('/api/products/search', [ProductController::class, 'search']);
-        Route::post('/api/transactions', [TransactionController::class, 'store']);
+        // POS & API Pendukung=>dijaga middleware shift
+        Route::middleware(['check.shift'])->group(function () {
+            Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+            Route::get('/api/products/search', [ProductController::class, 'search']);
+            Route::post('/api/transactions', [TransactionController::class, 'store']);
+        });
+
+        
+        // shift2an========================================================
+        // 💡 2. RUTE KHUSUS UNTUK PROSES ISI uang MODAL AWAL kasir (DI LUAR PROTEKSI SHIFT)
+        Route::get('/pos/open-shift', [App\Http\Controllers\ShiftController::class, 'showOpenForm'])->name('pos.open-shift');
+        Route::post('/pos/open-shift', [App\Http\Controllers\ShiftController::class, 'storeOpenShift'])->name('pos.store-shift');
+
+        // 💡 RUTE close sfhift:
+        Route::get('/pos/close-shift', [App\Http\Controllers\ShiftController::class, 'showCloseForm'])->name('pos.close-shift');
+        Route::post('/pos/close-shift', [App\Http\Controllers\ShiftController::class, 'storeCloseShift'])->name('pos.store-close');
+        
+        // shift2an========================================================
+
+
+        // add store  pelanggan (di modul POS)
+        Route::post('/api/customers', [CustomerController::class, 'storeApi']);
         
         // Transaksi & Print
         Route::get('/transactions', [TransactionController::class, 'index']);
@@ -60,17 +79,7 @@ Route::middleware('auth')->group(function () {
         // Laporan Penjualan Kasir
         Route::get('/laporan/penjualan-kasir', [LaporanPenjualanKasirController::class, 'index'])->name('laporan.penjualan-kasir');
 
-        // Laporan Penjualan per produk
-        Route::get('/laporan/penjualan-produk', [LaporanPenjualanProdukController::class, 'index']);
-
-        // Laporan Penjualan per pelanggan
-        Route::get('/laporan/penjualan-pelanggan', [LaporanPenjualanPelangganController::class, 'index']);
-
-        // Retur Barang
-        Route::get('/api/retur/search-products', [ReturBarangController::class, 'searchProducts'])->name('api.retur.search-products');
-        Route::resource('retur', ReturBarangController::class)->only(['index', 'create', 'store', 'show']);
-        Route::get('/retur/{id}/print', [ReturBarangController::class, 'print'])->name('retur.print');
-
+        
         // Profile (Breeze) & Ganti Password
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -94,6 +103,22 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['can:akses-spv-keatas'])->group(function () {
+
+        // Laporan Penjualan per produk
+        Route::get('/laporan/penjualan-produk', [LaporanPenjualanProdukController::class, 'index']);
+
+        // Laporan Penjualan per pelanggan
+        Route::get('/laporan/penjualan-pelanggan', [LaporanPenjualanPelangganController::class, 'index']);
+
+        // Laporan nilai asset
+        Route::get('/laporan/nilai-aset-stok', [StockValuationController::class, 'index'])->name('laporan.nilai-aset');
+        
+        // Retur Barang
+        Route::get('/api/retur/search-products', [ReturBarangController::class, 'searchProducts'])->name('api.retur.search-products');
+        Route::resource('retur', ReturBarangController::class)->only(['index', 'create', 'store', 'show']);
+        Route::get('/retur/{id}/print', [ReturBarangController::class, 'print'])->name('retur.print');
+
+
         // Master Data (Produk, Supplier, Kategori)
         // Manajemen Akun Karyawan (User)
         Route::resource('users', UserController::class)->except(['show', 'destroy']);
@@ -106,7 +131,8 @@ Route::middleware('auth')->group(function () {
         // Import Excel Produk
         Route::prefix('products')->group(function () {
             Route::get('/import', [ProductImportController::class, 'index'])->name('products.import');
-            Route::post('/import', [ProductImportController::class, 'import'])->name('products.import.store');
+            Route::post('/import', [ProductImportController::class, 'import'])->name('products.import');
+            // Route::post('/import', [ProductImportController::class, 'import'])->name('products.import.store');
         });
 
         // Purchase Order (PO) & Cetak PDF
@@ -141,6 +167,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
         Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
 
+        
         // Backup Database
         Route::prefix('backup')->group(function () {
         Route::get('/', [BackupController::class, 'index'])->name('backup.index');

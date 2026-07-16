@@ -293,33 +293,51 @@ function toggleMenu(name){
 
         const icon=document.getElementById('icon-'+item);
 
-        if(item===name){
-
-            if(menu.classList.contains('open')){
-
+        // 💡 PROTEKSI: Hanya jalankan jika elemennya memang ada di layar!
+        if (menu && icon) { 
+            if (item === name) {
+                if (menu.classList.contains('open')) {
+                    menu.classList.remove('open');
+                    icon.classList.remove('rotate');
+                    localStorage.removeItem('activeMenu');
+                } else {
+                    menu.classList.add('open');
+                    icon.classList.add('rotate');
+                    localStorage.setItem('activeMenu', item);
+                }
+            } else {
                 menu.classList.remove('open');
-
                 icon.classList.remove('rotate');
-
-                localStorage.removeItem('activeMenu');
-
-            }else{
-
-                menu.classList.add('open');
-
-                icon.classList.add('rotate');
-
-                localStorage.setItem('activeMenu',item);
-
             }
-
-        }else{
-
-            menu.classList.remove('open');
-
-            icon.classList.remove('rotate');
-
         }
+
+        // if(item===name){
+
+        //     if(menu.classList.contains('open')){
+
+        //         menu.classList.remove('open');
+
+        //         icon.classList.remove('rotate');
+
+        //         localStorage.removeItem('activeMenu');
+
+        //     }else{
+
+        //         menu.classList.add('open');
+
+        //         icon.classList.add('rotate');
+
+        //         localStorage.setItem('activeMenu',item);
+
+        //     }
+
+        // }else{
+
+        //     menu.classList.remove('open');
+
+        //     icon.classList.remove('rotate');
+
+        // }
 
     });
 

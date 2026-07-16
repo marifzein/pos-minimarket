@@ -28,9 +28,11 @@ class PosController extends Controller
         $customers = Customer::where('status',1)
         ->orderBy('nama')
         ->get([
+            'id',
             'kode_pelanggan',
             'nama',
             'telepon',
+            'alamat',
             'is_member'
         ]);
 

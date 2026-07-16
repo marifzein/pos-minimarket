@@ -127,4 +127,42 @@ class CustomerController extends Controller
             ->route('customers.index')
             ->with('success', 'Pelanggan berhasil dihapus.');
     }
+
+    /**
+     * Store a newly created resource via AJAX/API for POS.
+     */
+    public function storeApi(Request $request)
+    {
+        // 1. Validasi input minimal dari modal POS
+        $request->validate([
+            'nama'    => 'required|max:150',
+            'telepon' => 'nullable|max:30',
+            'alamat'  => 'nullable',
+        ]);
+
+        // 2. Buat data baru dengan default status aktif (1) dan bukan member (0)
+        //    serta generate otomatis kode pelanggan menggunakan Helper 
+        $customer = Customer::create([
+            'kode_pelanggan' => DocumentNumber::generateMaster('customers', 'kode_pelanggan', 'CUST'),
+            'nama'           => $request->nama,
+            'telepon'        => $request->telepon,
+            'alamat'         => $request->alamat,
+            'status'         => 1,
+            'is_member'      => 0,
+        ]);
+
+        // 3. Kembalikan respons JSON agar dibaca lancar oleh Alpine.js di POS
+        return response()->json([
+            'success'  => true,
+            'customer' => [
+                'id'             => $customer->id,
+                'kode_pelanggan' => $customer->kode_pelanggan,
+                'nama'           => $customer->nama,
+                'telepon'        => $customer->telepon,
+                'alamat'         => $customer->alamat,
+                'is_member'      => $customer->is_member,
+            ]
+        ]);
+    }
+
 }
