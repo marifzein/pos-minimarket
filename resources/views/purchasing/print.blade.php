@@ -64,9 +64,20 @@
             padding: 6px;
             font-weight: bold;
         }
+
+        /* Mengunci Kertas ke Mode Portrait A4 saat cetak/save PDF */
+        @media print {
+            @page { 
+                size: A4 portrait; 
+                margin: 15mm; 
+            }
+            .no-print { display: none; }
+            body { padding: 0; }
+        }
     </style>
 </head>
-<body>
+{{-- <body> --}}
+<body onload="window.print();"> <!-- Otomatis pemicu print modal window browser
     <div style="width: 100%;">
         <!-- Header Dokumen -->
         <table class="header-table">

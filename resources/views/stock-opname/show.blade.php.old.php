@@ -34,40 +34,52 @@
     >
         {{-- csrf utk POST , kalo meta utk AJAX --}}
         @csrf
-        {{-- --- MODIFIKASI HEADER & TOMBOL KEMBALI DISINI --- --}}
-        <x-page-header title="Stock Opname" subtitle="No SO : {{ $stockOpname->opname_no }} | Tanggal : {{ \Carbon\Carbon::parse($stockOpname->opname_date)->format('d-m-Y H:i') }}">
-            <x-slot:action>
-                <div class="flex items-center gap-3">
-                    {{-- Badge Status --}}
-                    @if($stockOpname->status=='OPEN')
-                        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
-                            OPEN
-                        </span>
-                    @else
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                            POSTED
-                        </span>
-                    @endif
+        <div class="flex justify-between items-center">
 
-                    {{-- Tombol Kembali --}}
-                    @if($stockOpname->status=='OPEN')
-                         {{-- <a href="#"> --}}
-                        <x-button color="gray" type="button" disabled>
-                            <i class="ri-arrow-left-line"></i> Kembali
-                        </x-button>
-                        {{-- </a> --}}
-                    @else
-                         <a href="/stock-opname">
-                        <x-button color="gray" type="button">
-                            <i class="ri-arrow-left-line"></i> Kembali
-                        </x-button>
-                    </a>
-                    @endif
+            <div>
+
+                <h2 class="text-2xl font-bold">
+                    Stock Opname
+                </h2>
+
+                <div class="text-sm text-gray-500 mt-1">
+
+                    No SO :
+                    <b>{{ $stockOpname->opname_no }}</b>
+
+                    |
+
+                    Tanggal :
+
+                    {{ \Carbon\Carbon::parse($stockOpname->opname_date)->format('d-m-Y H:i') }}
 
                 </div>
-            </x-slot:action>
-        </x-page-header>
-        {{-- --- END MODIFIKASI HEADER --- --}}
+
+            </div>
+
+            <div>
+
+                @if($stockOpname->status=='OPEN')
+
+                    <span
+                        class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm"
+                    >
+                        OPEN
+                    </span>
+
+                @else
+
+                    <span
+                        class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm"
+                    >
+                        POSTED
+                    </span>
+
+                @endif
+
+            </div>
+
+        </div>
 
         <div class="bg-white rounded-xl shadow p-4">
             {{-- scan produk --}}
@@ -76,8 +88,8 @@
             <label class="font-semibold">
                 Scan Barcode / Cari Barang
             </label>
-            {{-- <!-- Fitur Navigasi Keyboard --> --}}
-           <input
+
+            <input
                 type="text"
                 x-model="keyword"
                 x-ref="barcodeInput"
@@ -87,46 +99,44 @@
                 @endif
                 
                 @input="searchProduct"
-                
-                
-                @keydown.arrow-down.prevent="if (results.length > 0) selectedIndex = (selectedIndex + 1) % results.length"
-                @keydown.arrow-up.prevent="if (results.length > 0) selectedIndex = (selectedIndex - 1 + results.length) % results.length"
-                @keydown.enter.prevent="
-                    if (selectedIndex >= 0 && results[selectedIndex]) { 
-                        selectProduct(results[selectedIndex]); 
-                    } else { 
-                        searchProduct(); 
-                    }
-                "
-                @keydown.escape="results = []; selectedIndex = -1;"
+                @keydown.enter.prevent="searchProduct()"
 
                 placeholder="Scan barcode / ketik nama barang..."
                 class="w-full border rounded-lg p-2"
             >
 
-            <!-- Dropdown Hasil Pencarian -->
             <div
                 x-show="results.length"
                 class="border rounded-lg mt-2 bg-white max-h-56 overflow-auto"
             >
+
                 <template
-                    x-for="(item, index) in results"
+                    x-for="item in results"
                     :key="item.id"
                 >
-                    <!-- Ditambahkan class dynamic bg-purple-100 saat index terpilih -->
+
                     <div
-                        class="p-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                        :class="{ 'bg-purple-100 font-semibold': selectedIndex === index }"
+                        class="p-2 hover:bg-gray-100 cursor-pointer"
                         @click="selectProduct(item)"
-                        @mouseenter="selectedIndex = index"
                     >
-                        <div x-text="item.nama_barang"></div>
-                        <small class="text-gray-500">
-                            Kode: <span x-text="item.kode_barang"></span> | 
-                            Stok: <span x-text="item.stok"></span>
+
+                        <div
+                            x-text="item.nama_barang"
+                        ></div>
+
+                        <small>
+
+                            Stok :
+                            <span
+                                x-text="item.stok"
+                            ></span>
+
                         </small>
+
                     </div>
+
                 </template>
+
             </div>
 
             <input
@@ -187,11 +197,12 @@
 
                 </div>
 
-<!-- Input Stok Fisik / Jumlah Ditemukan -->
                 <div>
-                    <label class="font-semibold block mb-1">
-                        <!-- Label Berganti Secara Otomatis -->
-                        <span x-text="getScannedItem(selected.id) ? 'Jumlah ditemukan' : 'Stok Fisik'"></span>
+
+                    <label>
+
+                    Stok Fisik
+
                     </label>
 
                     <input
@@ -211,26 +222,38 @@
                         @endif
                         required
                         class="w-full border rounded-lg p-2"
-                        :class="getScannedItem(selected.id) ? 'border-purple-400 bg-purple-50/50' : 'border-gray-300'"
                     >
+
                 </div>
 
-                <!-- Hasil Selisih Aktual Komputer -->
                 <div>
-                    <label class="font-semibold block mb-1">
-                        Selisih
+
+                    <label>
+
+                    Selisih
+
                     </label>
 
                     <input
                         readonly
                         class="w-full border rounded-lg p-2 font-bold"
+
                         :class="{
-                            'text-green-600': getComputedSelisih() > 0,
-                            'text-red-600': getComputedSelisih() < 0,
-                            'text-gray-700': getComputedSelisih() == 0
+
+                            'text-green-600':
+                                stokFisik > (selected.stok ?? 0),
+
+                            'text-red-600':
+                                stokFisik < (selected.stok ?? 0),
+
+                            'text-gray-700':
+                                stokFisik == (selected.stok ?? 0)
+
                         }"
-                        :value="getComputedSelisih()"
+
+                        :value="stokFisik - (selected.stok ?? 0)"
                     >
+
                 </div>
 
                 <div class="mt-4">
@@ -425,115 +448,137 @@
     function stockAdjustment()
     {
         return {
-            keyword:'',
-            results:[],
-            selected:{},
-            stokFisik:0,
-            selectedIndex: -1,
-            
-            // Masukkan data barang yang sudah di-scan dari server ke state Alpine.js
-            scannedItems: @json($details->map(function($d) {
-                return [
-                    'product_id' => $d->product_id,
-                    'stock_system' => $d->stock_system, // <-- Tambahkan ini untuk merekam stok sistem awal (140)
-                    'stock_physical' => $d->stock_physical
-                ];
-            })),
 
+            keyword:'',
+
+            results:[],
+
+            selected:{},
+
+            stokFisik:0,
+            // awal focus
             init()
             {
+                // this.$nextTick(() => {
+
+                //     this.$refs.barcodeInput.focus();
+
+                // });
                 this.$watch('selected.id', (id) => {
+
                     if (!id) return;
+
                     requestAnimationFrame(() => {
+
                         this.$refs.stokFisikInput?.focus();
                         this.$refs.stokFisikInput?.select();
+
                     });
+
                 });
 
                 this.$nextTick(() => {
                     this.$refs.barcodeInput.focus();
                 });
             },
-            
+            // cari produk
             async searchProduct()
             {
                 if(this.keyword.length < 1)
                 {
                     this.results=[];
-                    this.selectedIndex = -1;
+
                     return;
                 }
 
-                let r = await fetch('/api/retur/search-products?q=' + encodeURIComponent(this.keyword));
-                this.results = await r.json();
-                this.selectedIndex = -1;
+                let r=await fetch(
 
-                if(this.results.length == 1)
+                    '/api/products/search?q='+this.keyword
+
+                );
+
+                this.results=await r.json();
+
+                /*
+                |------------------------------------
+                | Kalau hasil cuma 1
+                | langsung pilih barang
+                |------------------------------------
+                */
+
+                if(this.results.length==1)
                 {
-                    this.selectProduct(this.results[0]);
-                }
-            },
+                    this.selectProduct(
 
-            // Helper untuk mengecek apakah produk sudah pernah di-scan
-            getScannedItem(productId) {
-                return this.scannedItems.find(item => item.product_id === productId);
-            },
+                        this.results[0]
 
-            selectProduct(item)
-            {
-                this.selected = item;
-                
-                // Cek status riwayat scan produk ini
-                let history = this.getScannedItem(item.id);
-                if (history) {
-                    // Scan Ke-2 dst: Default input fisik diisi 0 (tinggal input jumlah ditemukan saja)
-                    this.stokFisik = 0; 
-                } else {
-                    // Scan Ke-1: Default disamakan dengan stok sistem awal
-                    this.stokFisik = item.stok;
+                    );
                 }
 
-                this.results = [];
-                this.keyword = item.nama_barang;
-                this.selectedIndex = -1;
             },
-
-            // Mengembalikan nilai selisih aktual secara reaktif ke UI komputer
-            getComputedSelisih() {
-                if (!this.selected.id) return 0;
-                
-                let history = this.getScannedItem(this.selected.id);
-                let qtyDitemukanSekarang = parseInt(this.stokFisik || 0);
-                
-                if (history) {
-                    // SEPERTI DI SKRINŠUT: Total Fisik Komulatif = (Fisik Sebelumnya + Input Ditemukan Baru)
-                    let totalFisikBaru = parseInt(history.stock_physical) + qtyDitemukanSekarang;
-                    let stokSistemAwal = parseInt(history.stock_system); // Angka 140
-                    
-                    // Rumus Selisih Aktual Opname: Total Fisik Komulatif - Stok Sistem Awal
-                    return totalFisikBaru - stokSistemAwal; 
-                } else {
-                    // Scan Ke-1 normal: Stok Fisik Baru - Stok Sistem
-                    let systemAwal = parseInt(this.selected.stok ?? 0);
-                    return qtyDitemukanSekarang - systemAwal;
-                }
-            },
-
+            // reset form
             resetForm()
             {
                 this.keyword='';
+
                 this.results=[];
+
                 this.selected={};
+
                 this.stokFisik=0;
-                this.selectedIndex = -1;
+
                 this.$nextTick(()=>{
+
                     this.$refs.barcodeInput.focus();
+
                 });
+
+            },
+            // pilih produk
+            selectProduct(item)
+            {
+                this.selected = item;
+
+                this.stokFisik = item.stok;
+
+                this.results = [];
+
+                this.keyword = item.nama_barang;
+
+                // console.log("refs sebelum:", this.$refs);
+
+                this.$nextTick(() => {
+
+                    // setTimeout(() => {
+
+                    //     this.$refs.stokFisikInput?.focus();
+
+                    //     this.$refs.stokFisikInput?.select();
+
+                    // }, 100);
+
+                    //  requestAnimationFrame(() => {
+
+                    //     this.$refs.stokFisikInput?.focus();
+                    //     this.$refs.stokFisikInput?.select();
+
+                    // });
+
+                });
+                // setTimeout(() => {
+
+                //     console.log(this.$refs);
+
+                //     this.$refs.stokFisikInput.focus();
+
+                //     this.$refs.stokFisikInput.select();
+
+                // }, 50);
             }
+
         }
     }
 
-    
     // ajax2
     document
     .getElementById('formScanSO')
@@ -541,83 +586,142 @@
         console.log("submit ajax");
         e.preventDefault();
 
-        let form = this;
-        let url = form.action;
-        let formData = new FormData(form);
+        let form=this;
 
-        try {
-            let response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json'
+        let url=form.action;
+
+        let formData=new FormData(form);
+
+        try{
+
+            let response=await fetch(url,{
+
+                method:'POST',
+
+                headers:{
+
+                    'X-CSRF-TOKEN':
+                    document
+                    .querySelector(
+                        'meta[name="csrf-token"]'
+                    )
+                    .content,
+
+                    'Accept':'application/json'
+
                 },
-                body: formData
+
+                body:formData
+
             });
 
-            let result = await response.json();
+            let result=await response.json();
 
             if(result.success){
+
                 Swal.fire({
-                    toast: true,
-                    position: 'center',
-                    icon: 'success',
-                    title: 'Sukses',
-                    text: result.message,
-                    showConfirmButton: false,
-                    timer: 800
+
+                    toast:true,
+                    position:'center',
+                    icon:'success',
+                    title:'Sukses',
+                    text:'Item telah tersimpan.',
+                    showConfirmButton:false,
+
+                    timer:800
+
                 });
 
-                // Cek jika response-nya adalah update akumulasi data lama
-                if (result.is_update) {
-                    // Reload halaman agar tabel di bawah otomatis menampilkan hitungan terbaru dari DB
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800);
-                } else {
-                    // Jika barang benar-benar baru, masukkan langsung ke tabel tanpa reload
-                    tambahBaris(result.detail);
-                    
-                    let alpineElement = document.querySelector('[x-data="stockAdjustment()"]');
-                    if (alpineElement && window.Alpine) {
-                        Alpine.$data(alpineElement).resetForm();
-                    }
-                    form.querySelector('input[name="notes"]').value = '';
-                }
+                tambahBaris(result.detail);
+
+                let alpine = document.querySelector('[x-data]')._x_dataStack[0];
+                alpine.resetForm();
+
+                
+
+            }
+            else{
+
+                Swal.fire({
+                    icon:'warning',
+                    title:'Ada kesalahan',
+                    text:result.message
+
+                }).then(()=>{
+
+                    let alpine =
+                    document.querySelector('[x-data]')._x_dataStack[0];
+
+                    alpine.$refs.barcodeInput.focus();
+
+                });
+
             }
 
         }
         catch(error){
-            console.error("Detail Error JS:", error); 
+
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Terjadi kesalahan sistem di browser: ' + error.message
+
+                icon:'error',
+
+                title:'Error',
+
+                text:'Terjadi kesalahan.'
+
             });
+
         }
+
     });
 
 
-    // tambah baris baru via AJAX
+    // tambah baris
     function tambahBaris(item){
-        let tbody = document.getElementById('tbodySO');
 
-        // --- CEK & HAPUS BARIS "BELUM ADA BARANG" JIKA ADA ---
-        if (tbody.rows.length === 1 && tbody.rows[0].cells.length === 1) {
-            tbody.innerHTML = '';
-        }
+        let tbody=document.getElementById('tbodySO');
 
         tbody.insertAdjacentHTML(
+
             'beforeend',
+
             `
             <tr class="border-t">
+
                 <td class="p-3">${item.kode_barang}</td>
+
                 <td>${item.nama_barang}</td>
-                <td class="text-center">${item.stock_system}</td>
-                <td class="text-center">${item.stock_physical}</td>
-                <td class="text-center">${item.difference}</td>
+
+                <td class="text-center">
+
+                    ${item.stock_system}
+
+                </td>
+
+                <td class="text-center">
+
+                    ${item.stock_physical}
+
+                </td>
+
+                <td class="text-center">
+
+                    ${item.difference}
+
+                </td>
+
+                
+
             </tr>
+
             `
+            // <td>
+
+                //     ${item.notes ?? ''}
+
+                // </td>
         );
+
     }
 
     // ===============================

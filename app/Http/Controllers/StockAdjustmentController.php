@@ -55,7 +55,7 @@ class StockAdjustmentController extends Controller
 
         // Menentukan status berdasarkan value tombol submit yang diklik
         $status = $request->input('action') === 'closed' ? 'closed' : 'draft';
-
+        try {
         DB::transaction(function () use ($request, $status) {
             // 2. Simpan Master Dokumen (Status tersimpan sesuai klik: draft / closed)
             $sa = StockAdjustment::create([
@@ -104,9 +104,33 @@ class StockAdjustmentController extends Controller
             }
         });
 
-        // 4. Kembali ke halaman utama (Index) membawa pesan sukses
-        return redirect()->route('stock-adjustments.index')
-            ->with('success', $status === 'closed' ? 'Stock Adjustment berhasil diposting!' : 'Draft Stock Adjustment berhasil disimpan ke database.');
+        $message = $status === 'closed' 
+                ? 'Stock Adjustment berhasil diposting!' 
+                : 'Draft Stock Adjustment berhasil disimpan ke database.';
+        
+        // --- KUNCI SINKRONISASI UX DI SINI ---
+        // Jika request dikirim via Fetch/AJAX (F10), kembalikan JSON respon agar terbaca oleh Javascript SweetAlert2
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+        }
+        
+        // Jika submit form biasa (F7 / Draft), redirect seperti biasa
+        return redirect()->route('stock-adjustments.index')->with('success', $message);
+        
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withInput()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
+        
     }
 
     public function post(StockAdjustment $stockAdjustment)
@@ -190,66 +214,100 @@ class StockAdjustmentController extends Controller
         // 1. Validasi Input
         $request->validate([
             'tgl_sa'       => 'required|date',
+            'catatan'      => 'nullable|string',
             'product_id'   => 'required|array|min:1',
             'product_id.*' => 'required|exists:products,id',
             'qty'          => 'required|array|min:1',
             'qty.*'        => 'required|integer|min:1',
-            'notes'        => 'nullable|array',
+            'notes'        => 'required|array|min:1',
+            'notes.*'      => 'required|string',
         ], [
             'product_id.required' => 'Wajib memilih minimal 1 produk!',
-            'qty.*.min' => 'Kuantitas tidak boleh kurang dari 1!'
+            'qty.*.min' => 'Kuantitas tidak boleh kurang dari 1!',
+            'notes.*.required' => 'Alasan wajib diisi!'
         ]);
 
         $status = $request->input('action') === 'closed' ? 'closed' : 'draft';
 
-        DB::transaction(function () use ($request, $stockAdjustment, $status) {
-            // 2. Update Master Dokumen
-            $stockAdjustment->update([
-                'tgl_sa'          => $request->tgl_sa,
-                'status'          => $status,
-                'catatan'         => $request->catatan,
-                'tgl_jam_selesai' => $status === 'closed' ? now() : null,
-            ]);
-
-            // 3. Hapus detail lama, nanti kita re-insert yang baru (Pendekatan terbersih untuk baris dinamis)
-            $stockAdjustment->details()->delete();
-
-            // 4. Insert Detail Baru & Eksekusi Potong Stok jika status berubah jadi Closed
-            foreach ($request->product_id as $index => $productId) {
-                $product   = Product::findOrFail($productId);
-                $qtyAdjust = (int) $request->qty[$index];
-                $itemNotes = $request->notes[$index] ?? null;
-
-                $stockBefore = $product->stok;
-                $stockAfter  = $stockBefore - $qtyAdjust;
-
-                StockAdjustmentDetail::create([
-                    'stock_adjustment_id' => $stockAdjustment->id,
-                    'product_id'          => $productId,
-                    'stock_system'        => $stockBefore,
-                    'qty'                 => $qtyAdjust,
-                    'notes'               => $itemNotes,
+        try {
+            DB::transaction(function () use ($request, $stockAdjustment, $status) {
+                // 2. Update Master Dokumen
+                $stockAdjustment->update([
+                    'tgl_sa'          => $request->tgl_sa,
+                    'status'          => $status,
+                    'catatan'         => $request->catatan,
+                    'tgl_jam_selesai' => $status === 'closed' ? now() : null,
                 ]);
 
-                if ($status === 'closed') {
-                    $product->update(['stok' => $stockAfter]);
+                // 3. Hapus detail lama
+                $stockAdjustment->details()->delete();
 
-                    DB::table('stock_movements')->insert([
-                        'product_id'   => $product->id,
-                        'type'         => 'Stock Adjustment',
-                        'qty'          => -$qtyAdjust,
-                        'stock_before' => $stockBefore,
-                        'stock_after'  => $stockAfter,
-                        'reference_no' => $stockAdjustment->nomor_sa,
-                        'notes'        => $itemNotes ?? 'Adjustment barang rusak/expired (' . $stockAdjustment->nomor_sa . ')',
-                        'created_at'   => now(),
-                        'updated_at'   => now(),
+                // 4. Insert Detail Baru & Eksekusi Potong Stok jika status berubah jadi Closed
+                foreach ($request->product_id as $index => $productId) {
+                    $product   = Product::findOrFail($productId);
+                    $qtyAdjust = (int) $request->qty[$index];
+                    $itemNotes = $request->notes[$index] ?? null;
+
+                    $stockBefore = $product->stok;
+                    $stockAfter  = $stockBefore - $qtyAdjust;
+
+                    StockAdjustmentDetail::create([
+                        'stock_adjustment_id' => $stockAdjustment->id,
+                        'product_id'          => $productId,
+                        'stock_system'        => $stockBefore,
+                        'qty'                 => $qtyAdjust,
+                        'notes'               => $itemNotes,
                     ]);
-                }
-            }
-        });
 
-        return redirect()->route('stock-adjustments.index')
-            ->with('success', $status === 'closed' ? 'Stock Adjustment berhasil diposting!' : 'Perubahan Draft berhasil disimpan.');
+                    if ($status === 'closed') {
+                        $product->update(['stok' => $stockAfter]);
+
+                        DB::table('stock_movements')->insert([
+                            'product_id'   => $product->id,
+                            'type'         => 'Stock Adjustment',
+                            'qty'          => -$qtyAdjust,
+                            'stock_before' => $stockBefore,
+                            'stock_after'  => $stockAfter,
+                            'reference_no' => $stockAdjustment->nomor_sa,
+                            'notes'        => $itemNotes ?? 'Adjustment barang rusak/expired (' . $stockAdjustment->nomor_sa . ')',
+                            'created_at'   => now(),
+                            'updated_at'   => now(),
+                        ]);
+                    }
+                }
+            });
+
+            $message = $status === 'closed' ? 'Stock Adjustment berhasil diposting!' : 'Perubahan Draft berhasil disimpan.';
+
+            // Response JSON untuk request AJAX (F10)
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                ]);
+            }
+
+            return redirect()->route('stock-adjustments.index')->with('success', $message);
+
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui data: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+    
+    //print boloo 
+    public function printPdf(StockAdjustment $stockAdjustment)
+    {
+        // Muat detail item beserta relasi produknya
+        $stockAdjustment->load('details.product', 'user');
+        
+        // Return view khusus cetak PDF (silakan buat file blade ini di stock-adjustments/pdf.blade.php)
+        return view('stock-adjustments.pdf', compact('stockAdjustment'));
     }
 }

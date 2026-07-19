@@ -8,7 +8,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
+// use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenerimaanBarangController extends Controller
 {
@@ -103,7 +103,7 @@ class PenerimaanBarangController extends Controller
         return response()->json($products);
     }
     
-    // print
+    // print dengan Native Browser Print
     public function print($id)
     {
         // 1. Ambil data induk penerimaan barang
@@ -125,11 +125,8 @@ class PenerimaanBarangController extends Controller
             ->where('penerimaan_barang_items.penerimaan_barang_id', $id)
             ->get();
 
-        // 3. Render view ke DomPDF
-        $pdf = Pdf::loadView('penerimaan.print', compact('penerimaan', 'items'));
-        
-        // Stream langsung ke browser dalam format PDF bersih
-        return $pdf->stream('Penerimaan-' . $penerimaan->no_penerimaan . '.pdf');
+        // 3. Langsung lempar ke view biasa (Tanpa Barryvdh PDF)
+        return view('penerimaan.print', compact('penerimaan', 'items'));
     }
 
     // save data

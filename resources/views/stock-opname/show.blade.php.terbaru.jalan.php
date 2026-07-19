@@ -187,11 +187,12 @@
 
                 </div>
 
-<!-- Input Stok Fisik / Jumlah Ditemukan -->
                 <div>
-                    <label class="font-semibold block mb-1">
-                        <!-- Label Berganti Secara Otomatis -->
-                        <span x-text="getScannedItem(selected.id) ? 'Jumlah ditemukan' : 'Stok Fisik'"></span>
+
+                    <label>
+
+                    Stok Fisik
+
                     </label>
 
                     <input
@@ -211,26 +212,38 @@
                         @endif
                         required
                         class="w-full border rounded-lg p-2"
-                        :class="getScannedItem(selected.id) ? 'border-purple-400 bg-purple-50/50' : 'border-gray-300'"
                     >
+
                 </div>
 
-                <!-- Hasil Selisih Aktual Komputer -->
                 <div>
-                    <label class="font-semibold block mb-1">
-                        Selisih
+
+                    <label>
+
+                    Selisih
+
                     </label>
 
                     <input
                         readonly
                         class="w-full border rounded-lg p-2 font-bold"
+
                         :class="{
-                            'text-green-600': getComputedSelisih() > 0,
-                            'text-red-600': getComputedSelisih() < 0,
-                            'text-gray-700': getComputedSelisih() == 0
+
+                            'text-green-600':
+                                stokFisik > (selected.stok ?? 0),
+
+                            'text-red-600':
+                                stokFisik < (selected.stok ?? 0),
+
+                            'text-gray-700':
+                                stokFisik == (selected.stok ?? 0)
+
                         }"
-                        :value="getComputedSelisih()"
+
+                        :value="stokFisik - (selected.stok ?? 0)"
                     >
+
                 </div>
 
                 <div class="mt-4">
@@ -429,16 +442,7 @@
             results:[],
             selected:{},
             stokFisik:0,
-            selectedIndex: -1,
-            
-            // Masukkan data barang yang sudah di-scan dari server ke state Alpine.js
-            scannedItems: @json($details->map(function($d) {
-                return [
-                    'product_id' => $d->product_id,
-                    'stock_system' => $d->stock_system, // <-- Tambahkan ini untuk merekam stok sistem awal (140)
-                    'stock_physical' => $d->stock_physical
-                ];
-            })),
+            selectedIndex: -1, // <-- Tambahkan ini untuk tracking baris aktif
 
             init()
             {
@@ -455,18 +459,20 @@
                 });
             },
             
+            // cari produk
             async searchProduct()
             {
                 if(this.keyword.length < 1)
                 {
                     this.results=[];
-                    this.selectedIndex = -1;
+                    this.selectedIndex = -1; // Reset index
                     return;
                 }
 
+                // Pinjam rute retur agar tidak terhadang shift kasir
                 let r = await fetch('/api/retur/search-products?q=' + encodeURIComponent(this.keyword));
                 this.results = await r.json();
-                this.selectedIndex = -1;
+                this.selectedIndex = -1; // Reset index setiap ada hasil baru
 
                 if(this.results.length == 1)
                 {
@@ -474,49 +480,14 @@
                 }
             },
 
-            // Helper untuk mengecek apakah produk sudah pernah di-scan
-            getScannedItem(productId) {
-                return this.scannedItems.find(item => item.product_id === productId);
-            },
-
+            // pilih produk
             selectProduct(item)
             {
                 this.selected = item;
-                
-                // Cek status riwayat scan produk ini
-                let history = this.getScannedItem(item.id);
-                if (history) {
-                    // Scan Ke-2 dst: Default input fisik diisi 0 (tinggal input jumlah ditemukan saja)
-                    this.stokFisik = 0; 
-                } else {
-                    // Scan Ke-1: Default disamakan dengan stok sistem awal
-                    this.stokFisik = item.stok;
-                }
-
+                this.stokFisik = item.stok;
                 this.results = [];
                 this.keyword = item.nama_barang;
                 this.selectedIndex = -1;
-            },
-
-            // Mengembalikan nilai selisih aktual secara reaktif ke UI komputer
-            getComputedSelisih() {
-                if (!this.selected.id) return 0;
-                
-                let history = this.getScannedItem(this.selected.id);
-                let qtyDitemukanSekarang = parseInt(this.stokFisik || 0);
-                
-                if (history) {
-                    // SEPERTI DI SKRINŠUT: Total Fisik Komulatif = (Fisik Sebelumnya + Input Ditemukan Baru)
-                    let totalFisikBaru = parseInt(history.stock_physical) + qtyDitemukanSekarang;
-                    let stokSistemAwal = parseInt(history.stock_system); // Angka 140
-                    
-                    // Rumus Selisih Aktual Opname: Total Fisik Komulatif - Stok Sistem Awal
-                    return totalFisikBaru - stokSistemAwal; 
-                } else {
-                    // Scan Ke-1 normal: Stok Fisik Baru - Stok Sistem
-                    let systemAwal = parseInt(this.selected.stok ?? 0);
-                    return qtyDitemukanSekarang - systemAwal;
-                }
             },
 
             resetForm()

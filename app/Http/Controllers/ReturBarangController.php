@@ -7,7 +7,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
+// use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReturBarangController extends Controller
 {
@@ -142,6 +142,7 @@ class ReturBarangController extends Controller
         }
     }
     // print============================
+    
     public function print($id)
     {
         $retur = DB::table('retur_barang')
@@ -161,10 +162,7 @@ class ReturBarangController extends Controller
             ->where('retur_barang_items.retur_barang_id', $id)
             ->get();
 
-        // Menggunakan ekstensi download PDF barryvdh
-        $pdf = Pdf::loadView('retur.print', compact('retur', 'items'));
-        
-        // Alirkan dokumen langsung tampil bersih di browser
-        return $pdf->stream('Retur-' . $retur->no_retur . '.pdf');
+        // Ganti dari Barryvdh PDF ke standard Laravel View biasa
+        return view('retur.print', compact('retur', 'items'));
     }
 }

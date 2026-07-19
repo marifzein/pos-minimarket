@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="utf-8">
     <title>Cetak Penerimaan Barang - {{ $penerimaan->no_penerimaan }}</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             font-size: 10pt;
             color: #000;
             line-height: 1.4;
             margin: 0;
-            padding: 0;
+            padding: 10px;
             width: 100%;
         }
         .text-right { text-align: right; }
@@ -47,49 +47,63 @@
         }
         .items-table th {
             border: 1px solid #000;
-            padding: 6px;
+            padding: 8px 6px;
             font-size: 9.5pt;
             font-weight: bold;
-            background-color: #fff;
+            background-color: #f4f4f4;
         }
         .items-table td {
             border: 1px solid #000;
-            padding: 6px;
+            padding: 8px 6px;
             font-size: 9.5pt;
         }
         
         /* Bagian Total */
         .total-row td {
             border: none !important;
-            padding: 6px;
+            padding: 8px 6px;
             font-weight: bold;
+        }
+
+        /* Mengunci Kertas ke Mode Portrait A4 saat cetak/save PDF */
+        @media print {
+            @page { 
+                size: A4 portrait; 
+                margin: 15mm; 
+            }
+            .no-print { display: none; }
+            body { padding: 0; }
+            .print-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
         }
     </style>
 </head>
-<body>
-    <div style="width: 100%;">
-        <!-- Header Dokumen -->
+<body onload="window.print();"> <!-- Otomatis pemicu print modal window browser[cite: 5] -->
+    
+    <!-- Wrapper pembatas layar biar ga melar pas ditutup -->
+    <div style="max-width: 800px; margin: 0 auto; padding: 20px;" class="print-container">
+        
+        <!-- Header Dokumen[cite: 10] -->
         <table class="header-table">
             <tr>
                 <td>
-                    <h2 style="margin:0;">POS MINIMARKET</h2>
-                    <p style="margin:0; font-size:9pt;">Jl. Raya Utama No. 123, Kota Administrasi</p>
+                    <h2 style="margin:0; font-size: 16pt;">POS MINIMARKET</h2>
+                    <p style="margin:0; font-size:9pt; color: #444;">Jl. Raya Utama No. 123, Kota Administrasi</p>
                 </td>
                 <td style="text-align: right; vertical-align: top;">
-                    <h2 style="margin:0;">BUKTI PENERIMAAN BARANG</h2>
-                    <p style="margin:0;"><strong>{{ $penerimaan->no_penerimaan }}</strong></p>
+                    <h2 style="margin:0; font-size: 14pt;">BUKTI PENERIMAAN BARANG</h2>
+                    <p style="margin:0; font-size: 11pt;"><strong>{{ $penerimaan->no_penerimaan }}</strong></p>
                 </td>
             </tr>
         </table>
 
         <hr style="border: 0; border-top: 1px solid #000; margin-bottom: 20px;">
 
-        <!-- Informasi Supplier & Penerimaan -->
+        <!-- Informasi Supplier & Penerimaan[cite: 10] -->
         <table class="info-table">
             <tr>
                 <td>
                     <strong>INFO SUPPLIER:</strong><br>
-                    {{ $penerimaan->supplier_name }}<br>
+                    <span style="font-size: 11pt; font-weight: bold;">{{ $penerimaan->supplier_name }}</span><br>
                     No. Dokumen / Nota Supplier: {{ $penerimaan->no_dokumen_supplier ?? '-' }}
                 </td>
                 <td>
@@ -101,7 +115,7 @@
             </tr>
         </table>
 
-        <!-- Daftar Item Pesanan (Garis Kotak Sempurna) -->
+        <!-- Daftar Item Pesanan[cite: 10] -->
         <table class="items-table">
             <thead>
                 <tr>
@@ -123,7 +137,7 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>
-                            {{ $item->nama_barang }}<br>
+                            <span style="font-weight: bold;">{{ $item->nama_barang }}</span><br>
                             <small style="color: #555;">{{ $item->kode_barang }}</small>
                             @if($item->qty_po == 0)
                                 <span style="font-size: 8pt; font-weight: bold; color: #7c3aed;">(Item Luar PO)</span>
@@ -136,35 +150,35 @@
                     </tr>
                 @endforeach
                 
-                <!-- Baris Total Bersih Tanpa Border Kotak Tabel Utama -->
+                <!-- Baris Total Bersih[cite: 10] -->
                 <tr class="total-row">
                     <td colspan="5" class="text-right">GRAND TOTAL NOTA</td>
-                    <td class="text-right" style="border: 1px double #000 !important;">
+                    <td class="text-right" style="border: 1px double #000 !important; font-size: 11pt;">
                         Rp {{ number_format($grandTotal, 0, ',', '.') }}
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- Catatan Opsional -->
+        <!-- Catatan Opsional[cite: 10] -->
         @if($penerimaan->catatan)
-            <div style="font-size: 9pt; margin-bottom: 40px;">
+            <div style="font-size: 9pt; margin-bottom: 40px; border: 1px dashed #999; padding: 8px; border-radius: 4px;">
                 <strong>Catatan Penerimaan:</strong> {{ $penerimaan->catatan }}
             </div>
         @endif
 
-        <!-- Tanda Tangan -->
+        <!-- Tanda Tangan[cite: 10] -->
         <table style="width: 100%; margin-top: 50px; text-align: center;">
             <tr>
                 <td>
                     <p>Diterima Oleh,</p>
-                    <div style="height: 60px;"></div>
+                    <div style="height: 50px;"></div>
                     <p><strong>{{ $penerimaan->kasir_name }}</strong></p>
                     <p style="font-size: 8pt; color: #555;">Gudang / Logistik Staff</p>
                 </td>
                 <td>
                     <p>Diserahkan Oleh,</p>
-                    <div style="height: 60px;"></div>
+                    <div style="height: 50px;"></div>
                     <p>__________________</p>
                     <p style="font-size: 8pt; color: #555;">Driver / Sales Supplier</p>
                 </td>

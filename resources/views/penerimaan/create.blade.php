@@ -157,13 +157,13 @@
         </a>
 
         <x-button color="blue" type="submit">
-            <i class="ri-save-3-line"></i> Simpan Penerimaan
+            <i class="ri-save-3-line"></i> F10 - Simpan Penerimaan
         </x-button>
     </div>
 </form>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 const search = document.getElementById('search-product');
 const result = document.getElementById('product-result');
@@ -172,6 +172,25 @@ const grandTotalLabel = document.getElementById('grand-total-label');
 let cart = [];
 let timer;
 let selectedIndex = -1;
+
+
+// 4. SHORTCUT KEYBOARD (F2: FOKUS INPUT, F10: SIMPAN)
+document.addEventListener('keydown', function(e) {
+    // Tombol F2 -> Fokus ke Input Pencarian / Barcode Scan
+    if (e.key === 'F2') {
+        e.preventDefault(); // Mencegah fungsi bawaan browser jika ada
+        search.focus();
+        search.select(); // Otomatis memblok teks di dalam agar langsung tertimpa saat diketik
+    }
+
+    // Tombol F10 -> Triger Simpan Form (Memicu validasi SweetAlert)
+    if (e.key === 'F10') {
+        e.preventDefault();
+        // Memanggil fungsi validateForm bawaan yang sudah kita buat di atas
+        validateForm(e);
+    }
+});
+
 
 document.addEventListener('DOMContentLoaded', function() {
     @if(isset($selectedPo))
@@ -209,6 +228,7 @@ function addToCart(id, name, code, price) {
     clearSearch();
 }
 
+// 1. NAVIGASI KEYBOARD PENCARIAN PRODUK
 search.addEventListener('keyup', function(e) {
     if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) return;
     clearTimeout(timer);
@@ -260,6 +280,7 @@ function updateRowHighlight(rows) {
     rows.forEach((row, index) => { if (index === selectedIndex) { row.classList.add('bg-blue-100'); row.scrollIntoView({ block: 'nearest' }); } else { row.classList.remove('bg-blue-100'); } });
 }
 
+// 2. RENDER TABLE (HANYA SAAT AWAL ATAU TAMBAH/HAPUS ITEM)
 function renderTable() {
     if (cart.length === 0) {
         tableItems.innerHTML = `<tr><td colspan="6"><div class="text-center py-10 text-slate-400 text-sm">Belum ada item masuk. Scan/cari produk di atas.</div></td></tr>`;
@@ -270,7 +291,7 @@ function renderTable() {
     cart.forEach((item, index) => {
         const subtotal = item.qty_terima * item.harga_beli; grandTotal += subtotal;
         html += `
-        <tr class="hover:bg-slate-50 border-b">
+        <tr class="hover:bg-slate-50 border-b item-row">
             <td class="p-3 text-sm">
                 <div class="font-semibold text-slate-800">${item.name}</div>
                 <div class="text-xs text-slate-400">${item.code}</div>
@@ -279,20 +300,69 @@ function renderTable() {
                 ${item.qty_po === 0 ? '<span class="inline-block mt-1 px-2 py-0.5 text-[9px] bg-purple-100 text-purple-700 font-bold rounded">Item Luar PO</span>' : ''}
             </td>
             <td class="p-3 text-center text-slate-500 font-bold">${item.qty_po}</td>
-            <td class="p-3 text-center"><input type="number" name="items[${index}][qty_terima]" min="1" value="${item.qty_terima}" data-index="${index}" class="qty-input border rounded-lg w-24 px-2 py-1 text-center font-bold text-blue-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></td>
-            <td class="p-3 text-right"><input type="number" name="items[${index}][harga_beli]" min="0" value="${item.harga_beli}" data-index="${index}" class="price-input border rounded-lg w-36 px-3 py-1 text-right font-semibold text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></td>
-            <td class="p-3 text-sm text-right text-slate-800 font-bold">Rp${new Intl.NumberFormat('id-ID').format(subtotal)}</td>
-            <td class="p-3 text-center"><button type="button" class="delete-btn text-red-500 hover:text-red-700 transition" data-index="${index}"><i class="ri-delete-bin-line text-lg"></i></button></td>
+            <td class="p-3 text-center">
+                <input type="number" name="items[${index}][qty_terima]" min="1" value="${item.qty_terima}" data-index="${index}" class="qty-input border rounded-lg w-24 px-2 py-1 text-center font-bold text-blue-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            </td>
+            <td class="p-3 text-right">
+                <input type="number" name="items[${index}][harga_beli]" min="0" value="${item.harga_beli}" data-index="${index}" class="price-input border rounded-lg w-36 px-3 py-1 text-right font-semibold text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            </td>
+            <td class="p-3 text-sm text-right text-slate-800 font-bold subtotal-cell">
+                Rp${new Intl.NumberFormat('id-ID').format(subtotal)}
+            </td>
+            <td class="p-3 text-center">
+                <button type="button" class="delete-btn text-red-500 hover:text-red-700 transition" data-index="${index}">
+                    <i class="ri-delete-bin-line text-lg"></i>
+                </button>
+            </td>
         </tr>`;
     });
     tableItems.innerHTML = html;
     grandTotalLabel.innerText = 'Rp' + new Intl.NumberFormat('id-ID').format(grandTotal);
 }
 
+// 3. EDIT QTY & HARGA AMAN REAL-TIME TANPA RE-RENDER DOM INPUT
 document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('qty-input')) { const index = e.target.dataset.index; const val = parseInt(e.target.value); cart[index].qty_terima = val >= 1 ? val : 1; if (val < 1) e.target.value = 1; renderTable(); }
-    if (e.target.classList.contains('price-input')) { const index = e.target.dataset.index; const val = parseFloat(e.target.value); cart[index].harga_beli = val >= 0 ? val : 0; if (val < 0) e.target.value = 0; renderTable(); }
+    if (e.target.classList.contains('qty-input')) { 
+        const index = e.target.dataset.index; 
+        let val = parseInt(e.target.value); 
+        
+        if (isNaN(val)) return; // Blokir jika kosong pas di-backspace biar gak merusak array
+        if (val < 1) val = 1; 
+
+        cart[index].qty_terima = val; 
+        updateTotalsWithoutRerender();
+    }
+    
+    if (e.target.classList.contains('price-input')) { 
+        const index = e.target.dataset.index; 
+        let val = parseFloat(e.target.value); 
+        
+        if (isNaN(val)) return; 
+        if (val < 0) val = 0; 
+
+        cart[index].harga_beli = val; 
+        updateTotalsWithoutRerender();
+    }
 });
+
+// Fungsi kalkulasi visual instan penangkal 'Lost Focus'
+function updateTotalsWithoutRerender() {
+    let grandTotal = 0;
+    const rows = tableItems.querySelectorAll('.item-row');
+    
+    cart.forEach((item, index) => {
+        const subtotal = item.qty_terima * item.harga_beli;
+        grandTotal += subtotal;
+        
+        if (rows[index]) {
+            const subtotalCell = rows[index].querySelector('.subtotal-cell');
+            if (subtotalCell) {
+                subtotalCell.innerText = 'Rp' + new Intl.NumberFormat('id-ID').format(subtotal);
+            }
+        }
+    });
+    grandTotalLabel.innerText = 'Rp' + new Intl.NumberFormat('id-ID').format(grandTotal);
+}
 
 document.addEventListener('click', function(e) {
     const btn = e.target.closest('.delete-btn'); if (!btn) return;
@@ -304,7 +374,7 @@ document.addEventListener('click', function(e) { if (!search.contains(e.target) 
 function validateForm(e) {
     e.preventDefault();
     if (cart.length === 0) { Swal.fire({ title: 'Peringatan', text: 'Daftar item penerimaan tidak boleh kosong!', icon: 'warning', confirmButtonColor: '#ef4444' }); return false; }
-    if (document.getElementById('supplier_id').value === "") { Swal.fire({ title: 'Peringatan', text: 'Harap pilih supplier terlebih dahulu!', icon: 'warning', confirmButtonColor: '#ef4444' }); return false; }
+    if (document.getElementsByName('supplier_id')[0].value === "") { Swal.fire({ title: 'Peringatan', text: 'Harap pilih supplier terlebih dahulu!', icon: 'warning', confirmButtonColor: '#ef4444' }); return false; }
     Swal.fire({ title: 'Posting Penerimaan?', text: 'Data penerimaan langsung masuk stok komputer dan tidak dapat diubah kembali.', icon: 'question', showCancelButton: true, confirmButtonColor: '#2563eb', cancelButtonColor: '#64748b', confirmButtonText: 'YA, Simpan!', cancelButtonText: 'Batal' }).then((result) => { if (result.isConfirmed) { document.getElementById('main-form').submit(); } });
 }
 </script>

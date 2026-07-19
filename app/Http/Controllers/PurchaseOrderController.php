@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Helpers\DocumentNumber;
-use Barryvdh\DomPDF\Facade\Pdf; // Jika menggunakan dompdf
+
 
 class PurchaseOrderController extends Controller
 {
@@ -112,30 +112,23 @@ class PurchaseOrderController extends Controller
     | Simpan
     |--------------------------------------------------------------------------
     */
-
     public function store(Request $request)
     {
         $request->validate([
-
             'po_number'   => 'required|unique:purchase_orders,po_number',
             'supplier_id' => 'required|exists:suppliers,id',
             'po_date'     => 'required|date',
-
             'product_id'  => 'required|array|min:1',
             'qty'         => 'required|array|min:1',
             'price'       => 'required|array|min:1',
-
         ]);
 
-        DB::transaction(function () use ($request) {
+        // Tangkap instance $po yang dikembalikan dari dalam transaksi
+        $po = DB::transaction(function () use ($request) {
 
-            $status =
-                $request->input('action') == 'ordered'
-                ? 'ORDERED'
-                : 'DRAFT';
+            $status = $request->input('action') == 'ordered' ? 'ORDERED' : 'DRAFT';
 
-            $po = PurchaseOrder::create([
-
+            $newPo = PurchaseOrder::create([
                 'po_number'   => $request->po_number,
                 'supplier_id' => $request->supplier_id,
                 'po_date'     => $request->po_date,
@@ -143,56 +136,52 @@ class PurchaseOrderController extends Controller
                 'notes'       => $request->notes,
                 'user_id'     => Auth::id(),
                 'total'       => 0,
-
             ]);
 
             $grandTotal = 0;
 
             foreach ($request->product_id as $i => $productId) {
-
                 $qty = (int)$request->qty[$i];
-
                 $price = (int)$request->price[$i];
-
                 $subtotal = $qty * $price;
 
                 PurchaseOrderItem::create([
-
-                    'purchase_order_id' => $po->id,
-
-                    'product_id' => $productId,
-
-                    'qty' => $qty,
-
-                    'price' => $price,
-
-                    'subtotal' => $subtotal,
-
+                    'purchase_order_id' => $newPo->id,
+                    'product_id'        => $productId,
+                    'qty'               => $qty,
+                    'price'             => $price,
+                    'subtotal'          => $subtotal,
                 ]);
 
-                
                 $grandTotal += $subtotal;
             }
 
-            $po->update([
-
+            $newPo->update([
                 'total' => $grandTotal
-
             ]);
 
+            // WAJIB: Return model PO agar bisa dipakai di luar closure transaksi
+            return $newPo;
         });
 
+        // Sekarang variabel $po di bawah ini aman digunakan & tidak bikin error 500 lagi!
+        if ($request->ajax() || $request->wantsJson()) {
+            $pdfUrl = $request->input('action') == 'ordered' 
+                ? route('purchasing.print-pdf', $po->id)
+                : null;
+
+            return response()->json([
+                'success' => true,
+                'pdf_url' => $pdfUrl,
+                'message' => $request->input('action') == 'ordered'
+                    ? 'Purchase Order berhasil diposting.'
+                    : 'Draft Purchase Order berhasil disimpan.'
+            ]);
+        }
+
         return redirect()
-
             ->route('purchasing.index')
-
-            ->with(
-
-                'success',
-
-                'Purchase Order berhasil disimpan.'
-
-            );
+            ->with('success', 'Purchase Order berhasil disimpan.');
     }
 
     /*
@@ -338,6 +327,23 @@ class PurchaseOrderController extends Controller
 
         });
 
+        // --- AWALAN BLOK SINKRONISASI AJAX ---
+        if ($request->ajax() || $request->wantsJson()) {
+            // Jika user memilih 'ordered' (F10), kita siapkan URL cetak native-nya
+            $pdfUrl = $request->action == 'ordered' 
+                ? route('purchasing.print-pdf', $purchasing->id)
+                : null;
+
+            return response()->json([
+                'success' => true,
+                'pdf_url' => $pdfUrl,
+                'message' => $request->action == 'ordered'
+                    ? 'Purchase Order berhasil diposting.'
+                    : 'Draft Purchase Order berhasil diperbarui.'
+            ]);
+        }
+        // --- AKHIRAN BLOK SINKRONISASI AJAX ---
+
         return redirect()
 
             ->route('purchasing.index')
@@ -381,28 +387,27 @@ class PurchaseOrderController extends Controller
 
     
 
+    
+
     /*
     |--------------------------------------------------------------------------
-    | Cetak PDF Purchase Order
+    | Cetak PDF Purchase Order (Native Browser Print)
     |--------------------------------------------------------------------------
     */
     public function printPdf(PurchaseOrder $purchasing)
     {
-        // Keamanan Tingkat Menengah: Hanya status ORDERED & RECEIVED yang boleh di-print
+        // Hanya status ORDERED & RECEIVED yang boleh di-print
         if (!in_array($purchasing->status, ['ORDERED', 'RECEIVED'])) {
             return redirect()->route('purchasing.index')
                 ->with('error', 'Cetak gagal! Dokumen Purchase Order harus berstatus ORDERED.');
         }
 
-        // Load data relasi lengkap
+        // Load data relasi lengkap[cite: 7]
         $purchasing->load(['supplier', 'items.product', 'user']);
 
-        // Render file view khusus cetak ke dalam format PDFStream
-        $pdf = Pdf::loadView('purchasing.print', [
+        // Langsung return view cetak biasa[cite: 8]
+        return view('purchasing.print', [
             'po' => $purchasing
-        ])->setPaper('a4', 'portrait');
-
-        // Download / Stream PDF ke browser dengan nama file yang rapi
-        return $pdf->stream("PO-{$purchasing->po_number}.pdf");
+        ]);
     }
 }

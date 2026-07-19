@@ -162,6 +162,8 @@ Route::middleware('auth')->group(function () {
         // Penyesuaian Stok (Stock Adjustment)
         Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show', 'destroy']);
         Route::post('/stock-adjustments/{stockAdjustment}/post', [StockAdjustmentController::class, 'post'])->name('stock-adjustments.post');
+        Route::get('/stock-adjustments/{stockAdjustment}/print-pdf', 
+        [StockAdjustmentController::class, 'printPdf'])->name('stock-adjustments.print-pdf');
 
         // Pengaturan Profil Toko
         Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');

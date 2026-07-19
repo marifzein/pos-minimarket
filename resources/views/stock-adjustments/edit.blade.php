@@ -4,10 +4,6 @@
 
 @section('content')
 
-{{-- <x-page-header
-    title="Edit Stock Adjustment"
-    subtitle="Ubah draft atau teruskan posting penyesuaian stok"
-> --}}
 <x-page-header
     title="{{ $stockAdjustment->status === 'closed' ? 'Detail Stock Adjustment' : 'Edit Stock Adjustment' }}"
     subtitle="{{ $stockAdjustment->status === 'closed' ? 'Melihat dokumen penyesuaian yang telah dikunci' : 'Ubah draft atau teruskan posting penyesuaian stok' }}"
@@ -32,7 +28,7 @@
     </div>
 @endif
 
-<form method="POST" action="{{ route('stock-adjustments.update', $stockAdjustment->id) }}" onsubmit="return validateForm()">
+<form method="POST" id="form-sa" action="{{ route('stock-adjustments.update', $stockAdjustment->id) }}">
     @csrf
     @method('PUT')
 
@@ -70,7 +66,7 @@
       @if($stockAdjustment->status !== 'closed')
         <div class="lg:col-span-1">
             <x-card>
-                <div class="font-semibold mb-4">Cari Produk Terganggu</div>
+                <div class="font-semibold mb-4">F2 - Cari Produk Terganggu</div>
                 <x-input
                     id="search-product"
                     name="search"
@@ -87,7 +83,6 @@
         </div>
       @endif
 
-        {{-- <div class="lg:col-span-2"> --}}
         <div class="{{ $stockAdjustment->status === 'closed' ? 'lg:col-span-3' : 'lg:col-span-2' }}">    
             <x-card>
                 <div class="mb-4">
@@ -111,21 +106,15 @@
     </div>
 
     <div class="flex justify-end gap-3 mt-6">
-        {{-- <a href="{{ route('stock-adjustments.index') }}">
-            <x-button color="secondary" type="button" full>
-                <i class="ri-close-circle-line text-red-500 text-base"></i>
-                {{ $stockAdjustment->status === 'closed' ? 'Kembali ke Index' : 'Batal' }}
-            </x-button>
-        </a> --}}
         @if($stockAdjustment->status !== 'closed')
-          <x-button color="orange" type="submit" name="action" value="draft" full>
+          <x-button color="orange" type="button" onclick="submitWithAction('draft')" name="action" value="draft" full>
               <i class="ri-save-line"></i>
-              Perbarui Draft SA
+              F7 Perbarui Draft SA
           </x-button>
 
-          <x-button color="green" type="submit" name="action" value="closed" full>
+          <x-button color="green" type="button" onclick="submitWithAction('closed')" name="action" value="closed" full>
               <i class="ri-checkbox-circle-line"></i>
-              Posting & Kunci Stok
+              F10 Posting & Kunci Stok
           </x-button>
         @endif
     </div>
@@ -136,6 +125,10 @@
 const search = document.getElementById('search-product');
 const result = document.getElementById('product-result');
 const saItems = document.getElementById('sa-items');
+const form = document.getElementById('form-sa');
+
+// Status dokumen dari sisi backend
+const isDocumentClosed = "{{ $stockAdjustment->status }}" === 'closed';
 
 // DI SINI KUNCINYA: Load data lama dari database ke dalam variabel array JavaScript
 let cart = @json($cartData); 
@@ -146,7 +139,13 @@ let selectedIndex = -1;
 // Langsung render data item lama saat halaman pertama kali dibuka
 renderTable();
 
+// Fokuskan input pencarian jika statusnya belum closed
+if (!isDocumentClosed && search) {
+    search.focus();
+}
+
 function clearSearch() {
+    if (!search || !result) return;
     result.innerHTML = `<div class="p-8 text-center text-slate-400">Ketik nama / barcode produk minimarket</div>`;
     search.value = '';
     selectedIndex = -1;
@@ -164,68 +163,70 @@ function addToCart(id, name, code) {
     clearSearch();
 }
 
-search.addEventListener('keyup', function(e) {
-    if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) return;
-    clearTimeout(timer);
-    const q = this.value.trim();
+if (!isDocumentClosed && search) {
+    search.addEventListener('keyup', function(e) {
+        if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) return;
+        clearTimeout(timer);
+        const q = this.value.trim();
 
-    if (q.length < 2) {
-        result.innerHTML = `<div class="p-8 text-center text-slate-400">Ketik minimal 2 karakter</div>`;
-        selectedIndex = -1;
-        return;
-    }
-
-    timer = setTimeout(() => {
-        fetch(`/api/products/search?q=${encodeURIComponent(q)}`)
-        .then(r => r.json())
-        .then(data => {
-            if (data.length === 0) {
-                result.innerHTML = `<div class="p-6 text-center text-slate-400">Produk tidak ditemukan</div>`;
-                selectedIndex = -1;
-                return;
-            }
-
-            let html = '';
-            data.forEach((item, index) => {
-                html += `
-                <div class="border-b p-3 hover:bg-indigo-50 cursor-pointer product-row"
-                     id="product-row-${index}" data-id="${item.id}" data-name="${item.nama_barang}" data-code="${item.kode_barang}">
-                    <div class="font-semibold">${item.nama_barang}</div>
-                    <div class="text-sm text-slate-500">${item.kode_barang} | Stok: ${item.stok}</div>
-                </div>`;
-            });
-            result.innerHTML = html;
+        if (q.length < 2) {
+            result.innerHTML = `<div class="p-8 text-center text-slate-400">Ketik minimal 2 karakter</div>`;
             selectedIndex = -1;
-
-            document.querySelectorAll('.product-row').forEach(row => {
-                row.onclick = function() {
-                    addToCart(this.dataset.id, this.dataset.name, this.dataset.code);
-                }
-            });
-        });
-    }, 300);
-});
-
-search.addEventListener('keydown', function(e) {
-    const rows = document.querySelectorAll('.product-row');
-    if (rows.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-        e.preventDefault(); selectedIndex++;
-        if (selectedIndex >= rows.length) selectedIndex = 0;
-        updateRowHighlight(rows);
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault(); selectedIndex--;
-        if (selectedIndex < 0) selectedIndex = rows.length - 1;
-        updateRowHighlight(rows);
-    } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (selectedIndex >= 0 && selectedIndex < rows.length) {
-            const activeRow = rows[selectedIndex];
-            addToCart(activeRow.dataset.id, activeRow.dataset.name, activeRow.dataset.code);
+            return;
         }
-    }
-});
+
+        timer = setTimeout(() => {
+            fetch(`/api/products/search?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.length === 0) {
+                    result.innerHTML = `<div class="p-6 text-center text-slate-400">Produk tidak ditemukan</div>`;
+                    selectedIndex = -1;
+                    return;
+                }
+
+                let html = '';
+                data.forEach((item, index) => {
+                    html += `
+                    <div class="border-b p-3 hover:bg-indigo-50 cursor-pointer product-row"
+                         id="product-row-${index}" data-id="${item.id}" data-name="${item.nama_barang}" data-code="${item.kode_barang}">
+                        <div class="font-semibold">${item.nama_barang}</div>
+                        <div class="text-sm text-slate-500">${item.kode_barang} | Stok: ${item.stok}</div>
+                    </div>`;
+                });
+                result.innerHTML = html;
+                selectedIndex = -1;
+
+                document.querySelectorAll('.product-row').forEach(row => {
+                    row.onclick = function() {
+                        addToCart(this.dataset.id, this.dataset.name, this.dataset.code);
+                    }
+                });
+            });
+        }, 300);
+    });
+
+    search.addEventListener('keydown', function(e) {
+        const rows = document.querySelectorAll('.product-row');
+        if (rows.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault(); selectedIndex++;
+            if (selectedIndex >= rows.length) selectedIndex = 0;
+            updateRowHighlight(rows);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault(); selectedIndex--;
+            if (selectedIndex < 0) selectedIndex = rows.length - 1;
+            updateRowHighlight(rows);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex >= 0 && selectedIndex < rows.length) {
+                const activeRow = rows[selectedIndex];
+                addToCart(activeRow.dataset.id, activeRow.dataset.name, activeRow.dataset.code);
+            }
+        }
+    });
+}
 
 function updateRowHighlight(rows) {
     rows.forEach((row, index) => {
@@ -245,9 +246,6 @@ function renderTable() {
     }
 
     let html = '';
-    // Ambil status dari PHP ke variabel JavaScript
-    const isClosed = "{{ $stockAdjustment->status }}" === 'closed';
-
     cart.forEach((item, index) => {
         html += `
         <tr class="hover:bg-slate-50 transition-colors duration-150">
@@ -258,16 +256,16 @@ function renderTable() {
             </td>
             <td class="text-center">
                 <input type="number" name="qty[]" min="1" value="${item.qty}" data-index="${index}" 
-                class="qty border border-slate-300 rounded-xl w-24 px-3 py-2 text-center font-bold text-indigo-600 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 hover:border-slate-400 ${isClosed ? 'bg-slate-100 opacity-70 cursor-not-allowed' : 'bg-white'}" 
-                ${isClosed ? 'disabled' : ''}>
+                class="qty border border-slate-300 rounded-xl w-24 px-3 py-2 text-center font-bold text-indigo-600 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 hover:border-slate-400 ${isDocumentClosed ? 'bg-slate-100 opacity-70 cursor-not-allowed' : 'bg-white'}" 
+                ${isDocumentClosed ? 'disabled' : ''}>
             </td>
             <td>
-                <input type="text" name="notes[]" value="${item.notes}" data-index="${index}" placeholder="Alasan (Misal: Bocor, Expired)" 
-                class="item-notes border border-slate-300 rounded-xl w-full px-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 hover:border-slate-400 ${isClosed ? 'bg-slate-100 opacity-70 cursor-not-allowed' : 'bg-white'}" 
-                ${isClosed ? 'disabled' : ''}>
+                <input type="text" name="notes[]" value="${item.notes || ''}" data-index="${index}" placeholder="Alasan (Misal: Bocor, Expired)" 
+                class="item-notes border border-slate-300 rounded-xl w-full px-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 hover:border-slate-400 ${isDocumentClosed ? 'bg-slate-100 opacity-70 cursor-not-allowed' : 'bg-white'}" 
+                ${isDocumentClosed ? 'disabled' : ''}>
             </td>
             <td class="text-center">
-                ${isClosed ? '<span class="text-slate-400">-</span>' : `
+                ${isDocumentClosed ? '<span class="text-slate-400">-</span>' : `
                 <button type="button" class="delete text-red-600 hover:text-red-800 p-1" data-index="${index}">
                     <i class="ri-delete-bin-line text-lg"></i>
                 </button>
@@ -281,7 +279,9 @@ function renderTable() {
 document.addEventListener('input', function(e) {
     if (e.target.classList.contains('qty')) {
         const index = e.target.dataset.index;
-        cart[index].qty = parseInt(e.target.value) || 1;
+        let val = parseInt(e.target.value);
+        if (isNaN(val) || val <= 0) val = 1;
+        cart[index].qty = val;
     }
     if (e.target.classList.contains('item-notes')) {
         const index = e.target.dataset.index;
@@ -290,18 +290,120 @@ document.addEventListener('input', function(e) {
 });
 
 document.addEventListener('click', function(e) {
+    if (isDocumentClosed) return;
     const btn = e.target.closest('.delete');
     if (!btn) return;
     cart.splice(btn.dataset.index, 1);
     renderTable();
 });
 
+// ==========================================
+// VALIDASI CLIENT SIDE
+// ==========================================
 function validateForm() {
     if (cart.length === 0) {
-        alert("Peringatan: Anda belum memilih produk apa pun!");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cart Masih Kosong!',
+            text: 'Silakan cari dan pilih minimal 1 produk terlebih dahulu.',
+            confirmButtonColor: '#4F46E5'
+        });
         return false;
     }
-    return true;
+
+    for (let i = 0; i < cart.length; i++) {
+        if (!cart[i].qty || cart[i].qty <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Qty Tidak Valid!',
+                text: `Kuantitas untuk barang "${cart[i].name}" harus lebih dari 0!`,
+                confirmButtonColor: '#EF4444'
+            });
+            return false;
+        }
+
+        if (!cart[i].notes || cart[i].notes.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Alasan Belum Diisi!',
+                text: `Alasan penyesuaian untuk barang "${cart[i].name}" wajib diisi!`,
+                confirmButtonColor: '#EF4444'
+            });
+            return false;
+        }
+    }
+    return true; 
+}
+
+// ==========================================
+// INTERSEPSI SHORTCUT KEYBOARD GLOBAL
+// ==========================================
+document.addEventListener('keydown', function(e) {
+    if (isDocumentClosed || !form) return;
+
+    // F2 -> Fokus Input Cari
+    if (e.key === 'F2') {
+        e.preventDefault();
+        if (search) {
+            search.focus();
+            search.select();
+        }
+    }
+    
+    // F7 -> Perbarui Draft
+    if (e.key === 'F7') {
+        e.preventDefault();
+        if (!validateForm()) return;
+        
+        Swal.fire({
+            title: 'Simpan perubahan Draft?',
+            text: 'Data SA akan diperbarui dengan status Draft dan masih bisa diedit kembali.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Perbarui!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                submitWithAction('draft');
+            }
+        });
+    }
+    
+    // F10 -> Posting & Kunci
+    if (e.key === 'F10') {
+        e.preventDefault();
+        if (!validateForm()) return;
+        
+        Swal.fire({
+            title: 'Posting & Kunci Stok?',
+            text: 'Stok akan langsung disesuaikan secara permanen dan dokumen ini tidak akan bisa diubah lagi!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#22c55e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Posting Sekarang!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                submitWithAction('closed');
+            }
+        });
+    }
+});
+
+function submitWithAction(actionValue) {
+    const oldAction = form.querySelector('input[name="action"]');
+    if (oldAction) oldAction.remove();
+
+    const inputAction = document.createElement('input');
+    inputAction.type = 'hidden';
+    inputAction.name = 'action';
+    inputAction.value = actionValue;
+    form.appendChild(inputAction);
+
+    form.submit();
 }
 </script>
 @endpush
