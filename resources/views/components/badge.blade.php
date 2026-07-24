@@ -24,6 +24,8 @@ $colors = [
 
     'indigo' => 'bg-indigo-100 text-indigo-700',
 
+    'orange' => 'bg-orange-100 text-orange-700',
+
 ];
 
 $sizes = [

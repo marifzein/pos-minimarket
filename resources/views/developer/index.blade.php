@@ -68,7 +68,7 @@
             >
 
                 @csrf
-
+                {{-- seeding demo/dummy produk , supplier, customer , sinkron/insert stock_movements--}}
                 <button
                     onclick="return confirm('Generate demo data ?')"
                     class="w-full rounded-xl bg-indigo-600 text-white py-5 hover:bg-indigo-700"

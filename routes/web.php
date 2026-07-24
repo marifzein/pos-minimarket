@@ -62,6 +62,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/pos/close-shift', [App\Http\Controllers\ShiftController::class, 'showCloseForm'])->name('pos.close-shift');
         Route::post('/pos/close-shift', [App\Http\Controllers\ShiftController::class, 'storeCloseShift'])->name('pos.store-close');
         
+        // Jalur menu Laporan Toko -> Laporan Shift
+        Route::get('/laporan/shift', [\App\Http\Controllers\ShiftController::class, 'index'])->name('laporan.shift.index');
+        Route::get('/laporan/shift/{id}', [\App\Http\Controllers\ShiftController::class, 'show'])->name('laporan.shift.show');
+
         // shift2an========================================================
 
 
@@ -195,6 +199,13 @@ Route::middleware('auth')->group(function () {
 
         //delete backup
         Route::delete('/delete/{file}', [BackupController::class, 'destroy'])->name('backup.destroy');
+
+
+        //Akunting=>rahasia perusahaan    
+        // Master COA Routes
+        Route::resource('coa', \App\Http\Controllers\CoaController::class)->except(['destroy']);
+        Route::patch('coa/{coa}/toggle-status', [\App\Http\Controllers\CoaController::class, 'toggleStatus'])->name('coa.toggle-status');
+        
     });
 
     /*

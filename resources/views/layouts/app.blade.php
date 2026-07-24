@@ -127,6 +127,7 @@ aside{
 #icon-inventory,
 #icon-penjualan,
 #icon-laporan,
+#icon-akunting,
 #icon-system{
 
     transition:transform .30s ease;
@@ -282,7 +283,8 @@ const menus=[
     'master',
     'inventory',
     'laporan',
-    'system'
+    'system',
+    'akunting',
 ];
 
 function toggleMenu(name){

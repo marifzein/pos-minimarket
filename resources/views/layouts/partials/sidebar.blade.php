@@ -279,11 +279,17 @@ class="w-64 shadow-lg z-30 flex flex-col">
             </a>
 
             @can('akses-owner-admin')
+            <a href="{{ route('laporan.shift.index') }}" 
+                class="submenu {{ request()->routeIs('laporan.shift.*') ? 'submenu-active' : '' }}">
+                <i class="ri-history-line"></i>
+                Laporan Shift
+            </a>
             <a href="{{ route('laporan.laba-rugi') }}" 
                 class="submenu {{ request()->routeIs('laporan.laba-rugi') ? 'submenu-active' : '' }}">
                 <i class="ri-money-dollar-box-line"></i>
                 Laba Rugi Kotor
             </a>
+
             @endcan
             
             <!-- Hanya Supervisor ke atas yang bisa melihat laporan stok & sales global -->
@@ -304,7 +310,35 @@ class="w-64 shadow-lg z-30 flex flex-col">
             @endcan
         </div>
         
-       
+       {{-- ===================== --}}
+       {{-- AKUNTING  --}}
+       {{-- ===================== --}}
+        @can('akses-owner-admin')
+            <button
+                type="button"
+                onclick="toggleMenu('akunting')"
+                class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
+
+                <div class="flex items-center gap-3">
+                    {{-- 💡 Diganti jadi icon ri-bank-line biar lebih mencerminkan akuntansi --}}
+                    <i class="ri-bank-line"></i>
+                    <span>Akunting</span>
+                </div>
+
+                {{-- 🚀 FIX 1: ID diganti dari 'icon-system' menjadi 'icon-akunting' --}}
+                <i id="icon-akunting" class="ri-arrow-right-s-line transition-all"></i>
+
+            </button>
+            
+            <div id="menu-akunting" class="menu-content">
+                {{-- 🚀 FIX 2: Class diganti full menggunakan 'submenu' terstandar agar UI/UX seragam --}}
+                <a href="{{ route('coa.index') }}" 
+                   class="submenu {{ request()->is('coa*') ? 'submenu-active' : '' }}">
+                    <i class="ri-bank-card-line"></i>
+                    Master COA
+                </a>
+            </div>
+        @endcan
         
         {{-- ===================== --}}
         {{-- SISTEM --}}
@@ -356,6 +390,7 @@ class="w-64 shadow-lg z-30 flex flex-col">
         @endcan
     </nav>
 
+    
 
 {{-- Logout --}}
     <div class="sidebar-footer p-4">

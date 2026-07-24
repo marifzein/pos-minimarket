@@ -119,4 +119,38 @@ class ShiftController extends Controller
 
         return redirect('/pos/open-shift')->with('success', 'Shift berhasil ditutup! Laporan shift telah disimpan.');
     }
+
+    // =========================================================================
+    // 💡 METHOD BARU: KHUSUS UNTUK MONITORING & LAPORAN SHIFT (Z-REPORT)
+    // =========================================================================
+
+    // Tampilkan semua riwayat shift yang pernah dibuat
+    public function index()
+    {
+        // Ambil data shift dan join dengan user untuk tahu nama kasirnya
+        $shifts = \App\Models\Shift::with('user')
+                       ->latest('opened_at')
+                       ->paginate(10);
+
+        return view('laporan.shift.index', compact('shifts'));
+    }   
+
+    // Tampilkan rincian detail satu shift (Z-Report Lengkap)
+    public function show($id)
+    {
+        $shift = \App\Models\Shift::with('user')->findOrFail($id);
+
+        // Agregasi Non-Cash (Card & Voucher) serta Total Omzet dari tabel transactions
+        $summary = \App\Models\Transaction::where('shift_id', $shift->id)
+            ->selectRaw('SUM(card) as total_card, SUM(voucher) as total_voucher, SUM(grand_total) as total_grand, COUNT(id) as count_trx')
+            ->first();
+
+        // Hitung total quantity produk yang terjual khusus di shift ini
+        $totalQtySold = \Illuminate\Support\Facades\DB::table('transaction_details')
+            ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->where('transactions.shift_id', $shift->id)
+            ->sum('transaction_details.qty');
+
+        return view('laporan.shift.show', compact('shift', 'summary', 'totalQtySold'));
+    }
 }

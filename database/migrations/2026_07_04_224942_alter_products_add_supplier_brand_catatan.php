@@ -26,6 +26,10 @@ return new class extends Migration
             $table->text('catatan')
                 ->nullable()
                 ->after('brand');
+            // menyelipkan hrgadiskon disini
+            $table->decimal('harga_diskon', 15, 0)
+            ->nullable()
+            ->after('harga_beli');
 
         });
     }
