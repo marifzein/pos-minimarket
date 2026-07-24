@@ -81,7 +81,7 @@
 
         <form
 
-            action="{{ route('products.import') }}"
+            action="{{ route('products.import.store') }}"
 
             method="POST"
 

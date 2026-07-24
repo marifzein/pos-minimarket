@@ -135,8 +135,8 @@ Route::middleware('auth')->group(function () {
         // Import Excel Produk
         Route::prefix('products')->group(function () {
             Route::get('/import', [ProductImportController::class, 'index'])->name('products.import');
-            Route::post('/import', [ProductImportController::class, 'import'])->name('products.import');
-            // Route::post('/import', [ProductImportController::class, 'import'])->name('products.import.store');
+            // Route::post('/import', [ProductImportController::class, 'import'])->name('products.import');
+            Route::post('/import', [ProductImportController::class, 'import'])->name('products.import.store');
         });
 
         // Purchase Order (PO) & Cetak PDF
