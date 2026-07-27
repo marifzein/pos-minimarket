@@ -10,7 +10,9 @@
     subtitle="Riwayat keluar masuk barang untuk {{ $product->nama_barang }}"
 >
     <x-slot:action>
-        <a href="{{ route('stock-cards.index') }}">
+        {{-- <a href="{{ route('stock-cards.index') }}"> --}}
+        {{-- dinamis bisa balik ke produk bisa ke kartu stok --}}
+        <a href="{{ url()->previous() }}">
             <x-button color="gray" type="button">
                 <i class="ri-arrow-left-line"></i>
                 Kembali
