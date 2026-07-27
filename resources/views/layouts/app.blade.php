@@ -155,6 +155,16 @@ aside::-webkit-scrollbar-track{
     background:#0A2947;
 }
 
+
+/* Menyembunyikan scrollbar tapi fungsi scroll tetap aktif */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
 </style>
 
 

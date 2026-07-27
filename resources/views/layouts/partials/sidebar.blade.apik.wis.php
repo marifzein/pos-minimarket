@@ -2,7 +2,7 @@
 class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}}
 <aside 
     :class="sidebarOpen ? 'w-64' : 'w-20'" 
-    class="shadow-lg z-30 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden no-scrollbar">
+    class="shadow-lg z-30 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden">
 
     {{-- Logo --}}
     {{-- <div class="px-6 py-6 "> --}}
@@ -41,8 +41,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
     </div>
 
     {{-- Menu --}}
-    {{-- <nav class="flex-1 py-5 overflow-hidden"> --}}
-    <nav class="flex-1 py-5 overflow-y-auto no-scrollbar">    
+    <nav class="flex-1 py-5 overflow-hidden">
 
         <!-- TOMBOL HAMBURGER -->
         {{-- <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-indigo-600 focus:outline-none p-2 rounded-xl hover:bg-slate-400 transition">
@@ -313,7 +312,6 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
                 <i class="ri-bank-card-line mr-2 text-lg"></i>
                 <span>Nilai Aset Stok</span>
             </a>
-
             @endcan
         </div>
         
