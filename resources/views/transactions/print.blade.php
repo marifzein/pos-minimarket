@@ -274,11 +274,11 @@ window.onload=function(){
 
 };
 
-window.onafterprint=function(){
+/*window.onafterprint=function(){
 
     window.close();
 
-};
+};*/
 
 </script>
 
