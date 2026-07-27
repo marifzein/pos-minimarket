@@ -260,26 +260,35 @@
 
 <br>
 
-<button onclick="window.print()">
-
+{{-- <button onclick="window.print()">
     Cetak
+</button> --}}
 
+<button onclick="eksekusiCetak()">
+    Cetak
 </button>
 
 <script>
+// 1. Deklarasikan fungsinya terlebih dahulu di atas
+function eksekusiCetak() {
+    // Deteksi apakah pengguna menggunakan perangkat Mobile (HP/Tablet)
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // --- JALUR HP / TABLET (Menggunakan RawBT) ---
+        var currentUrl = window.location.href;
+        var rawBtUrl = "rawbt:" + currentUrl;
+        window.location.href = rawBtUrl;
+    } else {
+        // --- JALUR PC / LAPTOP ---
+        window.print();
+    }
+}
 
-window.onload=function(){
-
-    window.print();
-
+// 2. Panggil fungsinya saat halaman selesai dimuat
+window.onload = function() {
+    eksekusiCetak();
 };
-
-/*window.onafterprint=function(){
-
-    window.close();
-
-};*/
-
 </script>
 
 </body>
