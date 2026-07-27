@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\StockMovement;
 use App\Models\Category;
 use App\Models\ProductPrice;
+use App\Models\Supplier;
 
 class ProductController extends Controller
 {
@@ -152,10 +153,13 @@ class ProductController extends Controller
          $categories = Category::where('is_active', true)
                     ->orderBy('name')
                     ->get();
-
+        // 💡 Ambil data supplier untuk dropdown
+        $suppliers = \App\Models\Supplier::where('is_active', true)
+                    ->orderBy('nama')
+                    ->get();
         return view(
             'products.create',
-            compact('categories')
+            compact('categories','suppliers')
         );
     }
         
@@ -175,6 +179,8 @@ class ProductController extends Controller
 
             'stok' =>
                 'required|integer|min:0',
+
+            'supplier_id' => 'nullable|exists:suppliers,id',
             
             'min_qty.*' =>
                 'nullable|integer|min:2',
@@ -194,11 +200,13 @@ class ProductController extends Controller
 
             'category_id'   => $request->category_id,
 
+            'supplier_id'   => $request->supplier_id,
+
             'harga_beli'    => $request->harga_beli,
 
             'harga'         => $request->harga,
 
-            'harga_diskon'  => $request->harga_diskon,
+            // 'harga_diskon'  => $request->harga_diskon,
 
             'stok'          => $request->stok,
 
@@ -287,11 +295,17 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
+        // 💡 Ambil data supplier untuk dropdown
+        $suppliers = \App\Models\Supplier::where('is_active', true)
+                    ->orderBy('nama')
+                    ->get();
+
         return view(
             'products.edit',
             compact(
                 'product',
-                'categories'
+                'categories',
+                'suppliers'
             )
         );
     }
@@ -302,9 +316,10 @@ class ProductController extends Controller
         $request->validate([
             'nama_barang' => 'required',
             'category_id' => 'nullable|exists:categories,id',
+            'supplier_id'   => 'required',
             'harga_beli' => 'required|numeric|gt:0',
             'harga'      => 'required|numeric|gt:0',
-            'harga_diskon' => 'nullable|numeric|min:0',
+            // 'harga_diskon' => 'nullable|numeric|min:0',
             'min_stok'     => 'required|integer|min:0',
             'satuan'       => 'required',
             
@@ -317,9 +332,10 @@ class ProductController extends Controller
             'barcode'      => $request->barcode,
             'nama_barang'  => $request->nama_barang,
             'category_id'  => $request->category_id,
+            'supplier_id'   => $request->supplier_id,
             'harga_beli'   => $request->harga_beli,
             'harga'        => $request->harga,
-            'harga_diskon' => $request->harga_diskon,
+            // 'harga_diskon' => $request->harga_diskon,
             'min_stok'     => $request->min_stok,
             'satuan'       => $request->satuan,
             'catatan'      => $request->catatan,

@@ -160,12 +160,28 @@
     </div>
 </div>
 {{-- harga grosiran end--}}
-    <x-input
+    {{-- <x-input
         label="Harga Diskon"
         name="harga_diskon"
         type="number"
         icon="ri-discount-percent-line"
-    />
+    /> --}}
+    <x-select
+        label="Supplier"
+        name="supplier_id"
+        icon="ri-truck-line"
+        required
+    >
+        <option value="">-- Pilih Supplier --</option>
+        @foreach($suppliers as $supplier)
+            <option
+                value="{{ $supplier->id }}"
+                @selected(old('supplier_id') == $supplier->id)
+            >
+                {{ $supplier->nama }} ({{ $supplier->kode }})
+            </option>
+        @endforeach
+    </x-select>
 
     <x-input
         label="Stok Awal"
