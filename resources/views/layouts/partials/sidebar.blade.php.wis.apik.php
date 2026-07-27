@@ -1,12 +1,10 @@
 {{-- <aside
 class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}}
-<aside 
-    :class="sidebarOpen ? 'w-64' : 'w-20'" 
-    class="shadow-lg z-30 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden">
+<aside
+class="w-64 shadow-lg z-30 flex flex-col">
 
     {{-- Logo --}}
-    {{-- <div class="px-6 py-6 "> --}}
-    <div class="px-6 py-6 border-b border-slate-800/20">
+    <div class="px-6 py-6 ">
 
         <div class="flex items-center gap-3">
 
@@ -20,8 +18,8 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
             </div>
 
-            {{-- <div> --}}
-            <div x-show="sidebarOpen" x-transition:enter="transition opacity duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">    
+            <div>
+
                 <h1 class="font-bold text-lg">
 
                     POS Minimarket
@@ -43,11 +41,6 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
     {{-- Menu --}}
     <nav class="flex-1 py-5 overflow-hidden">
 
-        <!-- TOMBOL HAMBURGER -->
-        {{-- <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-indigo-600 focus:outline-none p-2 rounded-xl hover:bg-slate-400 transition">
-            <i class="ri-menu-line text-2xl"></i>
-        </button> --}}
-
         {{-- Dashboard --}}
         {{-- <a
             class="
@@ -61,7 +54,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
         class="menu-parent menu-group w-full flex items-center gap-3 px-4 py-3
         {{ request()->is('dashboard*') ? 'submenu-active' : '' }}">
             <i class="ri-home-5-line"></i>
-            <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Dashboard</span>
+            <span>Dashboard</span>
         </a>
 
         {{-- ===================== --}}
@@ -77,7 +70,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
                 <i class="ri-shopping-cart-2-line"></i>
 
-                <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Penjualan</span>
+                <span>Penjualan</span>
 
             </div>
 
@@ -86,7 +79,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
         </button>
 
-        <div id="menu-kasir" class="menu-content" x-show="sidebarOpen">
+        <div id="menu-kasir" class="menu-content">
 
             <a href="/pos"
                 class="submenu {{ request()->is('pos') ? 'submenu-active' : '' }}">
@@ -123,7 +116,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
                 <i class="ri-database-2-line"></i>
 
-                <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Master Data</span>
+                <span>Master Data</span>
 
             </div>
 
@@ -132,7 +125,7 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
         </button>
 
-        <div id="menu-master" class="menu-content" x-show="sidebarOpen">
+        <div id="menu-master" class="menu-content">
             @can('akses-spv-keatas')
             <a href="/users"
                 class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}">
@@ -202,17 +195,18 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
             <div class="flex items-center gap-3">
 
-                <i class="ri-archive-line flex-shrink-0 text-xl"></i>
+                <i class="ri-archive-line"></i>
 
-                <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Inventory</span>
+                <span>Inventory</span>
 
             </div>
 
-            <i id="icon-inventory" x-show="sidebarOpen" class="ri-arrow-right-s-line transition-all"></i>
+            <i id="icon-inventory"
+                class="ri-arrow-right-s-line transition-all"></i>
 
         </button>
 
-        <div id="menu-inventory" class="menu-content" x-show="sidebarOpen">
+        <div id="menu-inventory" class="menu-content">
             
             <a href="/purchasing"
                 class="submenu {{ request()->is('purchasing*') ? 'submenu-active':'' }}">
@@ -270,13 +264,14 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
             class="menu-parent menu-group w-full px-4 py-3 flex items-center justify-between">
 
             <div class="flex items-center gap-3">
-                <i class="ri-file-list-3-line flex-shrink-0 text-xl"></i>
-                <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Laporan</span>
+                <i class="ri-file-list-3-line"></i>
+                <span>Laporan</span>
             </div>
-            <i id="icon-laporan" x-show="sidebarOpen" class="ri-arrow-right-s-line transition-all"></i>
+
+            <i id="icon-laporan" class="ri-arrow-right-s-line transition-all"></i>
         </button>
 
-        <div id="menu-laporan" class="menu-content" x-show="sidebarOpen">
+        <div id="menu-laporan" class="menu-content">
             <a href="{{ route('laporan.penjualan-kasir') }}" 
                 class="submenu {{ request()->routeIs('laporan.penjualan-kasir') ? 'submenu-active' : '' }}">
                 <i class="ri-line-chart-line"></i>
@@ -326,16 +321,16 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
                 <div class="flex items-center gap-3">
                     {{-- 💡 Diganti jadi icon ri-bank-line biar lebih mencerminkan akuntansi --}}
-                    <i class="ri-bank-line flex-shrink-0 text-xl"></i>
-                    <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Akunting</span>
+                    <i class="ri-bank-line"></i>
+                    <span>Akunting</span>
                 </div>
 
                 {{-- 🚀 FIX 1: ID diganti dari 'icon-system' menjadi 'icon-akunting' --}}
-                <i id="icon-akunting" x-show="sidebarOpen" class="ri-arrow-right-s-line transition-all"></i>
+                <i id="icon-akunting" class="ri-arrow-right-s-line transition-all"></i>
 
             </button>
             
-            <div id="menu-akunting" class="menu-content" x-show="sidebarOpen">
+            <div id="menu-akunting" class="menu-content">
                 {{-- 🚀 FIX 2: Class diganti full menggunakan 'submenu' terstandar agar UI/UX seragam --}}
                 <a href="{{ route('coa.index') }}" 
                    class="submenu {{ request()->is('coa*') ? 'submenu-active' : '' }}">
@@ -356,16 +351,18 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
             <div class="flex items-center gap-3">
 
-                <i class="ri-settings-3-line flex-shrink-0 text-xl"></i>
-                <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Sistem</span>
+                <i class="ri-settings-3-line"></i>
+
+                <span>Sistem</span>
 
             </div>
 
-            <i id="icon-system" x-show="sidebarOpen" class="ri-arrow-right-s-line transition-all"></i>
+            <i id="icon-system"
+                class="ri-arrow-right-s-line transition-all"></i>
 
         </button>
 
-        <div id="menu-system" class="menu-content" x-show="sidebarOpen">
+        <div id="menu-system" class="menu-content">
             <!-- Bagian Menu Sistem di Sidebar -->
             
             <a href="{{ route('setting.index') }}" 
@@ -404,9 +401,13 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
             @csrf
 
-            <button class="logout-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition justify-start">
-                <i class="ri-logout-box-r-line flex-shrink-0 text-xl"></i>
-                <span x-show="sidebarOpen" x-transition:enter="transition opacity duration-200">Logout</span>
+            <button
+                class="logout-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition">
+
+                <i class="ri-logout-box-r-line"></i>
+
+                Logout
+
             </button>
 
         </form>

@@ -57,8 +57,15 @@
     </div>
 
 </header> --}}
-<header class="h-20 bg-white border-b border-slate-50 shadow-sm flex items-center justify-end px-8 sticky top-0 z-20">
+<header class="h-20 bg-white border-b border-slate-50 shadow-sm flex items-center justify-between px-8 sticky top-0 z-20">
+    <!-- Tombol Hamburger (Sisi Kiri Header) -->
+    <div>
+        <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-indigo-600 focus:outline-none p-2 rounded-xl hover:bg-slate-100 transition">
+            <i class="ri-menu-line text-2xl"></i>
+        </button>
+    </div>
 
+    <!-- Area Profil & Notifikasi (Sisi Kanan Header Bawaan Kamu) -->
     <div class="flex items-center gap-5">
 
         <button class="text-slate-500 hover:text-indigo-600">

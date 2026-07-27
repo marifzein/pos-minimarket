@@ -173,9 +173,8 @@ aside::-webkit-scrollbar-track{
     @include('layouts.partials.sidebar')
 
     {{-- Content --}}
-    {{-- <div class="flex-1 flex flex-col bg-slate-100"> --}}
-    <div class="flex-1 flex flex-col bg-slate-100 min-w-0 transition-all duration-300 ease-in-out">
-            
+    <div class="flex-1 flex flex-col bg-slate-100">
+
     @include('layouts.partials.topbar')
 
     <main class="flex-1 overflow-y-auto">
