@@ -8,87 +8,42 @@
         <h1 class="text-2xl font-bold mb-6">Laporan Penjualan Per Produk</h1>
 
         <!-- Form Filter Tanggal (Sertakan parameter sort tersembunyi agar tidak hilang saat ganti tanggal) -->
-        <!-- Form Filter -->
-<form method="GET" action="/laporan/penjualan-produk" class="mb-6 bg-slate-50 p-4 rounded-xl border border-gray-100">
-    <input type="hidden" name="sort_by" value="{{ $sortBy }}">
-    <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
-    
-    <!-- Grid Input Filter 5 Kolom Sejajar -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-        
-        <!-- Filter Tanggal Mulai -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-            <input type="date" name="start_date" value="{{ $startDate }}" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-        </div>
-        
-        <!-- Filter Tanggal Selesai -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
-            <input type="date" name="end_date" value="{{ $endDate }}" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-        </div>
-
-        <!-- Filter Cari Item -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Cari Item (Nama/Kode)</label>
-            <input type="text" name="search_item" value="{{ $searchItem ?? '' }}" placeholder="Contoh: Rinso..." class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-        </div>
-
-        <!-- Filter Kategori -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Kategori</label>
-            <select name="category_id" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                <option value="">-- Semua Kategori --</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" {{ ($categoryId == $cat->id) ? 'selected' : '' }}>
-                        {{ $cat->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <!-- Filter Supplier -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Supplier</label>
-            <select name="supplier_id" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                <option value="">-- Semua Supplier --</option>
-                @foreach($suppliers as $sup)
-                    <option value="{{ $sup->id }}" {{ ($supplierId == $sup->id) ? 'selected' : '' }}>
-                        {{ $sup->nama }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-    </div>
-
-    <!-- Row Aksi Tombol -->
-    <div class="flex flex-wrap gap-2 items-center justify-between mt-4 pt-4 border-t border-gray-200">
-        <div>
-            <x-button type="submit" color="blue" size="sm" class="items-center">
-                <i class="ri-filter-3-line"></i> Filter Data
-            </x-button>
-
-            <a href="/laporan/penjualan-produk" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-1">
-                Reset
-            </a>
-        </div>
-        
-        <div class="flex gap-2">
-            <a href="{{ request()->fullUrlWithQuery(['export' => 'excel']) }}">
-                <x-button type="button" color="green" size="sm" class="items-center">
-                    <i class="ri-file-excel-2-line"></i> Export XLS
-                </x-button>
-            </a>
+        <form method="GET" action="/laporan/penjualan-produk" class="flex flex-wrap gap-4 items-end mb-6">
+            <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+            <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
             
-            <a href="{{ request()->fullUrlWithQuery(['export' => 'pdf']) }}" target="_blank">
-                <x-button type="button" color="red" size="sm" class="items-center">
-                    <i class="ri-file-pdf-line"></i> Cetak PDF
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
+                <input type="date" name="start_date" value="{{ $startDate }}" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
+                <input type="date" name="end_date" value="{{ $endDate }}" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+
+            <!-- Container Tombol: Rapi, Sejajar, & Presisi Mengikuti Tinggi Input -->
+            <div class="flex gap-2 items-center">
+                <!-- Filter Data Component -->
+                <x-button type="submit" color="blue" size="sm" class="items-center">
+                    Filter Data
                 </x-button>
-            </a>
-        </div>
-    </div>
-</form>
+                
+                <!-- Export XLS Component -->
+                <a href="{{ request()->fullUrlWithQuery(['export' => 'excel']) }}">
+                    <x-button type="button" color="green" size="sm" class="items-center">
+                        <i class="ri-file-excel-2-line"></i> Export XLS
+                    </x-button>
+                </a>
+                
+                <!-- Cetak PDF Component -->
+                <a href="{{ request()->fullUrlWithQuery(['export' => 'pdf']) }}" target="_blank">
+                    <x-button type="button" color="red" size="sm" class="items-center">
+                        <i class="ri-file-pdf-line"></i> Cetak PDF
+                    </x-button>
+                </a>
+            </div>
+        </form>
 
         <!-- Helper Generator Link Sort Dinamis -->
         @php
