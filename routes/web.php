@@ -169,9 +169,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/stock-adjustments/{stockAdjustment}/print-pdf', 
         [StockAdjustmentController::class, 'printPdf'])->name('stock-adjustments.print-pdf');
 
-        // Pengaturan Profil Toko
-        Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
-        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
+        
 
         
         // Backup Database
@@ -205,6 +203,10 @@ Route::middleware('auth')->group(function () {
         // Master COA Routes
         Route::resource('coa', \App\Http\Controllers\CoaController::class)->except(['destroy']);
         Route::patch('coa/{coa}/toggle-status', [\App\Http\Controllers\CoaController::class, 'toggleStatus'])->name('coa.toggle-status');
+
+        // Pengaturan Profil Toko
+        Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
+        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
         
     });
 
