@@ -26,7 +26,7 @@
 
             <!-- KIRI -->
 
-            <div class="col-span-3 space-y-4">
+            <div class="col-span-4 space-y-4">
 
                 <!-- INFO NOTA -->
 
@@ -250,7 +250,7 @@
 
             <!-- KANAN -->
 
-            <div class="col-span-9">
+            <div class="col-span-8">
 
                 <div 
                 class="bg-white rounded-xl shadow">
@@ -346,9 +346,7 @@
                                 <thead>
 
                                 <tr class="bg-gray-50">
-                                    <th class="text-center p-3 w-12">
-                                        No
-                                    </th>
+
                                     <th class="text-left p-3">
                                         Barang
                                     </th>
@@ -375,13 +373,12 @@
                                 <tbody>
 
                                   <template
-                                      x-for="(item, index) in cart"
+                                      x-for="item in cart"
                                       :key="item.id"
                                   >
 
                                   <tr class="border-b">
-                                      <!-- KOLOM NOMOR OTOMATIS BERDASARKAN BARIS -->  
-                                      <td class="p-3 text-center text-gray-500 font-medium bg-gray-50/50" x-text="index + 1"></td>
+
                                       <td class="p-3">
 
                                           <div
@@ -444,7 +441,7 @@
                                   <tr x-show="cart.length===0">
 
                                       <td
-                                          colspan="5"
+                                          colspan="4"
                                           class="text-center p-10 text-gray-400"
                                       >
 
