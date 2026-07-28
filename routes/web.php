@@ -80,6 +80,9 @@ Route::middleware('auth')->group(function () {
         // Pelanggan
         Route::resource('customers', CustomerController::class);
 
+        // Produk
+        Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+
         // Laporan Penjualan Kasir
         Route::get('/laporan/penjualan-kasir', [LaporanPenjualanKasirController::class, 'index'])->name('laporan.penjualan-kasir');
 
@@ -129,7 +132,7 @@ Route::middleware('auth')->group(function () {
         Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
 
         Route::resource('suppliers', SupplierController::class)->except(['show', 'destroy']);
-        Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+        // Route::resource('products', ProductController::class)->except(['show', 'destroy']);
         Route::resource('categories', CategoryController::class)->except(['show', 'destroy']);
 
         // Import Excel Produk
@@ -220,11 +223,15 @@ Route::middleware('auth')->group(function () {
             Route::post('/reset-transaksi', [DeveloperController::class, 'resetTransaksi'])->name('reset.transaksi');
             Route::post('/reset-master', [DeveloperController::class, 'resetMaster'])->name('reset.master');
             Route::post('/seed', [DeveloperController::class, 'seedDemo'])->name('seed');
+
+            // 💡 RUTE TERBARU UNTUK MANAGEMEN INTEGRASI AKSES MODUL CLIENT
+            Route::get('/modules', [\App\Http\Controllers\DeveloperController::class, 'modulesIndex'])->name('modules.index');
+            Route::post('/modules/update', [\App\Http\Controllers\DeveloperController::class, 'modulesUpdate'])->name('modules.update');
         });
         
         // Pengaturan Profil Toko
         Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
-        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
+        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');    
         
     });
 

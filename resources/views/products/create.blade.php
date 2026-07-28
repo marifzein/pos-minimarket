@@ -166,6 +166,7 @@
         type="number"
         icon="ri-discount-percent-line"
     /> --}}
+    
     <x-select
         label="Supplier"
         name="supplier_id"

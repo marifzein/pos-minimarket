@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;   
+
 
 use App\Models\Category;
 use App\Models\Supplier;
@@ -11,6 +13,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\StockMovement;
+use App\Models\ClientModule;
 
 use Illuminate\Support\Str;
 
@@ -231,7 +234,7 @@ class DeveloperController extends Controller
 
             // array $products 
             // (50 produk - Diperbarui menggunakan logika potongan per pcs)
-            $products = [
+            $products = [   
 
                 // =====================================================
                 // MAKANAN
@@ -1171,4 +1174,30 @@ class DeveloperController extends Controller
 
     }
 
+    public function modulesIndex()  
+    {
+        // Mengambil semua modul diurutkan berdasarkan nama controller
+        $modules = ClientModule::orderBy('controller_name', 'asc')->get();
+        
+        return view('developer.modules', compact('modules'));
+    }
+
+    public function modulesUpdate(Request $request)
+    {
+        // 1. Ambil array 'active_modules' dari form. Jika kosong (tidak ada yang dicentang), jadikan array kosong
+        $activeModuleIds = $request->input('active_modules', []);
+
+        // 2. Set semua modul menjadi tidak aktif (is_active = 0) terlebih dahulu
+        ClientModule::query()->update(['is_active' => false]);
+
+        // 3. Jika ada checkbox yang dicentang, aktifkan modul tersebut berdasarkan id-nya
+        if (!empty($activeModuleIds)) {
+            ClientModule::whereIn('id', $activeModuleIds)->update(['is_active' => true]);
+        }
+
+        // 4. WAJIB HAPUS CACHE! Agar middleware CheckModuleAccess langsung mendeteksi konfigurasi terbaru
+        Cache::forget('client_active_modules');
+
+        return redirect()->route('developer.modules.index')->with('success', 'Konfigurasi akses modul client berhasil diperbarui!');
+    }
 }

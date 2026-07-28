@@ -377,8 +377,14 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
                 Pengaturan Toko
             </a>                        
             
+            <a href="{{ route('developer.modules.index') }}" 
+            class="submenu {{ request()->routeIs('developer.modules.*') ? 'submenu-active' : '' }}">
+                <i class="ri-shield-keyhole-line"></i>
+                Akses Modul Client
+            </a>
+
             <a href="/developer"
-                class="submenu {{ request()->is('developer*') ? 'submenu-active':'' }}">
+                class="submenu {{ request()->is('developer') ? 'submenu-active':'' }}">
                 <i class="ri-code-s-slash-line"></i>
                 Developer
             </a>

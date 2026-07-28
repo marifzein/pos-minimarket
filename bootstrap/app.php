@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.shift' => \App\Http\Middleware\CheckOpenShift::class,
         ]);
 
+        // 2. Tambahkan middleware modul ke dalam grup 'web' secara global
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckModuleAccess::class,
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

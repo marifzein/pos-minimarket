@@ -21,7 +21,7 @@
             
             <div class="mb-5">
                 <label for="starting_cash" class="block text-sm font-semibold text-slate-700 mb-2">
-                    Uang Modal Awal (Cash Float)
+                    Uang Modal Awal (Cash)
                 </label>
                 <div class="relative rounded-xl shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
