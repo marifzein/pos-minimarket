@@ -369,19 +369,20 @@ class="w-64 bg-white border-r border-zinc-100 shadow-lg z-30 flex flex-col"> --}
 
         <div id="menu-system" class="menu-content" x-show="sidebarOpen">
             <!-- Bagian Menu Sistem di Sidebar -->
+            @can('akses-developer')
             
             <a href="{{ route('setting.index') }}" 
             class="submenu {{ request()->routeIs('setting.index') ? 'submenu-active' : '' }}">
                 <i class="ri-settings-4-line    "></i>
                 Pengaturan Toko
-            </a>
-                        
-            @can('akses-developer')
+            </a>                        
+            
             <a href="/developer"
                 class="submenu {{ request()->is('developer*') ? 'submenu-active':'' }}">
                 <i class="ri-code-s-slash-line"></i>
                 Developer
             </a>
+            
             @endcan
 
             
