@@ -15,7 +15,10 @@
         </div>
         <h1 class="text-6xl font-black text-slate-800 mb-2">403</h1>
         <p class="text-xl font-bold text-slate-700 mb-4">Akses Ditolak</p>
-        <p class="text-slate-500 mb-6">Anda tidak memiliki hak akses untuk membuka halaman atau melakukan aksi ini.</p>
+        <p class="text-slate-500 mb-6">
+            {{-- Anda tidak memiliki hak akses untuk membuka halaman atau melakukan aksi ini. --}}
+            {{ $exception->getMessage() ?: 'Anda tidak memiliki hak akses untuk membuka halaman atau melakukan aksi ini.' }}
+        </p>
         <a href="/dashboard" class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition shadow-lg shadow-indigo-100">
             Kembali ke Dashboard
         </a>

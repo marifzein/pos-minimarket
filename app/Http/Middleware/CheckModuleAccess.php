@@ -60,7 +60,7 @@ class CheckModuleAccess
 
             // 4. Jika tidak ada di daftar bypass dan statusnya MATI (tidak ada di list aktif), blokir!
             if (!in_array($controllerName, $bypassControllers) && !in_array($controllerName, $activeModules)) {
-                abort(403, 'Paket aplikasi Anda tidak mendukung fitur/halaman ini. Silakan hubungi admin.');
+                abort(403, 'Paket aplikasi Anda tidak mendukung fitur/halaman ini. Silakan hubungi admin/IT.');
             }
         }
 
