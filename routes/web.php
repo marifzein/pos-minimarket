@@ -204,9 +204,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('coa', \App\Http\Controllers\CoaController::class)->except(['destroy']);
         Route::patch('coa/{coa}/toggle-status', [\App\Http\Controllers\CoaController::class, 'toggleStatus'])->name('coa.toggle-status');
 
-        // Pengaturan Profil Toko
-        Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
-        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
+        
         
     });
 
@@ -223,7 +221,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/reset-master', [DeveloperController::class, 'resetMaster'])->name('reset.master');
             Route::post('/seed', [DeveloperController::class, 'seedDemo'])->name('seed');
         });
-
+        
+        // Pengaturan Profil Toko
+        Route::get('/system/setting', [SettingController::class, 'index'])->name('setting.index');
+        Route::put('/system/setting', [SettingController::class, 'update'])->name('setting.update');
         
     });
 
