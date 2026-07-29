@@ -36,6 +36,7 @@ class ClientModuleSeeder extends Seeder
             'StockAdjustmentController',
             'StockCardController',
             'StockOpnameController',
+            'StockValuationController',
             'SupplierController',
             'TransactionController',
             'UserController',
