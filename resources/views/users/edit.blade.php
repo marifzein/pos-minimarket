@@ -121,6 +121,16 @@
 
         </option>
 
+        <option value="Owner"
+
+            @selected($user->role=='Owner')
+
+        >
+
+            Owner
+
+        </option>
+
         <option value="Supervisor"
 
             @selected($user->role=='Supervisor')
