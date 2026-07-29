@@ -22,6 +22,10 @@ class UserController extends Controller
         ->when($currentUserRole === 'Supervisor', function ($query) {
             return $query->whereNotIn('role', ['Admin', 'Owner']);
         })
+        // 🚀 TAMBAHAN: JIKA yang login adalah Owner, FILTER/BUANG data user Admin
+        ->when($currentUserRole === 'Owner', function ($query) {
+            return $query->where('role', '!=', 'Admin');
+        })
         ->latest() 
         ->paginate(10); 
 
@@ -85,6 +89,11 @@ class UserController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah data akun ini.');
         }
 
+        // 🚀 TAMBAHAN: Proteksi jika Owner mencoba mengedit Admin via URL langsung
+        if (Auth::user()->role === 'Owner' && $user->role === 'Admin') {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data akun ini.');
+        }
+
         return view(
             'users.edit',
             compact('user')
@@ -103,6 +112,11 @@ class UserController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah data akun ini.');
         }
 
+        // 🚀 TAMBAHAN: Proteksi backend untuk Owner sebelum data tersimpan
+        if (Auth::user()->role === 'Owner' && $user->role === 'Admin') {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah data akun ini.');
+        }
+        
         $request->validate([
 
             'name'=>'required',

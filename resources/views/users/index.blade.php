@@ -110,7 +110,7 @@
 
                 </x-table-cell>
 
-                <x-table-cell class="text-center">
+                <x-table-cell class="text-center">  
                     
                     @if($user->role=='Admin')
                         
@@ -180,24 +180,22 @@
                     {{-- @if(auth()->user()->role === 'Supervisor' && in_array($user->role, ['Admin', 'Owner']))
                         <span class="text-xs text-slate-400 italic">n/a</span>
                     @else --}}
+                    {{-- Sembunyikan tombol Edit jika Supervisor mengakses Admin/Owner ATAU jika Owner mengakses Admin --}}
+                    @if(
+                        (auth()->user()->role === 'Supervisor' && in_array($user->role, ['Admin', 'Owner'])) || 
+                        (auth()->user()->role === 'Owner' && $user->role === 'Admin')
+                    )
+                        <span class="text-xs text-slate-400 italic">n/a</span>
+                    @else
                     <a href="/users/{{ $user->id }}/edit">
 
-                        <x-button
-
-                            color="blue"
-
-                            size="sm"
-
-                        >
-
+                        <x-button color="blue" size="sm">
                             <i class="ri-edit-line"></i>
-
                             Edit
-
-                        </x-button>
+                        </x-button> 
 
                     </a>
-                    {{-- @endif --}}
+                    @endif
                 </x-table-cell>
 
             </x-table-row>
