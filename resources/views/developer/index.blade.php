@@ -77,7 +77,7 @@
                 >
                     Reset Footer
                 </button>
-            </form>
+            </form> 
 
             {{-- Seed --}}
 
