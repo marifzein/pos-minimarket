@@ -38,3 +38,6 @@ Homestead.yaml
 Homestead.json
 
 # Project khusus
+
+#execute on local
+run-dev.bat

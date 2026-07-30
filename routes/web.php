@@ -222,6 +222,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [DeveloperController::class, 'index'])->name('index');
             Route::post('/reset-transaksi', [DeveloperController::class, 'resetTransaksi'])->name('reset.transaksi');
             Route::post('/reset-master', [DeveloperController::class, 'resetMaster'])->name('reset.master');
+            Route::post('/reset-footer', [DeveloperController::class, 'resetFooter'])->name('reset.footer');    
             Route::post('/seed', [DeveloperController::class, 'seedDemo'])->name('seed');
 
             // 💡 RUTE TERBARU UNTUK MANAGEMEN INTEGRASI AKSES MODUL CLIENT

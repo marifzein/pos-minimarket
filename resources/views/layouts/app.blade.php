@@ -176,35 +176,56 @@ aside::-webkit-scrollbar-track{
 {{-- <body class="bg-slate-100 text-slate-800"> --}}
 <body class="bg-slate-100 text-slate-800" x-data="{ sidebarOpen: true }">
 
-{{-- <div class="flex h-screen"> --}}
-<div class="flex h-screen overflow-hidden">
+    {{-- <div class="flex h-screen"> --}}
+    <div class="flex h-screen overflow-hidden">
 
-    {{-- Sidebar --}}
-    @include('layouts.partials.sidebar')
+        {{-- Sidebar --}}
+        @include('layouts.partials.sidebar')
 
-    {{-- Content --}}
-    {{-- <div class="flex-1 flex flex-col bg-slate-100"> --}}
-    <div class="flex-1 flex flex-col bg-slate-100 min-w-0 transition-all duration-300 ease-in-out">
-            
-    @include('layouts.partials.topbar')
+        {{-- Content --}}
+        {{-- <div class="flex-1 flex flex-col bg-slate-100"> --}}
+        
+        {{-- Content Area --}}
+        <div class="flex-1 flex flex-col bg-slate-100 min-w-0 transition-all duration-300 ease-in-out h-screen overflow-hidden">
+                
+            {{-- Header / Topbar (Fixed di atas, tidak ikut scroll) --}}
+            @include('layouts.partials.topbar')
 
-    <main class="flex-1 overflow-y-auto">
+            {{-- Area Tengah: Konten utama yang scrollable --}}
+            <main class="flex-1 overflow-y-auto bg-slate-50">
+                <div class="p-8 pb-24"> {{-- Ditambah padding bottom agar konten terbawah tidak ketutup footer --}}
+                    <div class="rounded-2xl">
+                        @yield('content')
+                    </div>
+                </div>
+            </main>
 
-        <div class="p-8">
+            {{-- Minimalist Footer: Fixed di bawah main content, terbagi 3 section --}}
+            <footer class="h-9 bg-white border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between px-6 text-xs text-slate-500 z-30 select-none">
+                
+                {{-- Section Kiri: Status / Cabang --}}
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                    <span>DaCen: <strong class="text-slate-700">{{ $footerData->section_left }}</strong></span>
+                </div>
 
-            <div class="rounded-2xl">
+                {{-- Section Tengah: Info Shortcut / Kasir Aktif --}}
+                <div class="hidden md:flex items-center gap-4 text-slate-400">
+                    <span>Kasir: <strong class="text-slate-600">{{ Auth::user()->name }}</strong></span>
+                    <span>•</span>
+                    <span>Modul: <strong class="text-indigo-600">{{ $footerData->section_center }}</strong></span>
+                </div>
 
-                @yield('content')
+                {{-- Section Kanan: Hak Cipta / Lisensi --}}
+                <div class="flex items-center gap-1 font-mono text-[11px]">
+                    <span>&copy; {{ date('Y') }} {{ $footerData->section_right }}</span>
+                </div>
 
-            </div>
+            </footer>
 
-        </div>
+        </div> {{-- End flex-col Content --}}
 
-    </main>
-
-</div>
-
-</div>
+    </div> {{-- End H-Screen Flex --}}
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    
 
@@ -326,33 +347,7 @@ function toggleMenu(name){
             }
         }
 
-        // if(item===name){
-
-        //     if(menu.classList.contains('open')){
-
-        //         menu.classList.remove('open');
-
-        //         icon.classList.remove('rotate');
-
-        //         localStorage.removeItem('activeMenu');
-
-        //     }else{
-
-        //         menu.classList.add('open');
-
-        //         icon.classList.add('rotate');
-
-        //         localStorage.setItem('activeMenu',item);
-
-        //     }
-
-        // }else{
-
-        //     menu.classList.remove('open');
-
-        //     icon.classList.remove('rotate');
-
-        // }
+        
 
     });
 

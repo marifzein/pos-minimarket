@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;   
+use Illuminate\Support\Facades\Cache;
+  
 
 
 use App\Models\Category;
@@ -14,6 +15,7 @@ use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\StockMovement;
 use App\Models\ClientModule;
+use App\Models\FooterSetting;
 
 use Illuminate\Support\Str;
 
@@ -1182,6 +1184,7 @@ class DeveloperController extends Controller
         return view('developer.modules', compact('modules'));
     }
 
+    // hak akses modul client
     public function modulesUpdate(Request $request)
     {
         // 1. Ambil array 'active_modules' dari form. Jika kosong (tidak ada yang dicentang), jadikan array kosong
@@ -1199,5 +1202,25 @@ class DeveloperController extends Controller
         Cache::forget('client_active_modules');
 
         return redirect()->route('developer.modules.index')->with('success', 'Konfigurasi akses modul client berhasil diperbarui!');
+    }
+
+    //reset footer
+    public function resetFooter()
+    {
+        // 1. 💡 Hancurkan cache lama yang nahan data lama
+        Cache::forget('global_footer_data');
+
+        // 2. 💡 Ambil data segar langsung dari tabel database setelah Anda edit di MySQL
+        $freshFooterData = FooterSetting::first(); // atau sesuaikan dengan cara ambil data footer Anda
+
+        // 3. 💡 Set ulang cache baru dengan data segar tersebut (misal disimpan selama 1 hari / sesuaikan)
+        if ($freshFooterData) {
+            Cache::put('global_footer_data', $freshFooterData, now()->addDays(1));
+        }
+
+        return back()->with(
+            'success',
+            'Cache berhasil dibersihkan! Data footer kini telah sinkron dengan perubahan terbaru di MySQL.'
+        );
     }
 }

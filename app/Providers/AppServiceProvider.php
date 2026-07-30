@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 
 // use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-
+use App\Models\FooterSetting;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,22 @@ class AppServiceProvider extends ServiceProvider
         // 4. MENU TRANSAKSI POS HARI-HARI (Kasir, Supervisor, Admin, Owner bisa buka)
         Gate::define('akses-pos', function ($user) {
             return in_array($user->role, ['Owner', 'Admin', 'Supervisor', 'Kasir']);
+        });
+
+        // =========================================================================
+        // 💡 LOGIC BARU: Share Data Footer Menggunakan Caching (Anti-Beban Server)
+        // =========================================================================
+        View::composer('layouts.app', function ($view) {
+            // Cek RAM server via Cache. Jika ada, pakai. Jika tidak ada/dihapus, baru senggol DB.
+            $footerData = Cache::remember('global_footer_data', 86400, function () {
+                return FooterSetting::first() ?? new FooterSetting([
+                    'section_left' => 'DaCen : Fipman (Surabaya HQ)',
+                    'section_center' => 'Modul: Point of Sales v2.1',
+                    'section_right' => '© ' . date('Y') . ' POS Minimarket. Powered by Zezdev Style.'
+                ]);
+            });
+
+            $view->with('footerData', $footerData);
         });
         
     }
