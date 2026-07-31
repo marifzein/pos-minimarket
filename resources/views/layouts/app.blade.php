@@ -18,6 +18,11 @@
     <title>
         @yield('title','POS Minimarket')
     </title>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="POS Minimarket">
+    <meta property="og:description" content="Sistem Aplikasi Point of Sales & Manajemen Stok Handal.">
+    <meta property="og:url" content="{{ url()->current() }}">
+
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite([
         'resources/css/app.css',
