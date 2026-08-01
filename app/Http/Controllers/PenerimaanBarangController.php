@@ -8,7 +8,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-// use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\DocumentNumber;
 
 class PenerimaanBarangController extends Controller
 {
@@ -151,7 +151,12 @@ class PenerimaanBarangController extends Controller
 
         DB::beginTransaction();
         try {
-            $noPenerimaan = 'GR-' . date('Ymd') . '-' . sprintf('%04d', (DB::table('penerimaan_barang')->count() + 1));
+            // $noPenerimaan = 'GR-' . date('Ymd') . '-' . sprintf('%04d', (DB::table('penerimaan_barang')->count() + 1));
+            $noPenerimaan = DocumentNumber::generate(
+                'penerimaan_barang', // nama tabel database kamu
+                'no_penerimaan',     // kolom target kode unik
+                'GR'                 // Prefix untuk Goods Receipt / Penerimaan Barang
+            );
             $currentUserId = Auth::id() ?? 1;
 
             // 1. Simpan Induk Penerimaan Barang

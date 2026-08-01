@@ -23,7 +23,7 @@ class CategorySeeder extends Seeder
 
         foreach ($data as $item) {
 
-            Category::create([
+            Category::updateOrCreate([
 
                 'name' => $item,
 

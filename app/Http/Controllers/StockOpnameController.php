@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\DocumentNumber;
 
 class StockOpnameController extends Controller
 {
@@ -41,22 +42,7 @@ class StockOpnameController extends Controller
 
     private function generateOpnameNo()
     {
-        $today = now()->format('Ymd');
-
-        $last = StockOpname::whereDate(
-            'created_at',
-            today()
-        )->count() + 1;
-
-        return 'SO-' .
-            $today .
-            '-' .
-            str_pad(
-                $last,
-                4,
-                '0',
-                STR_PAD_LEFT
-            );
+        return DocumentNumber::generate('stock_opnames', 'opname_no', 'SO');
     }
 
     public function start()

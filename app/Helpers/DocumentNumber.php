@@ -24,7 +24,7 @@ class DocumentNumber
 
         $last = DB::table($table)
             ->where($field, 'like', $like)
-            ->orderByDesc($field)
+            ->orderByDesc('id')
             ->value($field);
 
         if (!$last) {
@@ -33,16 +33,19 @@ class DocumentNumber
 
         } else {
 
-            $number = (int) substr($last, -4) + 1;
-
+            // $number = (int) substr($last, -4) + 1;
+            $parts = explode('-', $last);
+            $number = (int) end($parts) + 1;
         }
-
-        return sprintf(
-            '%s-%s-%04d',
-            $prefix,
-            $today,
-            $number
-        );
+        $digit = ($number > 9999) ? strlen((string)$number) : 4;
+        return sprintf('%s-%s-%0' . $digit . 'd', $prefix, $today, $number);
+        
+        // return sprintf(
+        //     '%s-%s-%04d',
+        //     $prefix,
+        //     $today,
+        //     $number
+        // );
     }
 
     /**
@@ -56,12 +59,12 @@ class DocumentNumber
         string $table,
         string $field,
         string $prefix,
-        int $digit = 4
+        int $digit = 6
     ): string {
 
         $last = DB::table($table)
             ->where($field, 'like', $prefix . '%')
-            ->orderByDesc($field)
+            ->orderByDesc('id')
             ->value($field);
 
         if (!$last) {
@@ -70,7 +73,10 @@ class DocumentNumber
 
         } else {
 
-            $number = (int) preg_replace('/\D/', '', $last) + 1;
+            // $number = (int) preg_replace('/\D/', '', $last) + 1;
+            // Ambil angka di belakang prefix
+            $numericPart = substr($last, strlen($prefix));
+            $number = (int) $numericPart + 1;
 
         }
 

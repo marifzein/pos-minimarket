@@ -7,7 +7,7 @@ use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-// use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\DocumentNumber;
 
 class ReturBarangController extends Controller
 {
@@ -83,7 +83,7 @@ class ReturBarangController extends Controller
 
         DB::beginTransaction();
         try {
-            $noRetur = 'RT-' . date('Ymd') . '-' . sprintf('%04d', (DB::table('retur_barang')->count() + 1));
+            $noRetur = DocumentNumber::generate('retur_barang', 'no_retur', 'RT');
             $currentUserId = Auth::id() ?? 1;
 
             // 1. Simpan Induk Retur

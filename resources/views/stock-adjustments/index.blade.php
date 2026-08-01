@@ -40,10 +40,10 @@
     <x-table>
         <x-table-header>
             <tr>
-                <x-table-head>No SA</x-table-head>
-                <x-table-head>Tanggal</x-table-head>
-                <x-table-head>Operator</x-table-head>
-                <x-table-head>Catatan</x-table-head>
+                <x-table-head class="text-left">No SA</x-table-head>
+                <x-table-head class="text-left">Tanggal</x-table-head>
+                <x-table-head class="text-left">Operator</x-table-head>
+                <x-table-head class="text-left">Catatan</x-table-head>
                 <x-table-head class="text-center">Status</x-table-head>
                 <x-table-head class="text-center">Aksi</x-table-head>
             </tr>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\Customer;
+use App\Helpers\DocumentNumber;
 
 class PosController extends Controller
 {
@@ -23,7 +24,8 @@ class PosController extends Controller
         ->with('productPrices') // 💡 Data grosir dimasukkan ke sini, bos!
         ->get();
 
-        $noNota = Transaction::generateNoNota();
+        // $noNota = Transaction::generateNoNota();
+        $noNota = DocumentNumber::generate('transactions', 'no_nota', 'INV');
 
         $customers = Customer::where('status',1)
         ->orderBy('nama')

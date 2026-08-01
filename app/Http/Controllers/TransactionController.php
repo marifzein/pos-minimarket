@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\DocumentNumber;
 
 class TransactionController extends Controller
 {
@@ -124,7 +125,8 @@ class TransactionController extends Controller
         try {
 
             // $noNota ='INV-' . now()->format('YmdHis');
-            $noNota = Transaction::generateNoNota();
+            // $noNota = Transaction::generateNoNota();
+            $noNota = DocumentNumber::generate('transactions', 'no_nota', 'INV');
 
              $customer = null;
 

@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\DocumentNumber;
 
 class StockAdjustmentController extends Controller
 {
@@ -20,31 +21,17 @@ class StockAdjustmentController extends Controller
     public function create()
     {
         // Generate Nomor SA otomatis (Format: SA-YYYYMMDD-0001)
-        $dateStr = now()->format('Ymd');
-        $prefix = 'SA-' . $dateStr . '-';
-        
-        $lastSA = StockAdjustment::where('nomor_sa', 'like', $prefix . '%')
-            ->orderBy('nomor_sa', 'desc')
-            ->first();
-
-        if ($lastSA) {
-            $lastNum = intval(substr($lastSA->nomor_sa, -4));
-            $nextNum = str_pad($lastNum + 1, 4, '0', STR_PAD_LEFT);
-        } else {
-            $nextNum = '0001';
-        }
-
-        $nomor_sa = $prefix . $nextNum;
+        $nomor_sa = DocumentNumber::generate('stock_adjustments', 'nomor_sa', 'SA');    
         $products = Product::where('is_active', 1)->orderBy('nama_barang')->get();
 
-        return view('stock-adjustments.create', compact('nomor_sa'));
+        return view('stock-adjustments.create', compact('nomor_sa', 'products'));
     }
 
     public function store(Request $request)
     {
         // 1. Validasi Input (Sesuai dengan name attribute HTML input array)
         $request->validate([
-            'nomor_sa'     => 'required|unique:stock_adjustments,nomor_sa',
+            // 'nomor_sa'     => 'required|unique:stock_adjustments,nomor_sa',
             'tgl_sa'       => 'required|date',
             'product_id'   => 'required|array|min:1',
             'product_id.*' => 'required|exists:products,id',
@@ -56,69 +43,75 @@ class StockAdjustmentController extends Controller
         // Menentukan status berdasarkan value tombol submit yang diklik
         $status = $request->input('action') === 'closed' ? 'closed' : 'draft';
         try {
-        DB::transaction(function () use ($request, $status) {
-            // 2. Simpan Master Dokumen (Status tersimpan sesuai klik: draft / closed)
-            $sa = StockAdjustment::create([
-                'nomor_sa'        => $request->nomor_sa,
-                'tgl_sa'          => $request->tgl_sa,
-                'user_id'         => Auth::id(),
-                'status'          => $status,
-                'catatan'         => $request->catatan,
-                'tgl_jam_selesai' => $status === 'closed' ? now() : null,
-            ]);
+            $fixNomorSa = null;    
+            DB::transaction(function () use ($request, $status) {
 
-            // 3. Loop Item Detail
-            foreach ($request->product_id as $index => $productId) {
-                $product   = Product::findOrFail($productId);
-                $qtyAdjust = (int) $request->qty[$index];
-                $itemNotes = $request->notes[$index] ?? null;
+                // 🔥 LANGKAH KRUSIAL: Generate nomor SA yang sesungguhnya langsung dari Helper!
+                // Karena berada di dalam DB::transaction, nomor ini dijamin aman dan anti-double.
+                $fixNomorSa = \App\Helpers\DocumentNumber::generate('stock_adjustments', 'nomor_sa', 'SA');
 
-                $stockBefore = $product->stok;
-                $stockAfter  = $stockBefore - $qtyAdjust;
-
-                // FIX: Menggunakan $sa->id (properti), BUKAN $sa->id() (method)
-                StockAdjustmentDetail::create([
-                    'stock_adjustment_id' => $sa->id, 
-                    'product_id'          => $productId,
-                    'stock_system'        => $stockBefore,
-                    'qty'                 => $qtyAdjust,
-                    'notes'               => $itemNotes,
+                // 2. Simpan Master Dokumen (Status tersimpan sesuai klik: draft / closed)
+                $sa = StockAdjustment::create([
+                    'nomor_sa'        => $fixNomorSa,
+                    'tgl_sa'          => $request->tgl_sa,
+                    'user_id'         => Auth::id(),
+                    'status'          => $status,
+                    'catatan'         => $request->catatan,
+                    'tgl_jam_selesai' => $status === 'closed' ? now() : null,
                 ]);
 
-                // Jika tombolnya "Posting & Kunci Stok", jalankan potong stok & mutasi barang
-                if ($status === 'closed') {
-                    $product->update(['stok' => $stockAfter]);
+                // 3. Loop Item Detail
+                foreach ($request->product_id as $index => $productId) {
+                    $product   = Product::findOrFail($productId);
+                    $qtyAdjust = (int) $request->qty[$index];
+                    $itemNotes = $request->notes[$index] ?? null;
 
-                    DB::table('stock_movements')->insert([
-                        'product_id'   => $product->id,
-                        'type'         => 'Stock Adjustment',
-                        'qty'          => -$qtyAdjust,
-                        'stock_before' => $stockBefore,
-                        'stock_after'  => $stockAfter,
-                        'reference_no' => $sa->nomor_sa,
-                        'notes'        => $itemNotes ?? 'Adjustment barang rusak/expired (' . $sa->nomor_sa . ')',
-                        'created_at'   => now(),
-                        'updated_at'   => now(),
+                    $stockBefore = $product->stok;
+                    $stockAfter  = $stockBefore - $qtyAdjust;
+
+                    // FIX: Menggunakan $sa->id (properti), BUKAN $sa->id() (method)
+                    StockAdjustmentDetail::create([
+                        'stock_adjustment_id' => $sa->id, 
+                        'product_id'          => $productId,
+                        'stock_system'        => $stockBefore,
+                        'qty'                 => $qtyAdjust,
+                        'notes'               => $itemNotes,
                     ]);
-                }
-            }
-        });
 
-        $message = $status === 'closed' 
-                ? 'Stock Adjustment berhasil diposting!' 
-                : 'Draft Stock Adjustment berhasil disimpan ke database.';
-        
-        // --- KUNCI SINKRONISASI UX DI SINI ---
-        // Jika request dikirim via Fetch/AJAX (F10), kembalikan JSON respon agar terbaca oleh Javascript SweetAlert2
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-            ]);
-        }
-        
-        // Jika submit form biasa (F7 / Draft), redirect seperti biasa
-        return redirect()->route('stock-adjustments.index')->with('success', $message);
+                    // Jika tombolnya "Posting & Kunci Stok", jalankan potong stok & mutasi barang
+                    if ($status === 'closed') {
+                        $product->update(['stok' => $stockAfter]);
+
+                        DB::table('stock_movements')->insert([
+                            'product_id'   => $product->id,
+                            'type'         => 'Stock Adjustment',
+                            'qty'          => -$qtyAdjust,
+                            'stock_before' => $stockBefore,
+                            'stock_after'  => $stockAfter,
+                            'reference_no' => $sa->nomor_sa,
+                            'notes'        => $itemNotes ?? 'Adjustment barang rusak/expired (' . $sa->nomor_sa . ')',
+                            'created_at'   => now(),
+                            'updated_at'   => now(),
+                        ]);
+                    }
+                }
+            });
+
+            $message = $status === 'closed' 
+                    ? 'Stock Adjustment berhasil diposting!' 
+                    : 'Draft Stock Adjustment berhasil disimpan ke database.';
+            
+            // --- KUNCI SINKRONISASI UX DI SINI ---
+            // Jika request dikirim via Fetch/AJAX (F10), kembalikan JSON respon agar terbaca oleh Javascript SweetAlert2
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                ]);
+            }
+            
+            // Jika submit form biasa (F7 / Draft), redirect seperti biasa
+            return redirect()->route('stock-adjustments.index')->with('success', $message);
         
         } catch (\Exception $e) {
             if ($request->ajax() || $request->wantsJson()) {

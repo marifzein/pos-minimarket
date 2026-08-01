@@ -46,6 +46,11 @@ class SupplierController extends Controller
 
             'email'=>'nullable|email'
 
+        ], [
+            // 🔥 Tulis pesan kustom kamu di sini, Bos!
+            'kode.unique'   => 'Kode supplier ini sudah terdaftar di sistem!',
+            'kode.required' => 'Kode supplier wajib diisi!',
+            'nama.required' => 'Nama supplier tidak boleh kosong!',
         ]);
 
         Supplier::create($request->all());
@@ -81,6 +86,11 @@ class SupplierController extends Controller
 
             'email'=>'nullable|email'
 
+        ], [
+            // 🔥 Tulis pesan kustom kamu di sini, Bos!
+            'kode.unique'   => 'Kode supplier ini sudah terdaftar di sistem!',
+            'kode.required' => 'Kode supplier wajib diisi!',
+            'nama.required' => 'Nama supplier tidak boleh kosong!',
         ]);
 
         $supplier->update($request->all());

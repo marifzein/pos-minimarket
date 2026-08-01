@@ -16,37 +16,33 @@ class Transaction extends Model
         );
     }
 
-    public static function generateNoNota()
-    {
-        $today = now()->format('Ymd');
+    // public static function generateNoNota()
+    // {
+    //     $today = now()->format('Ymd');
 
-        // $last = self::whereDate('created_at', today())
-        //     ->orderByDesc('id')
-        //     ->first();
-
-        $last = self::where('no_nota', 'like', 'INV-' . $today . '-%')
-            ->orderByDesc('id')
-            ->first();  
+    //     $last = self::where('no_nota', 'like', 'INV-' . $today . '-%')
+    //         ->orderByDesc('id')
+    //         ->first();  
 
 
-        if (!$last) {
-            $number = 1;
-        } else {
+    //     if (!$last) {
+    //         $number = 1;
+    //     } else {
 
-            $lastNumber = (int) substr(
-                $last->no_nota,
-                -5
-            );
+    //         $lastNumber = (int) substr(
+    //             $last->no_nota,
+    //             -5
+    //         );
 
-            $number = $lastNumber + 1;
-        }
+    //         $number = $lastNumber + 1;
+    //     }
 
-        return sprintf(
-            'INV-%s-%05d',
-            $today,
-            $number
-        );
-    }
+    //     return sprintf(
+    //         'INV-%s-%05d',
+    //         $today,
+    //         $number
+    //     );
+    // }
 
     public function user()
     {
