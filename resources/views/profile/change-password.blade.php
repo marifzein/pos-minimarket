@@ -63,7 +63,7 @@
                     name="password"
                     ::type="showNew ? 'text' : 'password'"
                     icon="ri-lock-password-line"
-                    placeholder="Masukkan password baru (min. 8 karakter)"
+                    placeholder="Masukkan password baru (min. 6 karakter)"
                     required
                 />
                 <!-- Tombol Mata (Eye Toggle) -->
