@@ -26,6 +26,7 @@ use App\Http\Controllers\LaporanLabaRugiController;
 use App\Http\Controllers\LaporanPenjualanProdukController;
 use App\Http\Controllers\LaporanPenjualanPelangganController;
 use App\Http\Controllers\Laporan\StockValuationController;
+use App\Http\Controllers\DailyResetStockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -165,6 +166,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/stock-opname/{stockOpname}', [StockOpnameController::class, 'store']);
         Route::post('/stock-opname/{stockOpname}/finish', [StockOpnameController::class, 'finish']);
         Route::get('/stock-opname/{stockOpname}/print', [StockOpnameController::class, 'print'])->name('stock-opname.print');
+        
+        // Fitur Reset Stok Harian Resto (Langsung Posted) Stck opname harian otomatis reset 0
+        Route::prefix('inventory/daily-reset')->name('daily-reset.')->group(function () {
+            Route::get('/', [DailyResetStockController::class, 'index'])->name('index');
+            Route::post('/', [DailyResetStockController::class, 'store'])->name('store');
+        }); 
+
 
         // Penyesuaian Stok (Stock Adjustment)
         Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show', 'destroy']);

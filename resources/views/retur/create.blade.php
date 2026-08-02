@@ -114,11 +114,27 @@
     search.addEventListener('keyup', function(e) {
         if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) return;
         clearTimeout(timer);
+
+        // 1. Cek apakah supplier sudah dipilih atau belum
+        const supplierId = document.getElementById('supplier_id').value;
+        if (!supplierId) {
+            this.value = ''; // Bersihkan tulisan/scan barcode yang masuk
+            Swal.fire({
+                title: 'Peringatan!',
+                text: 'Harap pilih supplier terlebih dahulu sebelum mencari atau menycan barang.',
+                icon: 'warning',
+                confirmButtonColor: '#9333ea'
+            }).then(() => {
+                document.getElementById('supplier_id').focus(); // Otomatis arahkan fokus ke select supplier
+            });
+            return;
+        }
+
         const q = this.value.trim();
         if (q.length < 2) { result.innerHTML = ''; result.classList.add('hidden'); return; }
 
         timer = setTimeout(() => {
-            fetch(`/api/retur/search-products?q=${encodeURIComponent(q)}`)
+            fetch(`/api/retur/search-products?q=${encodeURIComponent(q)}&supplier_id=${supplierId}`)
             .then(r => r.json())
             .then(data => {
                 if (data.length === 0) {

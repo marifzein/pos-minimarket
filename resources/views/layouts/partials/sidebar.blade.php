@@ -176,6 +176,9 @@
                 <a href="{{ route('retur.index') }}" class="submenu {{ request()->is('retur*') ? 'submenu-active' : '' }}"><i class="ri-arrow-go-back-line"></i> Retur Barang</a>
                 <a href="/stock-opname" class="submenu {{ request()->is('stock-opname*') ? 'submenu-active':'' }}"><i class="ri-survey-line"></i> Stok Opname</a>
                 <a href="/stock-adjustments" class="submenu {{ request()->is('stock-adjustments*') ? 'submenu-active':'' }}"><i class="ri-equalizer-line"></i> Penyesuaian Stok</a>
+                
+                <a href="/inventory/daily-reset" class="submenu {{ request()->is('daily-reset*') ? 'submenu-active':'' }}"><i class="ri-equalizer-line"></i> Opname Harian</a>
+                {{-- route('daily-reset.index') --}}
             </div>
 
             <!-- POPUP MELAYANG INVENTORY -->

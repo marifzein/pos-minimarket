@@ -43,7 +43,7 @@
                 <x-table-cell class="text-left text-slate-600">{{ \Carbon\Carbon::parse($row->tanggal_retur)->format('d M Y') }}</x-table-cell>
                 <x-table-cell class="text-left text-slate-700 font-medium">{{ $row->supplier_name }}</x-table-cell>
                 <x-table-cell class="text-center"><x-badge color="purple">{{ $row->total_item }} Produk</x-badge></x-table-cell>
-                <x-table-cell class="text-left text-slate-600"><i class="ri-user-smile-line text-xs text-slate-400 mr-1"></i>{{ $row->kasir_name }}</x-table-cell>
+                <x-table-cell class="text-left text-slate-600"></i>{{ $row->kasir_name }}</x-table-cell>
                 <x-table-cell class="text-center">
                     <a href="{{ route('retur.show', $row->id) }}">
                         <button type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white transition">

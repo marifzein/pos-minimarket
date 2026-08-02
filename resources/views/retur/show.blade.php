@@ -5,6 +5,11 @@
 <x-page-header title="Rincian Retur Barang" :subtitle="'No. Bukti Retur: ' . $retur->no_retur">
     <x-slot:action>
         <div class="flex gap-2">
+            
+                <a href="{{ route('retur.index') }}">
+                    <x-button color="gray" type="button"><i class="ri-arrow-left-line"></i> Kembali</x-button>
+                </a>
+            
             <a href="{{ route('retur.print', $retur->id) }}" target="_blank">
                 <x-button color="purple" type="button">
                     <i class="ri-printer-line"></i> Cetak Dokumen PDF

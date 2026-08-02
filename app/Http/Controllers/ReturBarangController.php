@@ -59,7 +59,10 @@ class ReturBarangController extends Controller
     public function searchProducts(Request $request)
     {
         $search = $request->get('q');
+        $supplierId = $request->get('supplier_id'); 
+
         $products = Product::where('is_active', 1)
+            ->where('supplier_id', $supplierId) // 2. Filter produk wajib dari supplier ini
             ->where(function($query) use ($search) {
                 $query->where('kode_barang', $search)
                       ->orWhere('nama_barang', 'like', '%' . $search . '%');
