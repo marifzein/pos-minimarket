@@ -162,35 +162,41 @@
             <tr>
                 <!-- Kolom Produk -->
                 <x-table-head class="p-0 text-left hover:bg-slate-200 transition">
-                    <a href="{{ $getSortLink('nama_barang') }}" class="block p-3 w-full h-full font-bold">
-                        Produk<span class="text-blue-600 text-xs">{{ $renderArrow('nama_barang') }}</span>
+                    <a href="{{ $getSortLink('nama_barang') }}" class="block p-0 w-full h-full font-bold">
+                        Kode Barang<span class="text-blue-600 text-xs">{{ $renderArrow('kode_barang') }}</span>
+                    </a>
+                </x-table-head>
+
+                <x-table-head class="p-0 text-left hover:bg-slate-200 transition">
+                    <a href="{{ $getSortLink('barcode') }}" class="block p-0 w-full h-full font-bold">
+                        Nama<span class="text-blue-600 text-xs">{{ $renderArrow('barcode') }}</span>
                     </a>
                 </x-table-head>
 
                 <!-- Kolom Barcode -->
                 <x-table-head class="p-0 text-left hover:bg-slate-200 transition">
-                    <a href="{{ $getSortLink('barcode') }}" class="block p-3 w-full h-full font-bold">
+                    <a href="{{ $getSortLink('barcode') }}" class="block p-0 w-full h-full font-bold">
                         Barcode<span class="text-blue-600 text-xs">{{ $renderArrow('barcode') }}</span>
                     </a>
                 </x-table-head>
 
                 <!-- Kolom Harga Beli -->
                 <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
-                    <a href="{{ $getSortLink('harga_beli') }}" class="block p-3 w-full h-full font-bold">
+                    <a href="{{ $getSortLink('harga_beli') }}" class="block p-0 w-full h-full font-bold">
                         Harga Beli<span class="text-blue-600 text-xs">{{ $renderArrow('harga_beli') }}</span>
                     </a>
                 </x-table-head>
 
                 <!-- Kolom Harga Jual -->
                 <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
-                    <a href="{{ $getSortLink('harga') }}" class="block p-3 w-full h-full font-bold">
+                    <a href="{{ $getSortLink('harga') }}" class="block p-0 w-full h-full font-bold">
                         Harga Jual<span class="text-blue-600 text-xs">{{ $renderArrow('harga') }}</span>
                     </a>
                 </x-table-head>
 
                 <!-- Kolom Stok -->
                 <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
-                    <a href="{{ $getSortLink('stok') }}" class="block p-3 w-full h-full font-bold">
+                    <a href="{{ $getSortLink('stok') }}" class="block p-0 w-full h-full font-bold">
                         Stock<span class="text-blue-600 text-xs">{{ $renderArrow('stok') }}</span>
                     </a>
                 </x-table-head>
@@ -207,6 +213,15 @@
         @forelse($products as $product)
 
             <tr>
+                <x-table-cell class="text-left">
+
+                    {{-- <div class="font-semibold"> --}}
+
+                        {{ $product->kode_barang }} 
+
+                    {{-- </div> --}}
+
+                </x-table-cell>
 
                 <x-table-cell class="text-left">
 
