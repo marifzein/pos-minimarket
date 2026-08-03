@@ -45,11 +45,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['can:akses-pos'])->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/api/products/search', [ProductController::class, 'search']);
 
         // POS & API Pendukung=>dijaga middleware shift
         Route::middleware(['check.shift'])->group(function () {
-            Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
-            Route::get('/api/products/search', [ProductController::class, 'search']);
+            Route::get('/pos', [PosController::class, 'index'])->name('pos.index');            
             Route::post('/api/transactions', [TransactionController::class, 'store']);
         });
 
@@ -117,7 +117,7 @@ Route::middleware('auth')->group(function () {
         
         // Produk
         Route::resource('products', ProductController::class)->except(['show', 'destroy']);
-        
+
         // Laporan Penjualan per produk
         Route::get('/laporan/penjualan-produk', [LaporanPenjualanProdukController::class, 'index']);
 
