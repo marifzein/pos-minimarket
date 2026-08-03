@@ -104,9 +104,8 @@
             <div id="menu-master" class="menu-content" x-show="sidebarOpen">
                 @can('akses-spv-keatas')
                 <a href="/users" class="submenu {{ request()->is('users*') ? 'submenu-active':'' }}"><i class="ri-group-line"></i> User</a>
-                @endcan
+                
                 <a href="/products" class="submenu {{ request()->is('products*') && !request()->is('products/import*') ? 'submenu-active':'' }}"><i class="ri-box-3-line"></i> Produk</a>
-                @can('akses-spv-keatas')
                 <a href="/products/import" class="submenu {{ request()->is('products/import*') ? 'submenu-active':'' }}"><i class="ri-file-upload-line"></i> Import Produk</a>
                 <a href="/categories" class="submenu {{ request()->is('categories*') ? 'submenu-active':'' }}"><i class="ri-price-tag-3-line"></i> Kategori</a>
                 <a href="/suppliers" class="submenu {{ request()->is('suppliers*') ? 'submenu-active':'' }}"><i class="ri-truck-line"></i> Supplier</a>
@@ -133,11 +132,11 @@
                 <a href="/users" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-group-line text-base opacity-60 group-hover:opacity-100"></i> User
                 </a>
-                @endcan
+                
                 <a href="/products" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-box-3-line text-base opacity-60 group-hover:opacity-100"></i> Produk
                 </a>
-                @can('akses-spv-keatas')
+                
                 <a href="/products/import" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-file-upload-line text-base opacity-60 group-hover:opacity-100"></i> Import Produk
                 </a>
@@ -157,7 +156,7 @@
         {{-- ===================== --}}
         {{-- INVENTORY --}}
         {{-- ===================== --}}
-        @can('akses-spv-keatas')
+        
         <div class="relative group" x-data="{ hovered: false }" @mouseenter="hovered = true" @mouseleave="hovered = false">
             <button type="button" 
                 @click="if (sidebarOpen) { toggleMenu('inventory') }"
@@ -170,15 +169,21 @@
             </button>
 
             <div id="menu-inventory" class="menu-content" x-show="sidebarOpen">
+                @can('akses-spv-keatas')
                 <a href="/purchasing" class="submenu {{ request()->is('purchasing*') ? 'submenu-active':'' }}"><i class="ri-store-2-line"></i> Pembelian (PO)</a>
                 <a href="{{ route('penerimaan.index') }}" class="submenu {{ request()->is('penerimaan*') ? 'submenu-active':'' }}"><i class="ri-download-2-line"></i> Penerimaan Barang</a>
+                @endcan
+
                 <a href="/stock-cards" class="submenu {{ request()->is('stock-cards*') ? 'submenu-active':'' }}"><i class="ri-file-history-line"></i> Kartu Stok</a>
+
+                @can('akses-spv-keatas')
                 <a href="{{ route('retur.index') }}" class="submenu {{ request()->is('retur*') ? 'submenu-active' : '' }}"><i class="ri-arrow-go-back-line"></i> Retur Barang</a>
                 <a href="/stock-opname" class="submenu {{ request()->is('stock-opname*') ? 'submenu-active':'' }}"><i class="ri-survey-line"></i> Stok Opname</a>
                 <a href="/stock-adjustments" class="submenu {{ request()->is('stock-adjustments*') ? 'submenu-active':'' }}"><i class="ri-equalizer-line"></i> Penyesuaian Stok</a>
                 
                 <a href="/inventory/daily-reset" class="submenu {{ request()->is('daily-reset*') ? 'submenu-active':'' }}"><i class="ri-equalizer-line"></i> Opname Harian</a>
                 {{-- route('daily-reset.index') --}}
+                @endcan
             </div>
 
             <!-- POPUP MELAYANG INVENTORY -->
@@ -215,7 +220,7 @@
                 </a>
             </div>
         </div>
-        @endcan
+        
 
         {{-- ===================== --}}
         {{-- LAPORAN --}}

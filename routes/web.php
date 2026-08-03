@@ -81,8 +81,11 @@ Route::middleware('auth')->group(function () {
         // Pelanggan
         Route::resource('customers', CustomerController::class);
 
-        // Produk
-        Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+        
+
+        // Kartu Stok
+        Route::get('stock-cards', [StockCardController::class, 'index'])->name('stock-cards.index');
+        Route::get('stock-cards/{product}', [StockCardController::class, 'show'])->name('stock-cards.show');
 
         // Laporan Penjualan Kasir
         Route::get('/laporan/penjualan-kasir', [LaporanPenjualanKasirController::class, 'index'])->name('laporan.penjualan-kasir');
@@ -111,7 +114,10 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['can:akses-spv-keatas'])->group(function () {
-
+        
+        // Produk
+        Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+        
         // Laporan Penjualan per produk
         Route::get('/laporan/penjualan-produk', [LaporanPenjualanProdukController::class, 'index']);
 
@@ -147,9 +153,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('purchasing', PurchaseOrderController::class)->except(['destroy']);
         Route::get('purchasing/{purchasing}/print-pdf', [PurchaseOrderController::class, 'printPdf'])->name('purchasing.print-pdf');
 
-        // Kartu Stok
-        Route::get('stock-cards', [StockCardController::class, 'index'])->name('stock-cards.index');
-        Route::get('stock-cards/{product}', [StockCardController::class, 'show'])->name('stock-cards.show');
+        
 
         // Penerimaan Barang
         Route::get('/penerimaan-barang', [PenerimaanBarangController::class, 'index'])->name('penerimaan.index');

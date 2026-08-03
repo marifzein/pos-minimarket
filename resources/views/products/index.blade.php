@@ -180,12 +180,14 @@
                     </a>
                 </x-table-head>
 
+                @can('akses-owner-admin')
                 <!-- Kolom Harga Beli -->
                 <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
                     <a href="{{ $getSortLink('harga_beli') }}" class="block p-0 w-full h-full font-bold">
                         Harga Beli<span class="text-blue-600 text-xs">{{ $renderArrow('harga_beli') }}</span>
                     </a>
                 </x-table-head>
+                @endcan
 
                 <!-- Kolom Harga Jual -->
                 <x-table-head class="p-0 text-right hover:bg-slate-200 transition">
@@ -239,6 +241,7 @@
 
                 </x-table-cell>
 
+                @can('akses-owner-admin')
                 <x-table-cell class="text-right">
                     @if(!$product->harga_beli || $product->harga_beli == 0)
                         <span class="text-red-600 font-bold bg-red-50 px-2 py-1 rounded border border-red-200 text-xs inline-block animate-pulse">
@@ -248,6 +251,7 @@
                         Rp {{ number_format($product->harga_beli, 0, ',', '.') }}
                     @endif
                 </x-table-cell>
+                @endcan
 
                 <x-table-cell class="text-right">
 
