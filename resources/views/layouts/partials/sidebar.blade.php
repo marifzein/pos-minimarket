@@ -56,6 +56,9 @@
             <!-- ACCORDION (Hanya saat Sidebar Terbuka) -->
             <div id="menu-kasir" class="menu-content" x-show="sidebarOpen">
                 <a href="/pos" class="submenu {{ request()->is('pos') ? 'submenu-active' : '' }}"><i class="ri-shopping-cart-2-line"></i> POS</a>
+
+                <a href="/pos/mobile" class="submenu {{ request()->is('pos/mobile*') ? 'submenu-active' : '' }}"><i class="ri-shopping-cart-2-line"></i> POS Mobile</a>
+
                 <a href="/pos/close-shift" class="submenu {{ request()->is('pos/close-shift*') ? 'submenu-active' : '' }}"><i class="ri-shut-down-line"></i> Tutup Shift</a>
                 <a href="/transactions" class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}"><i class="ri-price-tag-3-line"></i> Riwayat Transaksi</a>
             </div>

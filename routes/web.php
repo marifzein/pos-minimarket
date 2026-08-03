@@ -27,6 +27,7 @@ use App\Http\Controllers\LaporanPenjualanProdukController;
 use App\Http\Controllers\LaporanPenjualanPelangganController;
 use App\Http\Controllers\Laporan\StockValuationController;
 use App\Http\Controllers\DailyResetStockController;
+use App\Http\Controllers\PosMobileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +50,11 @@ Route::middleware('auth')->group(function () {
 
         // POS & API Pendukung=>dijaga middleware shift
         Route::middleware(['check.shift'])->group(function () {
-            Route::get('/pos', [PosController::class, 'index'])->name('pos.index');            
+            Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+
+            // 📱 Versi Mobile & Tablet Baru
+            Route::get('/pos/mobile', [PosMobileController::class, 'index'])->name('pos.mobile');
+
             Route::post('/api/transactions', [TransactionController::class, 'store']);
         });
 

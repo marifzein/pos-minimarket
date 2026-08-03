@@ -40,7 +40,8 @@ class ClientModuleSeeder extends Seeder
             'SupplierController',
             'TransactionController',
             'UserController',
-            'DailyResetStockController'
+            'DailyResetStockController',
+            'PosMobileController'
         ];
 
         // Looping untuk memasukkan atau mengupdate data ke database
