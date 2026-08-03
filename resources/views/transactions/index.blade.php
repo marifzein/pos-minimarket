@@ -1,18 +1,28 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app') --}}
+@extends(
+    preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', request()->header('User-Agent')) 
+    || preg_match('/(ipad|tablet|(android(?!.*mobile)))/i', request()->header('User-Agent')) 
+    ? 'layouts.mobile-app' 
+    : 'layouts.app'
+)
 
 @section('title','Riwayat Transaksi')
+@section('page_subtitle', 'Data penjualan kasir')
 
 @section('content')
 
-<h1 class="text-2xl font-bold mb-4">
+{{-- <h1 class="text-2xl font-bold mb-4"> --}}
+<h1 class="text-2xl font-bold mb-4 hidden md:block">
     Riwayat Transaksi
 </h1>
 
-<div class="max-w-7xl mx-auto p-6">
+{{-- <div class="max-w-7xl mx-auto p-6"> --}}
+<div class="max-w-7xl mx-auto p-0 md:p-6">
 
     
 
-    <div class="bg-white rounded-xl shadow">
+    {{-- <div class="bg-white rounded-xl shadow"> --}}
+    <div class="bg-white rounded-xl shadow overflow-x-auto">    
 
         <table class="w-full">
 
@@ -101,7 +111,7 @@
 
                 <tr>
 
-                    <td colspan="3"
+                    <td colspan="6"
                         class="p-10 text-center text-gray-400">
 
                         Belum ada transaksi
