@@ -442,7 +442,7 @@ function posKasir() {
         clearCustomer(){ this.selectedCustomer = null; this.customerSearch = ''; this.customerResults = []; this.$nextTick(() => { document.getElementById('barcodeInput')?.focus() }); },
         getDynamicPrice(product, qty) {
             let hargaEceran = Number(product.harga); let potonganTerpilih = 0;
-            let grosirList = product.product_prices || []; 
+            let grosirList = product.productPrices || []; 
             if (grosirList && grosirList.length > 0) {
                 let sortedGrosir = [...grosirList].sort((a, b) => Number(b.min_qty) - Number(a.min_qty));
                 let match = sortedGrosir.find(g => Number(qty) >= Number(g.min_qty));
