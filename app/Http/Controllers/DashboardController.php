@@ -7,12 +7,36 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\StockOpname;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER USER MOBILE / KASIR
+        |--------------------------------------------------------------------------
+        */
+        $user = Auth::user();
+        $userAgent = $request->header('User-Agent');
+        
+        // Deteksi apakah perangkat yang mengakses adalah Mobile/Tablet
+        $isMobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', $userAgent) 
+                || preg_match('/(ipad|tablet|(android(?!.*mobile)))/i', $userAgent);
+
+        // Jika dia adalah Kasir DAN login lewat HP/Tablet, lempar langsung ke POS Mobile
+        if ($user && $user->role === 'Kasir' && $isMobile) {
+            return redirect()->route('pos.mobile');
+        }
+        
+        /*
+        |--------------------------------------------------------------------------
+        | LOGIC DASHBOARD UTAMA DESKTOP (Jalan jika PC / Admin)
+        |--------------------------------------------------------------------------
+        */
         $todaySales =
             Transaction::whereDate(
                 'created_at',

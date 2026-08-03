@@ -74,7 +74,7 @@
                     <div class="space-y-1">
                         <a href="/pos" class="flex items-center gap-3 px-3 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl"><i class="ri-computer-line text-base"></i> POS Utama</a>
                         <a href="/shift/close" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold rounded-xl"><i class="ri-lock-password-line text-base"></i> Tutup Shift</a>
-                        <a href="/transactions/history" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold rounded-xl"><i class="ri-history-line text-base"></i> Riwayat Transaksi</a>
+                        <a href="/transactions" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold rounded-xl"><i class="ri-history-line text-base"></i> Riwayat Transaksi</a>
                     </div>
                 </div>
 
@@ -90,7 +90,7 @@
                 <div>
                     <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Inventory</span>
                     <div class="space-y-1">
-                        <a href="/stock/card" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold rounded-xl"><i class="ri-file-list-3-line text-base"></i> Kartu Stok</a>
+                        <a href="/stock-cards" class="flex items-center gap-3 px-3 py-2 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold rounded-xl"><i class="ri-file-list-3-line text-base"></i> Kartu Stok</a>
                     </div>
                 </div>
 

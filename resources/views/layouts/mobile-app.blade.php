@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'POS Kasir Mobile')</title>
+    
+    <!-- CDN Assets dari file asli anda -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+    @stack('styles')
+</head>
+<!-- Inisialisasi root state global minimal untuk kontrol layout mobile -->
+<body x-data="{ showMenu: false, showPriceModal: false, priceSearch: '', priceResults: [] }">
+
+    <!-- ========================================================== -->
+    <!-- GLOBAL SIDEBAR HAMBURGER / DRAWER MOBILE -->
+    <!-- ========================================================== -->
+    <div x-show="showMenu" class="fixed inset-0 z-50 flex" x-cloak>
+        <div x-show="showMenu" x-transition:enter="transition-opacity ease-linear duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="showMenu = false" class="fixed inset-0 bg-black/50 backdrop-blur-xs"></div>
+
+        <div x-show="showMenu" x-transition:enter="transition ease-in-out duration-200 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-200 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="relative flex flex-col w-72 max-w-xs bg-slate-900 text-slate-200 h-full p-5 shadow-2xl">
+            
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="ri-store-2-fill text-indigo-400 text-xl"></i>
+                    <span class="font-black text-sm tracking-wider text-white">MENU KASIR</span>
+                </div>
+                <button @click="showMenu = false" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 active:bg-slate-700">
+                    <i class="ri-close-line text-lg"></i>
+                </button>
+            </div>
+
+            <!-- List Navigasi Dinamis -->
+            <div class="mt-4 flex-1 overflow-y-auto space-y-4">
+                <div>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Penjualan</span>
+                    <div class="space-y-1">
+                        <a href="/pos/mobile" class="flex items-center gap-3 px-3 py-2 {{ Request::is('pos/mobile') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-bold rounded-xl"><i class="ri-computer-line text-base"></i> POS Utama</a>
+                        <a href="/pos/close-shift" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*close-shift*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-lock-password-line text-base"></i> Tutup Shift</a>
+                        <a href="/riwayat-transaksi" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*riwayat*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-history-line text-base"></i> Riwayat Transaksi</a>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Master Data</span>
+                    <div class="space-y-1">
+                        <a href="/pelanggan" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*pelanggan*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-user-shared-line text-base"></i> Pelanggan</a>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Inventory</span>
+                    <div class="space-y-1">
+                        <a href="/kartu-stok" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*stok*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-file-list-3-line text-base"></i> Kartu Stok</a>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Laporan</span>
+                    <div class="space-y-1">
+                        <a href="/laporan-kasir" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*laporan*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-pie-chart-line text-base"></i> Penjualan Kasir</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white text-xs">
+                    {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs font-bold text-white leading-none truncate">{{ Auth::user()->name ?? 'Admin Kasir' }}</p>
+                    <span class="text-[10px] text-slate-500">Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- KONTEN MASTER LAYOUT UTAMA -->
+    <!-- ========================================================== -->
+    <div class="flex flex-col min-h-screen px-3 py-3 select-none">
+        
+        <!-- GLOBAL TOPBAR MINIMALIS -->
+        <div class="flex items-center justify-between bg-white p-3 rounded-2xl shadow-xs border border-slate-100 mb-3">
+            <div class="flex items-center gap-2.5">
+                <button @click="showMenu = true" type="button" class="w-9 h-9 bg-slate-100 active:bg-slate-200 rounded-xl flex items-center justify-center text-slate-700 active:scale-95 transition">
+                    <i class="ri-menu-2-line text-xl"></i>
+                </button>
+                <div>
+                    <h1 class="text-sm font-black text-slate-800 leading-none">@yield('page_title', 'POS KASIR')</h1>
+                    <span class="text-[9px] text-slate-400 font-mono">@yield('page_subtitle')</span>
+                </div>
+            </div>
+            
+            <!-- Fungsi Global Cek Harga Pintasan -->
+            <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
+                <i class="ri-price-tag-3-line text-lg"></i>
+            </button>
+        </div>
+
+        <!-- SLOT UTAMA ISI KONTEN HALAMAN -->
+        @yield('content')
+
+    </div>
+
+    <!-- GLOBAL MODAL CEK HARGA (Bisa Muncul dari Halaman Mana Saja) -->
+    <div x-show="showPriceModal" x-cloak class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm shadow-2xl" @click.outside="showPriceModal = false">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-black text-slate-800 text-sm flex items-center gap-1"><i class="ri-price-tag-2-line text-indigo-600"></i> Cek Harga Barang</h3>
+                <button type="button" @click="showPriceModal = false" class="w-7 h-7 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center">✕</button>
+            </div>
+            <input x-ref="globalPriceInput" x-model="priceSearch" @input="let q = priceSearch.trim(); if(q.length < 1) { priceResults = []; return; } fetch(`/api/products/search?q=${encodeURIComponent(q)}`).then(r => r.json()).then(data => { priceResults = data; })" placeholder="Masukkan nama barang..." class="w-full bg-slate-50 border-0 focus:ring-2 focus:ring-indigo-500 rounded-xl p-2 text-xs outline-none shadow-3xs">
+            <div class="mt-2.5 max-h-48 overflow-y-auto divide-y divide-slate-100 rounded-xl border border-slate-100">
+                <template x-for="item in priceResults" :key="item.id">
+                    <div class="p-2.5 bg-slate-50/50 flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-slate-800 text-xs" x-text="item.nama_barang"></div>
+                            <div class="text-[9px] text-slate-400" x-text="'Stok: ' + item.stok"></div>
+                        </div>
+                        <div class="text-xs font-black text-green-600" x-text="'Rp ' + Number(item.harga).toLocaleString('id-ID')"></div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    @stack('scripts')
+</body>
+</html>
