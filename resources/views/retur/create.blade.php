@@ -121,7 +121,7 @@
             this.value = ''; // Bersihkan tulisan/scan barcode yang masuk
             Swal.fire({
                 title: 'Peringatan!',
-                text: 'Harap pilih supplier terlebih dahulu sebelum mencari atau menycan barang.',
+                text: 'Harap pilih supplier terlebih dahulu sebelum mencari atau menscan barang.',
                 icon: 'warning',
                 confirmButtonColor: '#9333ea'
             }).then(() => {
