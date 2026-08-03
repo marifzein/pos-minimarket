@@ -172,9 +172,10 @@ class TransactionController extends Controller
                 // 💡 Menggunakan eager load relasi productPrices agar tidak memicu query berulang-ulang
                 $product = Product::with('productPrices')->findOrFail($item['id']);
 
-                if ($product->stok < $item['qty']) {
-                    throw new \Exception($product->nama_barang . ' stok tidak cukup');
-                }
+                // menjaga stok tidak boleh minus
+                // if ($product->stok < $item['qty']) {
+                //     throw new \Exception($product->nama_barang . ' stok tidak cukup');
+                // }
 
                 // Kalkulasi harga setelah potongan grosir
                 $hargaFinal = (float) $product->harga;

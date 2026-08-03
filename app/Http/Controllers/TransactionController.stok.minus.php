@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\DocumentNumber;
 
 class TransactionController extends Controller
 {
@@ -29,14 +30,30 @@ class TransactionController extends Controller
     // load page
     public function index()
     {
-        $transactions =
-            Transaction::latest()
-            ->paginate(20);
+        // $transactions =
+        //     Transaction::latest()
+        //     ->paginate(20);
+
+        // return view(
+        //     'transactions.index',
+        //     compact('transactions')
+        // );
+
+        // 1. Inisialisasi query transaksi dengan eager load relasi user (kasir)
+        $query = Transaction::with(['user', 'customerRelation'])->latest();
+
+        // 🔑 2. Proteksi Multi-Role: Jika yang login adalah Kasir, batasi hanya transaksinya sendiri
+        if (strtolower(Auth::user()->role) === 'kasir') {
+            $query->where('user_id', Auth::id());
+        }
+
+        // 3. Eksekusi paginasinya
+        $transactions = $query->paginate(20);
 
         return view(
             'transactions.index',
             compact('transactions')
-        );
+        );  
     }
 
     // save transaksi
@@ -89,12 +106,27 @@ class TransactionController extends Controller
             ], 422);
         }
 
+        // 💡 1. CARI SHIFT AKTIF UNTUK USER YANG SEDANG LOGIN SEBELUM MULAI TRANSACTION
+        $activeShift = \App\Models\Shift::where('user_id', Auth::id())
+                                        ->where('status', 'open')
+                                        ->first();
+
+        // Opsional: Kalau mau ketat, tolak transaksi jika kasir belum buka shift
+        if (!$activeShift) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda belum membuka shift kasir! Silakan buka shift terlebih dahulu.'
+            ], 403);
+        }
+
+
         DB::beginTransaction();
 
         try {
 
             // $noNota ='INV-' . now()->format('YmdHis');
-            $noNota = Transaction::generateNoNota();
+            // $noNota = Transaction::generateNoNota();
+            $noNota = DocumentNumber::generate('transactions', 'no_nota', 'INV');
 
              $customer = null;
 
@@ -112,6 +144,8 @@ class TransactionController extends Controller
                 'no_nota'      => $noNota,
                 'user_id'      => Auth::id(),
 
+                'shift_id'     => $activeShift->id, // 🔥 shift_id aman tersimpan
+                
                 'pelanggan' => $request->pelanggan,
 
                 'telp' => $customer?->telepon,
@@ -131,88 +165,60 @@ class TransactionController extends Controller
 
             foreach ($cart as $item) {
 
-                if (
-                        !isset($item['qty'])
-                        ||
-                        $item['qty'] < 1
-                    )
-                    {
-                        throw new \Exception(
-                            'Qty tidak valid'
-                        );
-                    }
-
-                $product =
-                    Product::findOrFail(
-                        $item['id']
-                    );
-
-                if (
-                    $product->stok <
-                    $item['qty']
-                ) {
-                    throw new \Exception(
-                        $product->nama_barang .
-                        ' stok tidak cukup'
-                    );
+                if (!isset($item['qty']) || $item['qty'] < 1) {
+                    throw new \Exception('Qty tidak valid');
                 }
 
+                // 💡 Menggunakan eager load relasi productPrices agar tidak memicu query berulang-ulang
+                $product = Product::with('productPrices')->findOrFail($item['id']);
+
+                if ($product->stok < $item['qty']) {
+                    throw new \Exception($product->nama_barang . ' stok tidak cukup');
+                }
+
+                // Kalkulasi harga setelah potongan grosir
+                $hargaFinal = (float) $product->harga;
+                
+                // 💡 Disesuaikan dengan nama relasi di model Product: productPrices
+                if ($product->productPrices && $product->productPrices->count() > 0) {
+                    // Diurutkan dari min_qty terbesar (descending) untuk mencocokkan tier grosir teratas
+                    $grosirList = $product->productPrices->sortByDesc('min_qty');
+
+                    foreach ($grosirList as $grosir) {
+                        if ($item['qty'] >= $grosir->min_qty) {
+                            $hargaFinal = (float) $product->harga - (float) $grosir->potongan;
+                            break; 
+                        }
+                    }
+                }
+
+                $itemSubtotal = $hargaFinal * $item['qty'];
+
                 TransactionDetail::create([
-
-                    'transaction_id' =>
-                        $transaction->id,
-
-                    'product_id' =>
-                        $product->id,
-
-                    'kode_barang' =>
-                        $product->kode_barang,
-
-                    'nama_barang' =>
-                        $product->nama_barang,
-
-                    'harga' =>
-                        $item['harga'],
-
-                    'qty' =>
-                        $item['qty'],
-
-                    'subtotal' =>
-                        $item['harga'] *
-                        $item['qty']
+                    'transaction_id' => $transaction->id,
+                    'product_id'     => $product->id,
+                    'kode_barang'    => $product->kode_barang,
+                    'nama_barang'    => $product->nama_barang,
+                    'harga'          => $hargaFinal,
+                    'harga_beli'     => $product->harga_beli,
+                    'qty'            => $item['qty'],
+                    'subtotal'       => $itemSubtotal
                 ]);
 
-                $stokSebelum =
-                    $product->stok;
-
-                $stokSesudah =
-                    $stokSebelum -
-                    $item['qty'];
+                $stokSebelum = $product->stok;
+                $stokSesudah = $stokSebelum - $item['qty'];
 
                 $product->update([
-                    'stok' =>
-                        $stokSesudah
+                    'stok' => $stokSesudah
                 ]);
 
                 StockMovement::create([
-
-                    'product_id' =>
-                        $product->id,
-
-                    'type' =>
-                        'SALE',
-
-                    'qty' =>
-                        -$item['qty'],
-
-                    'stock_before' =>
-                        $stokSebelum,
-
-                    'stock_after' =>
-                        $stokSesudah,
-
-                    'reference_no' =>
-                        $noNota
+                    'product_id'   => $product->id,
+                    'type'         => 'SALE',
+                    'qty'          => -$item['qty'],
+                    'stock_before' => $stokSebelum,
+                    'stock_after'  => $stokSesudah,
+                    'reference_no' => $noNota
                 ]);
             }
 
