@@ -48,30 +48,32 @@
                 <div>
                     <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Penjualan</span>
                     <div class="space-y-1">
-                        <a href="/pos/mobile" class="flex items-center gap-3 px-3 py-2 {{ Request::is('pos/mobile') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-bold rounded-xl"><i class="ri-computer-line text-base"></i> POS Utama</a>
-                        <a href="/pos/close-shift" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*close-shift*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-lock-password-line text-base"></i> Tutup Shift</a>
-                        <a href="/riwayat-transaksi" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*riwayat*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-history-line text-base"></i> Riwayat Transaksi</a>
+                        <a href="{{ route('pos.mobile') }}" class="flex items-center gap-3 px-3 py-2 {{ Request::is('pos/mobile') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-bold rounded-xl"><i class="ri-computer-line text-base"></i> POS Utama</a>
+                        
+                        <a href="{{ route('pos.close-shift') }}" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*close-shift*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-lock-password-line text-base"></i> Tutup Shift</a>
+
+                        <a href="/transactions" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*transactions*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-history-line text-base"></i> Riwayat Transaksi</a>
                     </div>
                 </div>
 
                 <div>
                     <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Master Data</span>
                     <div class="space-y-1">
-                        <a href="/pelanggan" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*pelanggan*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-user-shared-line text-base"></i> Pelanggan</a>
+                        <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*customers*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-user-shared-line text-base"></i> Pelanggan</a>
                     </div>
                 </div>
 
                 <div>
                     <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Inventory</span>
                     <div class="space-y-1">
-                        <a href="/kartu-stok" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*stok*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-file-list-3-line text-base"></i> Kartu Stok</a>
+                        <a href="{{ route('stock-cards.index') }}" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*stock-cards*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-file-list-3-line text-base"></i> Kartu Stok</a>
                     </div>
                 </div>
 
                 <div>
                     <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">    </span>
                     <div class="space-y-1">
-                        <a href="/laporan-kasir" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*laporan*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-pie-chart-line text-base"></i> Penjualan Kasir</a>
+                        <a href="{{ route('laporan.penjualan-kasir') }}" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*penjualan-kasir*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-pie-chart-line text-base"></i> Penjualan Kasir</a>
                     </div>
                 </div>
             </div>
