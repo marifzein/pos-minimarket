@@ -88,22 +88,23 @@
             </div> --}}
 
             <!-- FOOTER PROFIL & TOMBOL LOGOUT -->
-            <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="pt-4 mt-auto border-t border-slate-800 flex items-center justify-between flex-shrink-0">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">
                         {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-bold text-white leading-none truncate">{{ Auth::user()->name ?? 'Admin Kasir' }}</p>
-                        <span class="text-[10px] text-slate-500">Online</span>
+                        <span class="text-[10px] text-slate-500">Apik</span>
                     </div>
                 </div>
 
-                <!-- Form & Tombol Logout Minimalis -->
-                <form id="mobile-logout-form" action="{{ route('logout') }}" method="POST" class="inline">
+                <!-- Form & Tombol Logout -->
+                <form id="mobile-logout-form" action="{{ route('logout') }}" method="POST" class="inline flex-shrink-0">
                     @csrf
-                    <button type="button" @click="confirmLogout()" class="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/30 text-rose-400 flex items-center justify-center transition active:scale-95" title="Logout Sesi">
-                        <i class="ri-logout-box-r-line text-base"></i>LOG OUT
+                    <button type="button" @click="confirmLogout()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/30 text-rose-400 flex items-center gap-1.5 transition active:scale-95 text-xs font-bold" title="Logout Sesi">
+                        <i class="ri-logout-box-r-line text-sm"></i>
+                        <span>LOGOUT</span>
                     </button>
                 </form>
             </div>
