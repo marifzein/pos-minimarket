@@ -69,14 +69,15 @@
                 </div>
 
                 <div>
-                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Laporan</span>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">    </span>
                     <div class="space-y-1">
                         <a href="/laporan-kasir" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*laporan*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-pie-chart-line text-base"></i> Penjualan Kasir</a>
                     </div>
                 </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-800 flex items-center gap-2.5">
+            <!-- FOOTER PROFIL & TOMBOL LOGOUT -->
+            {{-- <div class="pt-4 border-t border-slate-800 flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white text-xs">
                     {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                 </div>
@@ -84,7 +85,31 @@
                     <p class="text-xs font-bold text-white leading-none truncate">{{ Auth::user()->name ?? 'Admin Kasir' }}</p>
                     <span class="text-[10px] text-slate-500">Online</span>
                 </div>
+            </div> --}}
+
+            <!-- FOOTER PROFIL & TOMBOL LOGOUT -->
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">
+                        {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-white leading-none truncate">{{ Auth::user()->name ?? 'Admin Kasir' }}</p>
+                        <span class="text-[10px] text-slate-500">Online</span>
+                    </div>
+                </div>
+
+                <!-- Form & Tombol Logout Minimalis -->
+                <form id="mobile-logout-form" action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="button" @click="confirmLogout()" class="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/30 text-rose-400 flex items-center justify-center transition active:scale-95" title="Logout Sesi">
+                        <i class="ri-logout-box-r-line text-base"></i>LOG OUT
+                    </button>
+                </form>
             </div>
+
+            
+
         </div>
     </div>
 
@@ -100,15 +125,15 @@
                     <i class="ri-menu-2-line text-xl"></i>
                 </button>
                 <div>
-                    <h1 class="text-sm font-black text-slate-800 leading-none">@yield('page_title', 'POS KASIR')</h1>
-                    <span class="text-[9px] text-slate-400 font-mono">@yield('page_subtitle')</span>
+                    <h1 class="text-sm font-black text-slate-800 leading-none">@yield('title', 'POS KASIR')</h1>
+                    <span class="text-[11px] text-slate-400 font-mono">@yield('page_subtitle')</span>
                 </div>
             </div>
             
             <!-- Fungsi Global Cek Harga Pintasan -->
-            <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
+            {{-- <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
                 <i class="ri-price-tag-3-line text-lg"></i>
-            </button>
+            </button> --}}
         </div>
 
         <!-- SLOT UTAMA ISI KONTEN HALAMAN -->
@@ -137,6 +162,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Script Konfirmasi Logout SweetAlert2 -->
+    <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Keluar Sesi Kasir?',
+                text: 'Pastikan shift kerja anda sudah ditutup jika sudah selesai shift',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Logout!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('mobile-logout-form').submit();
+                }
+            });
+        }
+    </script>
 
     @stack('scripts')
 </body>

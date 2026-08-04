@@ -203,15 +203,20 @@
                     <i class="ri-archive-line text-base"></i> Inventory
                 </div>
                 <!-- Submenu -->
+                @can('akses-spv-keatas')
                 <a href="/purchasing" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-store-2-line text-base opacity-60 group-hover:opacity-100"></i> Pembelian (PO)
                 </a>
                 <a href="{{ route('penerimaan.index') }}" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-download-2-line text-base opacity-60 group-hover:opacity-100"></i> Penerimaan Barang
                 </a>
+                @endcan
+
                 <a href="/stock-cards" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-file-history-line text-base opacity-60 group-hover:opacity-100"></i> Kartu Stok
                 </a>
+
+                @can('akses-spv-keatas')
                 <a href="{{ route('retur.index') }}" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-arrow-go-back-line text-base opacity-60 group-hover:opacity-100"></i> Retur Barang
                 </a>
@@ -221,6 +226,7 @@
                 <a href="/stock-adjustments" class="flex items-center gap-3 px-5 py-2 text-sm text-slate-400 hover:bg-[#123A61] hover:text-white group">
                     <i class="ri-equalizer-line text-base opacity-60 group-hover:opacity-100"></i> Penyesuaian Stok
                 </a>
+                @endcan
             </div>
         </div>
         

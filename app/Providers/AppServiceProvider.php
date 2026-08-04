@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\FooterSetting;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
     
+        // NGROK Cek apakah request datang dari proxy Ngrok (ada header X-Forwarded-Proto https)
+        if (str_contains(request()->header('X-Forwarded-Proto'), 'https')) {
+            // Paksa semua URL (asset(), route(), dll) pakai https://
+            URL::forceScheme('https');
+        }
+
         // 1. MENU DEVELOPER & BACKUP DB: Hanya murni Admin IT saja
         Gate::define('akses-developer', function ($user) {
             return $user->role === 'Admin';

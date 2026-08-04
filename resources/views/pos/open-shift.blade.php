@@ -1,10 +1,17 @@
-@extends('layouts.app')
+@extends(
+    preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', request()->header('User-Agent')) 
+    || preg_match('/(ipad|tablet|(android(?!.*mobile)))/i', request()->header('User-Agent')) 
+    ? 'layouts.mobile-app' 
+    : 'layouts.app'
+)
 
 @section('title', 'Buka Shift Kasir')
 
 @section('content')
-<div class="min-h-[70vh] flex items-center justify-center">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+{{-- <div class="min-h-[70vh] flex items-center justify-center"> --}}
+<div class="min-h-[70vh] md:min-h-0 flex items-center justify-center p-0 md:p-6">
+    {{-- <div class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-8"> --}}
+    <div class="w-full max-w-md bg-white rounded-2xl md:shadow-xl border border-slate-100 p-6 md:p-8">
         
         <!-- Header -->
         <div class="text-center mb-6">
