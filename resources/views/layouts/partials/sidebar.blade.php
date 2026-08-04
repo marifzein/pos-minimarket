@@ -61,6 +61,13 @@
 
                 <a href="/pos/close-shift" class="submenu {{ request()->is('pos/close-shift*') ? 'submenu-active' : '' }}"><i class="ri-shut-down-line"></i> Tutup Shift</a>
                 <a href="/transactions" class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}"><i class="ri-price-tag-3-line"></i> Riwayat Transaksi</a>
+
+                {{-- <a href="/transactions" class="submenu {{ request()->is('transactions*') ? 'submenu-active':'' }}"><i class="ri-price-tag-3-line"></i> Riwayat Transaksi</a> --}}
+
+                @can('akses-owner-admin')
+                <a href="/pembatalan" class="submenu {{ request()->is('pembatalan*') ? 'submenu-active':'' }}"><i class="ri-forbid-line"></i> Pembatalan Transaksi</a>
+                @endcan
+
             </div>
 
             <!-- POPUP MELAYANG (Hanya saat Sidebar Menciut & di-Hover) -->

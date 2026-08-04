@@ -23,6 +23,7 @@ class LaporanLabaRugiController extends Controller
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
+            ->whereRaw('transactions.status != ?', ['Batal'])// 👈 HANYA TRANSAKSI YANG TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->groupBy(DB::raw('DATE(transactions.created_at)'))
             ->orderBy('tanggal', 'asc')
@@ -32,11 +33,13 @@ class LaporanLabaRugiController extends Controller
         // Hitung total akumulasi di bagian bawah (Footer)
         $totals = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->leftJoin('pembatalan_penjualans', 'transactions.id', '=', 'pembatalan_penjualans.transaction_id')
             ->select(
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
+            ->whereRaw('transactions.status != ?', ['Batal'])// 👈 HANYA TRANSAKSI YANG TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->first();
 
@@ -51,12 +54,14 @@ class LaporanLabaRugiController extends Controller
 
         $reports = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->leftJoin('pembatalan_penjualans', 'transactions.id', '=', 'pembatalan_penjualans.transaction_id')
             ->select(
                 DB::raw('DATE(transactions.created_at) as tanggal'),
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
+            ->whereRaw('transactions.status != ?', ['Batal'])// 👈 HANYA TRANSAKSI YANG TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->groupBy(DB::raw('DATE(transactions.created_at)'))
             ->orderBy('tanggal', 'asc')
@@ -64,11 +69,13 @@ class LaporanLabaRugiController extends Controller
 
         $totals = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->leftJoin('pembatalan_penjualans', 'transactions.id', '=', 'pembatalan_penjualans.transaction_id')
             ->select(
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
+            ->whereRaw('transactions.status != ?', ['Batal'])// 👈 HANYA TRANSAKSI YANG TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->first();
 
@@ -90,12 +97,14 @@ class LaporanLabaRugiController extends Controller
 
         $reports = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->leftJoin('pembatalan_penjualans', 'transactions.id', '=', 'pembatalan_penjualans.transaction_id')
             ->select(
                 DB::raw('DATE(transactions.created_at) as tanggal'),
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
+            ->whereRaw('transactions.status != ?', ['Batal'])// 👈 HANYA TRANSAKSI YANG TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->groupBy(DB::raw('DATE(transactions.created_at)'))
             ->orderBy('tanggal', 'asc')
@@ -103,11 +112,13 @@ class LaporanLabaRugiController extends Controller
 
         $totals = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->leftJoin('pembatalan_penjualans', 'transactions.id', '=', 'pembatalan_penjualans.transaction_id')
             ->select(
                 DB::raw('SUM(transaction_details.subtotal) as total_pendapatan'),
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'), // 👈 FIX
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor') // 👈 FIX
             )
+            ->whereRaw('transactions.status != ?', ['Batal'])// 👈 HANYA TRANSAKSI YANG TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
             ->first();
 

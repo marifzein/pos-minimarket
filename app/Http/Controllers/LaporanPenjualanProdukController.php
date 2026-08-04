@@ -41,6 +41,7 @@ class LaporanPenjualanProdukController extends Controller
                 DB::raw('SUM(transaction_details.qty * transaction_details.harga_beli) as total_hpp'),
                 DB::raw('SUM(transaction_details.subtotal) - SUM(transaction_details.qty * transaction_details.harga_beli) as laba_kotor')
             )
+            ->whereRaw('transactions.status != ?', ['Batal']) // 👈 FILTER TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$startDate, $endDate]);
 
         // Logika Pemicu Filter Kondisional
@@ -69,6 +70,7 @@ class LaporanPenjualanProdukController extends Controller
         $totalsQuery = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
             ->join('products', 'transaction_details.product_id', '=', 'products.id')
+            ->whereRaw('transactions.status != ?', ['Batal']) // 👈 FILTER TIDAK BATAL
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$startDate, $endDate]);
 
         if (!empty($searchItem)) {

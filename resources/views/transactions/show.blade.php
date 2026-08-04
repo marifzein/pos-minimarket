@@ -33,11 +33,15 @@
             target="_blank"
             {{-- class="bg-green-600 text-white px-4 py-2 rounded" --}}
         >
-            {{-- 🖨 Cetak --}}
-            <x-button color="green">
-                <i class="ri-printer-line"></i>
-                Cetak
-            </x-button>
+            <!-- 💡 Sembunyikan Tombol Cetak jika transaksi Batal -->
+        @if(strtolower($transaction->status) !== 'batal')
+            <a href="{{ route('transactions.print',$transaction->id) }}" target="_blank">
+                <x-button color="green">
+                    <i class="ri-printer-line"></i>
+                    Cetak
+                </x-button>
+            </a>
+        @endif
            
         </a>
 
@@ -63,6 +67,13 @@
                     {{ $transaction->created_at }}
                 </div>
 
+                <div>
+                    <b>Kasir :</b>
+                    <span class="font-medium text-slate-800">
+                        {{ $transaction->user?->name ?? 'System' }}
+                    </span>
+                </div>
+
             </div>
 
             <div>
@@ -86,6 +97,33 @@
             </div>
 
         </div>
+
+
+        <!-- 💡 Alert Detail Pembatalan jika Transaksi Batal -->
+        @if(strtolower($transaction->status) === 'batal' && $transaction->pembatalan)
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg space-y-1 text-sm">
+                <div class="font-bold text-red-800 text-base mb-1">
+                    <i class="ri-error-warning-line mr-1"></i> Informasi Pembatalan:
+                </div>
+                <div>
+                    <b>Dibatalkan oleh :</b> 
+                    <span class="text-red-700 font-semibold">
+                        {{ $transaction->pembatalan->user?->name ?? 'System/Admin' }}
+                    </span> 
+                    pada 
+                    <span class="font-medium text-slate-700">
+                        {{ $transaction->pembatalan->created_at->format('Y-m-d H:i:s') }}
+                    </span>
+                </div>
+                <div>
+                    <b>Alasan :</b> 
+                    <span class="italic text-slate-700">
+                        "{{ $transaction->pembatalan->alasan }}"
+                    </span>
+                </div>
+            </div>
+        @endif
+        
 
         <table class="w-full border">
 

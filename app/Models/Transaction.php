@@ -16,33 +16,7 @@ class Transaction extends Model
         );
     }
 
-    // public static function generateNoNota()
-    // {
-    //     $today = now()->format('Ymd');
-
-    //     $last = self::where('no_nota', 'like', 'INV-' . $today . '-%')
-    //         ->orderByDesc('id')
-    //         ->first();  
-
-
-    //     if (!$last) {
-    //         $number = 1;
-    //     } else {
-
-    //         $lastNumber = (int) substr(
-    //             $last->no_nota,
-    //             -5
-    //         );
-
-    //         $number = $lastNumber + 1;
-    //     }
-
-    //     return sprintf(
-    //         'INV-%s-%05d',
-    //         $today,
-    //         $number
-    //     );
-    // }
+    
 
     public function user()
     {
@@ -54,4 +28,12 @@ class Transaction extends Model
         // Menghubungkan kolom 'pelanggan' di transactions ke 'kode_pelanggan' di customers
         return $this->belongsTo(Customer::class, 'pelanggan', 'kode_pelanggan');
     }
+
+    // Relasi ke Pembatalan Penjualan
+    public function pembatalan()
+    {
+        return $this->hasOne(PembatalanPenjualan::class, 'transaction_id');
+    }
+
+    
 }

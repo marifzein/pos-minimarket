@@ -28,6 +28,7 @@ use App\Http\Controllers\LaporanPenjualanPelangganController;
 use App\Http\Controllers\Laporan\StockValuationController;
 use App\Http\Controllers\DailyResetStockController;
 use App\Http\Controllers\PosMobileController;
+use App\Http\Controllers\PembatalanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -210,6 +211,15 @@ Route::middleware('auth')->group(function () {
     */
     Route::middleware(['can:akses-owner-admin'])->group(function () {
         
+            
+        // Menu Pembatalan
+    Route::get('/pembatalan', [PembatalanController::class, 'index'])->name('pembatalan.index');
+    Route::get('/pembatalan/{id}/confirm', [PembatalanController::class, 'create'])->name('pembatalan.create');
+    Route::post('/pembatalan/{id}/process', [PembatalanController::class, 'store'])->name('pembatalan.store');
+    
+    // Laporan Pembatalan
+    Route::get('/pembatalan/report', [PembatalanController::class, 'report'])->name('pembatalan.report');
+
         // Laporan Rugi Laba Kotor
         Route::get('/laporan/laba-rugi', [LaporanLabaRugiController::class, 'index'])->name('laporan.laba-rugi');
         Route::get('/laporan/laba-rugi/excel', [LaporanLabaRugiController::class, 'exportExcel'])->name('laporan.laba-rugi.excel');

@@ -32,6 +32,7 @@ class LaporanPenjualanPelangganController extends Controller
                 DB::raw('COUNT(transactions.id) as total_transaksi'),
                 DB::raw('SUM(transactions.grand_total) as total_belanja')
             )
+            ->where('transactions.status', '!=', 'Batal') // 👈 Filter mengabaikan transaksi batal
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$startDate, $endDate])
             ->groupBy('transactions.pelanggan', 'customers.nama');
 

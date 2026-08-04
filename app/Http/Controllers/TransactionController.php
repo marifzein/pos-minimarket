@@ -18,7 +18,7 @@ class TransactionController extends Controller
     public function show($id)
     {
         $transaction =
-            Transaction::with('details')
+            Transaction::with('details', 'user', 'pembatalan.user')
             ->findOrFail($id);
 
         return view(

@@ -53,14 +53,12 @@ class DeveloperController extends Controller
         DB::table('stock_opnames')->truncate();
 
         DB::table('transaction_details')->truncate();
-        DB::table('transactions')->truncate();
-
-        
-
-        
+        DB::table('transactions')->truncate();               
 
         DB::table('stock_opname_details')->truncate();
         DB::table('stock_opnames')->truncate();
+
+        DB::table('pembatalan_penjualans')->truncate();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
@@ -1210,10 +1208,10 @@ class DeveloperController extends Controller
         // 1. 💡 Hancurkan cache lama yang nahan data lama
         Cache::forget('global_footer_data');
 
-        // 2. 💡 Ambil data segar langsung dari tabel database setelah Anda edit di MySQL
+        // 2. 💡 Ambil data segar langsung dari tabel database setelah di edit di MySQL
         $freshFooterData = FooterSetting::first(); // atau sesuaikan dengan cara ambil data footer Anda
 
-        // 3. 💡 Set ulang cache baru dengan data segar tersebut (misal disimpan selama 1 hari / sesuaikan)
+        // 3. 💡 Set ulang cache baru dengan data segar  (misal disimpan selama 1 hari )
         if ($freshFooterData) {
             Cache::put('global_footer_data', $freshFooterData, now()->addDays(1));
         }

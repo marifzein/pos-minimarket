@@ -27,6 +27,7 @@ class LaporanPenjualanKasirController extends Controller
                 DB::raw('SUM((transactions.cash - transactions.kembalian) + transactions.card + transactions.voucher) as total_grand')
             )
             ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
+            ->where('transactions.status', '!=', 'Batal') // 👈 FILTER EXCLUDE BATAL
             ->groupBy(DB::raw('DATE(transactions.created_at)'), 'transactions.user_id', 'users.name')
             ->orderBy('tanggal', 'asc')
             ->orderBy('nama_kasir', 'asc');
@@ -39,7 +40,8 @@ class LaporanPenjualanKasirController extends Controller
                 DB::raw('SUM(transactions.voucher) as total_voucher'),
                 DB::raw('SUM((transactions.cash - transactions.kembalian) + transactions.card + transactions.voucher) as total_grand')
             )
-            ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal]);
+            ->whereBetween(DB::raw('DATE(transactions.created_at)'), [$dari_tanggal, $sampai_tanggal])
+            ->where('transactions.status', '!=', 'Batal'); // 👈 FILTER EXCLUDE BATAL;
 
         // 🔑 PROTEKSI MULTI-ROLE:
         // Jika yang login memiliki role 'kasir', batasi hanya melihat datanya sendiri.
