@@ -28,10 +28,10 @@ class AppServiceProvider extends ServiceProvider
     {
     
         // NGROK Cek apakah request datang dari proxy Ngrok (ada header X-Forwarded-Proto https)
-        if (str_contains(request()->header('X-Forwarded-Proto'), 'https')) {
-            // Paksa semua URL (asset(), route(), dll) pakai https://
-            URL::forceScheme('https');
-        }
+        // if (str_contains(request()->header('X-Forwarded-Proto'), 'https')) {
+        //     // Paksa semua URL (asset(), route(), dll) pakai https://
+        //     URL::forceScheme('https');
+        // }
 
         // 1. MENU DEVELOPER & BACKUP DB: Hanya murni Admin IT saja
         Gate::define('akses-developer', function ($user) {
