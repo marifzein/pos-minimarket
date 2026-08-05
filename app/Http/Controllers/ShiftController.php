@@ -82,7 +82,7 @@ class ShiftController extends Controller
         ]);
 
         if ($isMobile) {
-            return redirect('/pos.mobile')->with('success', 'Shift berhasil dibuka. Selamat bertugas!');
+            return redirect('/pos/mobile')->with('success', 'Shift berhasil dibuka. Selamat bertugas!');
         }
         else{
             return redirect('/pos')->with('success', 'Shift berhasil dibuka. Selamat bertugas!');
