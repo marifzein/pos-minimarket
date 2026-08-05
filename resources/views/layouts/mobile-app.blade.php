@@ -23,7 +23,8 @@
     @stack('styles')
 </head>
 <!-- Inisialisasi root state global minimal untuk kontrol layout mobile -->
-<body x-data="{ showMenu: false, showPriceModal: false, priceSearch: '', priceResults: [] }">
+{{-- <body x-data="{ showMenu: false, showPriceModal: false, priceSearch: '', priceResults: [] }"> --}}
+<body x-data="{ showMenu: false }">
 
     <!-- ========================================================== -->
     <!-- GLOBAL SIDEBAR HAMBURGER / DRAWER MOBILE -->
@@ -134,9 +135,9 @@
             </div>
             
             <!-- Fungsi Global Cek Harga Pintasan -->
-            <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
+            {{-- <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
                 <i class="ri-price-tag-3-line text-lg"></i>
-            </button>
+            </button> --}}
         </div>
 
         <!-- SLOT UTAMA ISI KONTEN HALAMAN -->
@@ -145,7 +146,7 @@
     </div>
 
     <!-- GLOBAL MODAL CEK HARGA (Bisa Muncul dari Halaman Mana Saja) -->
-    <div x-show="showPriceModal" x-cloak class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
+    {{-- <div x-show="showPriceModal" x-cloak class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm shadow-2xl" @click.outside="showPriceModal = false">
             <div class="flex justify-between items-center mb-3">
                 <h3 class="font-black text-slate-800 text-sm flex items-center gap-1"><i class="ri-price-tag-2-line text-indigo-600"></i> Cek Harga Barang</h3>
@@ -164,7 +165,7 @@
                 </template>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Script Konfirmasi Logout SweetAlert2 -->
     <script>
