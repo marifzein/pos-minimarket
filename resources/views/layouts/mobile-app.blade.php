@@ -97,7 +97,7 @@
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-bold text-white leading-none truncate">{{ Auth::user()->name ?? 'Admin Kasir' }}</p>
-                        <span class="text-[10px] text-slate-500">Apik</span>
+                        <span class="text-[10px] text-slate-500">Mobile Online</span>
                     </div>
                 </div>
 
