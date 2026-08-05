@@ -11,14 +11,29 @@ use Carbon\Carbon;
 class ShiftController extends Controller
 {
     // 1. TAMPILKAN FORM ISI MODAL AWAL
-    public function showOpenForm()
+    public function showOpenForm(Request $request)
     {
+        $userAgent = $request->header('User-Agent');
         $activeShift = Shift::where('user_id', Auth::id())
                             ->where('status', 'open')
                             ->exists();
 
+        // dicek dulu apakah mobile atau desktop
+        $isMobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', $userAgent) 
+                || preg_match('/(ipad|tablet|(android(?!.*mobile)))/i', $userAgent);
+
+           
+        
         if ($activeShift) {
-            return redirect('/pos');
+            
+             // Jika lewat HP/Tablet, lempar langsung ke POS Mobile
+            if ($isMobile) {
+                return redirect()->route('pos.mobile');
+            }
+            else{
+                return redirect('/pos');
+            }
+            
         }
 
         return view('pos.open-shift');
@@ -27,6 +42,11 @@ class ShiftController extends Controller
     // 2. SIMPAN MODAL AWAL KE DATABASE
     public function storeOpenShift(Request $request)
     {
+        $userAgent = $request->header('User-Agent');
+        // dicek dulu apakah mobile atau desktop
+        $isMobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', $userAgent) 
+                || preg_match('/(ipad|tablet|(android(?!.*mobile)))/i', $userAgent);
+
         $request->validate([
             'starting_cash' => 'required|numeric|min:0',
         ], [
@@ -40,7 +60,15 @@ class ShiftController extends Controller
                             ->exists();
 
         if ($activeShift) {
-            return redirect('/pos');
+
+            // Jika lewat HP/Tablet, lempar langsung ke POS Mobile
+            if ($isMobile) {
+                return redirect()->route('pos.mobile');
+            }
+            else{
+                return redirect('/pos');
+            }
+            
         }
 
         Shift::create([
@@ -53,7 +81,14 @@ class ShiftController extends Controller
             'opened_at' => now(),
         ]);
 
-        return redirect('/pos')->with('success', 'Shift berhasil dibuka. Selamat bertugas!');
+        if ($isMobile) {
+            return redirect('/pos.mobile')->with('success', 'Shift berhasil dibuka. Selamat bertugas!');
+        }
+        else{
+            return redirect('/pos')->with('success', 'Shift berhasil dibuka. Selamat bertugas!');
+
+        }
+        
     }
 
     // 3. 💡 TAMPILKAN HALAMAN TUTUP SHIFT (KALKULASI SEBELUM CLOSING)
