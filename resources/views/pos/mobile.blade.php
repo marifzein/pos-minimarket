@@ -467,21 +467,51 @@ function posKasir() {
         validateQty(item) { item.qty = parseInt(item.qty); if(isNaN(item.qty) || item.qty < 1){ item.qty = 1; } },
         calculateItem(item) { item.qty = Number(item.qty); if (item._originalProduct) { item.harga = this.getDynamicPrice(item._originalProduct, item.qty); } this.recalculate(); },
         
+        // Helper fokus yang kompatibel untuk Desktop & HP
+        focusBarcode() {
+            const el = this.$refs.barcodeInput || document.getElementById('barcodeInput');
+            if (el) {
+                el.focus();
+                // Pada mobile, kadang perlu triggger click agar keyboard muncul
+                if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                    el.click();
+                }
+            }
+        },
+
         // Poin 2: Otomatis fokus ke input barcode setelah item masuk keranjang
         addToCart(product) {
+            if (!product) return;
+
             let found = this.cart.find(item => item.id === product.id);
             if(found) { 
                 found.qty++; 
                 found.harga = this.getDynamicPrice(found._originalProduct, found.qty); 
             } else { 
                 let initialPrice = this.getDynamicPrice(product, 1); 
-                this.cart.push({ id: product.id, kode_barang: product.kode_barang, nama_barang: product.nama_barang, harga: initialPrice, qty: 1, _originalProduct: product }); 
+                this.cart.push({ 
+                    id: product.id, 
+                    kode_barang: product.kode_barang, 
+                    nama_barang: product.nama_barang, 
+                    harga: initialPrice, 
+                    qty: 1, 
+                    _originalProduct: product 
+                }); 
             }
+
+            // Clear pencarian
             this.search = ''; 
             this.products = []; 
             this.selectedIndex = 0; 
             this.recalculate(); 
-            this.$nextTick(() => { this.$refs.barcodeInput?.focus(); });
+
+            // Eksekusi fokus SINKRON agar dikenali browser HP sebagai User Gesture
+            this.focusBarcode();
+
+            // Fallback $nextTick tanpa setTimeout lama
+            this.$nextTick(() => {
+                this.focusBarcode();
+            });
         },
         
         searchProduct() {
