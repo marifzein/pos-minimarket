@@ -27,6 +27,9 @@
                     placeholder="Scan barcode / ketik nama barang..."
                     class="w-full bg-slate-50 border-0 focus:ring-2 focus:ring-indigo-500 rounded-xl pl-9 pr-4 py-2.5 text-xs font-semibold outline-none transition placeholder:text-slate-400"
                 >
+
+                 
+
                 
                 <!-- Dropdown Hasil Pencarian Produk -->
                 <div x-show="products.length" class="absolute left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-xl mt-1.5 z-40 max-h-52 overflow-y-auto divide-y divide-slate-100" x-cloak>
@@ -288,6 +291,11 @@
     </div>
 
 </div>
+
+
+
+
+
 @endsection
 
 @push('scripts')

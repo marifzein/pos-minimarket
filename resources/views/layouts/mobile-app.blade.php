@@ -134,9 +134,9 @@
             </div>
             
             <!-- Fungsi Global Cek Harga Pintasan -->
-            {{-- <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
+            <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
                 <i class="ri-price-tag-3-line text-lg"></i>
-            </button> --}}
+            </button>
         </div>
 
         <!-- SLOT UTAMA ISI KONTEN HALAMAN -->
