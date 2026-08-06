@@ -22,8 +22,7 @@
     </style>
     @stack('styles')
 </head>
-<!-- Inisialisasi root state global minimal untuk kontrol layout mobile -->
-{{-- <body x-data="{ showMenu: false, showPriceModal: false, priceSearch: '', priceResults: [] }"> --}}
+
 <body x-data="{ showMenu: false }">
 
     <!-- ========================================================== -->
@@ -72,23 +71,14 @@
                 </div>
 
                 <div>
-                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">    </span>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Laporan</span>
                     <div class="space-y-1">
                         <a href="{{ route('laporan.penjualan-kasir') }}" class="flex items-center gap-3 px-3 py-2 {{ Request::is('*penjualan-kasir*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 text-slate-400' }} text-xs font-semibold rounded-xl"><i class="ri-pie-chart-line text-base"></i> Penjualan Kasir</a>
                     </div>
                 </div>
             </div>
 
-            <!-- FOOTER PROFIL & TOMBOL LOGOUT -->
-            {{-- <div class="pt-4 border-t border-slate-800 flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-white text-xs">
-                    {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
-                </div>
-                <div class="min-w-0">
-                    <p class="text-xs font-bold text-white leading-none truncate">{{ Auth::user()->name ?? 'Admin Kasir' }}</p>
-                    <span class="text-[10px] text-slate-500">Online</span>
-                </div>
-            </div> --}}
+            
 
             <!-- FOOTER PROFIL & TOMBOL LOGOUT -->
             <div class="pt-4 mt-auto border-t border-slate-800 flex items-center justify-between flex-shrink-0">
@@ -134,10 +124,7 @@
                 </div>
             </div>
             
-            <!-- Fungsi Global Cek Harga Pintasan -->
-            {{-- <button @click="showPriceModal = true; $nextTick(() => $refs.globalPriceInput?.focus())" class="w-9 h-9 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition flex items-center justify-center active:scale-95">
-                <i class="ri-price-tag-3-line text-lg"></i>
-            </button> --}}
+            
         </div>
 
         <!-- SLOT UTAMA ISI KONTEN HALAMAN -->
@@ -145,27 +132,7 @@
 
     </div>
 
-    <!-- GLOBAL MODAL CEK HARGA (Bisa Muncul dari Halaman Mana Saja) -->
-    {{-- <div x-show="showPriceModal" x-cloak class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-        <div class="bg-white rounded-2xl p-4 w-full max-w-sm shadow-2xl" @click.outside="showPriceModal = false">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-black text-slate-800 text-sm flex items-center gap-1"><i class="ri-price-tag-2-line text-indigo-600"></i> Cek Harga Barang</h3>
-                <button type="button" @click="showPriceModal = false" class="w-7 h-7 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center">✕</button>
-            </div>
-            <input x-ref="globalPriceInput" x-model="priceSearch" @input="let q = priceSearch.trim(); if(q.length < 1) { priceResults = []; return; } fetch(`/api/products/search?q=${encodeURIComponent(q)}`).then(r => r.json()).then(data => { priceResults = data; })" placeholder="Masukkan nama barang..." class="w-full bg-slate-50 border-0 focus:ring-2 focus:ring-indigo-500 rounded-xl p-2 text-xs outline-none shadow-3xs">
-            <div class="mt-2.5 max-h-48 overflow-y-auto divide-y divide-slate-100 rounded-xl border border-slate-100">
-                <template x-for="item in priceResults" :key="item.id">
-                    <div class="p-2.5 bg-slate-50/50 flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-slate-800 text-xs" x-text="item.nama_barang"></div>
-                            <div class="text-[9px] text-slate-400" x-text="'Stok: ' + item.stok"></div>
-                        </div>
-                        <div class="text-xs font-black text-green-600" x-text="'Rp ' + Number(item.harga).toLocaleString('id-ID')"></div>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div> --}}
+    
 
     <!-- Script Konfirmasi Logout SweetAlert2 -->
     <script>
