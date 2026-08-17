@@ -19,7 +19,7 @@ class DailyResetStockController extends Controller
     public function index()
     {
         $products = Product::where('is_active', 1)
-                            ->where('stok', '>', 0)
+                            ->where('stok', '!=', 0)
                             ->get();
 
         return view('stock-opname.daily-reset', compact('products'));
@@ -68,8 +68,10 @@ class DailyResetStockController extends Controller
                 $stokFisikBaru = 0; // Target reset harian resto
                 $selisih = $stokFisikBaru - $stokSystem; // Pasti bernilai minus (misal: 0 - 79 = -79)
 
+                
                 // Jika stok di sistem ternyata sudah 0 atau minus, abaikan
-                if ($stokSystem <= 0) continue;
+                // if ($stokSystem <= 0) continue;
+                if ($stokSystem == 0) continue;
 
                 // a. Insert ke detail opname
                 StockOpnameDetail::create([

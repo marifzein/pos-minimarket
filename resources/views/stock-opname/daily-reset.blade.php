@@ -106,7 +106,8 @@
                             <tr>
                                 <td colspan="6" class="p-8 text-center text-slate-400">
                                     <i class="ri-inbox-line text-3xl block mb-2"></i>
-                                    Tidak ada produk aktif dengan stok di atas 0 malam ini.
+                                    {{-- Tidak ada produk aktif dengan stok di atas 0 malam ini. --}}
+                                    Semua stok produk sudah nol
                                 </td>
                             </tr>
                         @endforelse
