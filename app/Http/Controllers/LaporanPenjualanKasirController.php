@@ -73,6 +73,6 @@ class LaporanPenjualanKasirController extends Controller
         $reports = $query->paginate(20)->withQueryString();
         $totals = $totalsQuery->first();
 
-        return view('laporan.penjualan-kasir', compact('reports', 'totals', 'dari_tanggal', 'sampai_tanggal'));
+        return view('laporan.penjualan-kasir', compact('reports', 'totals', 'dari_tanggal', 'sampai_tanggal', 'kasir'));
     }
 }
