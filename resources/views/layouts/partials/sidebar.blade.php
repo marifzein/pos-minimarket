@@ -308,7 +308,7 @@
         {{-- ===================== --}}
         {{-- AKUNTING --}}
         {{-- ===================== --}}
-        @can('akses-owner-admin')
+        {{-- @can('akses-owner-admin')
         <div class="relative group" x-data="{ hovered: false }" @mouseenter="hovered = true" @mouseleave="hovered = false">
             <button type="button" 
                 @click="if (sidebarOpen) { toggleMenu('akunting') }"
@@ -343,7 +343,7 @@
                 </a>
             </div>
         </div>
-        @endcan
+        @endcan --}}
 
         {{-- ===================== --}}
         {{-- SISTEM --}}

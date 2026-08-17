@@ -167,11 +167,21 @@ class TransactionController extends Controller
 
                 if (!isset($item['qty']) || $item['qty'] < 1) {
                     throw new \Exception('Qty tidak valid');
-                }
+                }   
 
                 // 💡 Menggunakan eager load relasi productPrices agar tidak memicu query berulang-ulang
                 $product = Product::with('productPrices')->findOrFail($item['id']);
 
+                // 💡 CEGAT STOK NOL/MINUS JIKA KONFIGURASI MEMATIKAN STOK MINUS, cek .env
+                $allowMinus = env('ALLOW_MINUS_STOCK', true);
+
+                if (!$allowMinus) {
+                    // Cek jika stok saat ini kurang dari qty yang diminta
+                    if ($product->stok < $item['qty']) {
+                        throw new \Exception('Stok ' . $product->nama_barang . ' tidak mencukupi (sisa: ' . $product->stok . ')');
+                    }
+                }
+                
                 // menjaga stok tidak boleh minus
                 // if ($product->stok < $item['qty']) {
                 //     throw new \Exception($product->nama_barang . ' stok tidak cukup');
